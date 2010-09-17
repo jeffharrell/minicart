@@ -1,0 +1,65 @@
+eBay Open Source License Agreement
+
+"Affiliate" means any past, present, or future subsidiary, parent, sister
+company, or other corporation, firm, business, partnership, joint venture, or
+entity that controls, is controlled by, or is under common control of, eBay or
+any of its subsidiaries. The term "control" as used in this Agreement, means
+the possession, directly or indirectly, solely or jointly, of the power to
+direct or cause the direction of management, actions or policies of a legally
+recognizable entity, whether through the ownership of voting shares, by
+contract, or otherwise. The rights conferred by this Agreement on eBay shall
+automatically and immediately extend to any entity that is not an Affiliate of
+or a part of eBay as of the date eBay first makes the Code publicly available
+("Effective Date") and subsequently becomes an Affiliate or a part of eBay
+(e.g., a future Affiliate or acquired business), and shall extend to or
+continue to be retained by any entity that is an Affiliate or a part of eBay
+as of the Effective Date and subsequently loses its status as an Affiliate or
+part of eBay (e.g., a former Affiliate or divested business).
+
+"Code" means that eBay code which is JavaScript with the exposed object being
+"PAYPAL.apps.Minicart" as it exists on the date eBay first makes such code
+publicly available.
+
+"User" means a person or entity that makes a derivative work of the Code.
+
+Copyright (c), 2010, eBay, Inc. All Rights Reserved. The User is licensed to
+make derivative works of the Code and to distribute those derivative works, in
+source and binary forms, under all eBay copyrights in the Code; and
+
+eBay grants the User a worldwide, non-exclusive, non-transferable, royalty
+free license, under the eBay-owned patents that cover the User's derivative
+works of the Code, to make and use such derivative works, and to license such
+derivative works;
+
+ provided that the following conditions are met:
+
+1. the User grants eBay and its Affiliates, and every other User, a license
+coextensive with the above copyright license, under all copyrights in all
+derivative works of the Code made by the User; and
+
+2. the User grants eBay and its Affiliates, and every other User a worldwide,
+non-exclusive, non-transferable, royalty free, license, under all patents
+licensable by the User that cover the User's derivative works of the Code, to
+make and use such derivative works, and to license such derivative works;
+
+3. distribution of any derivative work of the Code must reproduce this
+agreement, verbatim and in its entirety, including the disclaimer below, in
+the documentation and/or in any other materials provided with the
+distribution.
+
+NEITHER THE NAME OF EBAY NOR THE NAME OF ANY USER MAY BE USED TO ENDORSE OR
+PROMOTE PRODUCTS DERIVED FROM THE CODE WITHOUT SPECIFIC PRIOR WRITTEN
+PERMISSION. THE CODE AND EVERY DERIVATIVE WORK THEREOF IS RESPECTIVELY
+PROVIDED BY EBAY AND EVERY USER "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT OF ANY INTELLECTUAL
+PROPERTY RIGHT ARE DISCLAIMED. IN NO EVENT SHALL EBAY OR ANY USER BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF ANY USE
+OF THE CODE OR SUCH DERIVATIVE WORKS, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE. EACH USER HEREBY ASSUMES SOLE RESPONSIBILITY TO SECURE ANY NEEDED
+LICENSE, OTHER THAN THE LICENSES GRANTED ABOVE, UNDER ANY INTELLECTUAL
+PROPERTY RIGHTS.
