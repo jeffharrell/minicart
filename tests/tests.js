@@ -125,13 +125,15 @@
         fakeEvent(product2, 'submit');
         
         // make sure content is correct
-        test('content', 4, function() {
-            var product = cart.products[1];
+        test('content', 5, function() {
+            var product1 = cart.products[0];
+            var product2 = cart.products[1];
             
-            ok(product.nameNode.innerHTML == 'Product 2<span><br>#12345<br>Color: Green<br>Discount: \u00A51.00</span>', 'Product description was updated correctly');
-            ok(product.quantityNode.value == '2', 'Product quantity was updated correctly');
-            ok(product.priceNode.innerHTML == '\u00A54.00', 'Product price was updated correctly');
-            ok(cart.UI.subtotalAmount.innerHTML == '\u00A55.00 JPY', 'Subtotal was updated correctly');
+            ok(product1.priceNode.innerHTML == '\u00A51.50', 'Product 1 price was updated correctly');
+            ok(product2.nameNode.innerHTML == 'Product 2<span><br>#12345<br>Color: Green<br>Discount: \u00A51.00</span>', 'Product 2 description was updated correctly');
+            ok(product2.quantityNode.value == '2', 'Product 2 quantity was updated correctly');
+            ok(product2.priceNode.innerHTML == '\u00A54.00', 'Product 2 price was updated correctly');
+            ok(cart.UI.subtotalAmount.innerHTML == '\u00A55.50 JPY', 'Subtotal was updated correctly');
             
             testUserRemoveProducts(cart);
         });

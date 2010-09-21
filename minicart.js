@@ -650,7 +650,7 @@ PAYPAL.apps = PAYPAL.apps || {};
                         price = product.amount;
                         discount = (product.discount_amount) ? product.discount_amount : 0;
                         
-                        amount += parseInt((price - discount) * product.quantity, 10);
+                        amount += parseFloat((price - discount) * product.quantity);
                     }
                 }
             }
