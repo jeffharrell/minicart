@@ -392,7 +392,7 @@ PAYPAL.apps = PAYPAL.apps || {};
                             target = target.parentNode;
                         }
                         
-                        self.hide(e);
+                        self.hide(null);
                     }
                 }
             });
