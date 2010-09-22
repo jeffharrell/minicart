@@ -1,3 +1,10 @@
+Version 2.0.1
+Updates include:
+ - Fix to correct link behavior when the Mini Cart is displayed
+ - Fix to subtotal calculation
+
+
+
 Version 2.0
 Updates include:
  - Content can now be localized and / or modified using the Mini Cart configuration
