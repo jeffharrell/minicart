@@ -325,7 +325,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			self.UI.summary.appendChild(self.UI.shipping);
 			
 			// Workaround: IE 6 and IE 7/8 in quirks mode do not support position:fixed in CSS
-			if (window.attachEvent) {
+			if (window.attachEvent && !window.opera) {
 				var version = navigator.userAgent.match(/MSIE\s([^;]*)/);
 				
 				if (version) {
@@ -406,19 +406,25 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}); 
 
 			// Update other windows when HTML5 localStorage is updated
-			$.event.add(window, 'storage', function (e) {
-				// Firefox
-				if (!e.key) {
-					// unimplemented
-				// Safari and Chrome	
-				} else if (e.key == config.name) {
-					self.products = [];
-					self.UI.itemList.innerHTML = '';
-					self.UI.subtotalAmount.innerHTML = '';
+			if (window.attachEvent && !window.opera) {
+    			$.event.add(document, 'storage', function (e) {
+    			    // IE (unimplemented)
+    			});		    
+		    } else {
+    			$.event.add(window, 'storage', function (e) {
+    				// Firefox (unimplemented)
+    				if (!e.key) {
+    				// Safari and Chrome	
+    				} else if (e.key == config.name) {
+    					self.products = [];
+    					self.UI.itemList.innerHTML = '';
+    					self.UI.subtotalAmount.innerHTML = '';
 					
-					_parseStorage();
-				}
-			});
+    					_parseStorage();
+    					self.updateSubtotal();
+    				}
+    			});
+            }
 		};
 
 
