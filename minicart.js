@@ -135,9 +135,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 			onCheckout: null,
 			
 			/**
-			 * Custom event fired when the cart is reset
+			 * Custom event fired before the cart is reset
 			 */
-			onReset: null
+			onReset: null,
+			
+			/**
+			 * Custom event fired after the cart is reset
+			 */
+			afterReset: null
 		}
 	};
 
@@ -873,6 +878,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Resets the cart to it's intial state
 		 */
 		self.reset = function () {			  
+			if (typeof config.events.onReset === 'function') {
+				config.events.onReset.call(self);
+			}
+			
 			self.products = [];
 						
 			if (self.isShowing) {
@@ -883,8 +892,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			$.storage.remove();
 			
-			if (typeof config.events.onReset === 'function') {
-				config.events.onReset.call(self);
+			if (typeof config.events.afterReset === 'function') {
+				config.events.afterReset.call(self);
 			}
 		};
 		
