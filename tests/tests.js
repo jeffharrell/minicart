@@ -117,23 +117,29 @@
     }
 
     function testUserAddProducts(cart) {
-        // add some products to the cart
+        // add product 1 to the cart
         var product1 = document.getElementById('product1');
         fakeEvent(product1, 'submit');
+
+        // add it again to make sure the quantity updates correctly
+        fakeEvent(product1, 'submit');
+        fakeEvent(product1, 'submit');
         
+        // add product 2 to the cart
         var product2 = document.getElementById('product2');
         fakeEvent(product2, 'submit');
         
         // make sure content is correct
-        test('content', 5, function() {
+        test('content', 6, function() {
             var product1 = cart.products[0];
             var product2 = cart.products[1];
-            
-            ok(product1.priceNode.innerHTML == '\u00A51.50', 'Product 1 price was updated correctly');
+            console.log(product1.quantityNode.value);
+            ok(product1.priceNode.innerHTML == '\u00A54.50', 'Product 1 price was updated correctly');
+            ok(product1.quantityNode.value == '3', 'Product 1 quantity was updated correctly');
             ok(product2.nameNode.innerHTML == 'Product 2<span><br>#12345<br>Color: Green<br>Discount: \u00A51.00</span>', 'Product 2 description was updated correctly');
             ok(product2.quantityNode.value == '2', 'Product 2 quantity was updated correctly');
             ok(product2.priceNode.innerHTML == '\u00A54.00', 'Product 2 price was updated correctly');
-            ok(cart.UI.subtotalAmount.innerHTML == '\u00A55.50 JPY', 'Subtotal was updated correctly');
+            ok(cart.UI.subtotalAmount.innerHTML == '\u00A58.50 JPY', 'Subtotal was updated correctly');
             
             testUserRemoveProducts(cart);
         });

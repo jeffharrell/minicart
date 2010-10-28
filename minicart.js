@@ -575,7 +575,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 							product.setQuantity(value);
 
 							// Delete the product
-							if (parseInt(product.quantityNode.value, 10) === 0) {
+							if (!product.getQuantity()) {
 								_removeProduct(product, offset);
 							}
 
@@ -763,7 +763,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Check if the product has already been added; update if so
 			if (typeof offset != 'undefined' && self.products[offset]) {
-				self.products[offset].details.quantity += 1;
+				self.products[offset].details.quantity += parseInt(data.details.quantity || 1, 10);
+				
 				self.products[offset].setPrice(data.details.amount * self.products[offset].details.quantity);
 				self.products[offset].setQuantity(self.products[offset].details.quantity);
 				
@@ -1027,8 +1028,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 
 			// Quantity
+			this.details.quantity = parseInt(this.details.quantity, 10);
+			
 			this.quantityNode.name = 'quantity_' + position;
-			this.quantityNode.value = (parseInt(this.details.quantity, 10) > 0) ? parseInt(this.details.quantity, 10) : 1;
+			this.quantityNode.value = this.details.quantity ? this.details.quantity : 1;
 			this.quantityNode.className = 'quantity';
 
 			// Remove button
