@@ -21,6 +21,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 	 */
 	var config = {		
 		/**
+		 * The URL of the paypal website
+		 */
+		paypalURL: 'https://www.paypal.com/cgi-bin/webscr',
+			    
+		/**
 		 * Edge of the window to pin the cart to
 		 */
 		displayEdge: 'right',
@@ -289,7 +294,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			self.UI.cart = document.createElement('form');
 			self.UI.cart.method = 'post';
-			self.UI.cart.action = 'https://www.paypal.com/cgi-bin/webscr';
+			self.UI.cart.action = config.paypalURL;
 			self.UI.cart.appendChild(cmd);
 			self.UI.cart.appendChild(type);
 			self.UI.cart.appendChild(bn);
