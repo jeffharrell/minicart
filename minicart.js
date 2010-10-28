@@ -44,10 +44,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Strings used for display text
 		 */		
 		strings: {
-			button: 'Checkout',
-			subtotal: 'Subtotal: ',
-			discount: 'Discount: ',
-			shipping: 'does not include shipping & tax'
+			button: '',
+			subtotal: '',
+			discount: '',
+			shipping: ''
 		},
 		
 		/**
@@ -307,11 +307,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			self.UI.button = document.createElement('input');
 			self.UI.button.type = 'submit';
-			self.UI.button.value = config.strings.button;
+			self.UI.button.value = config.strings.button || 'Checkout';
 			self.UI.summary.appendChild(self.UI.button);
 			
 			self.UI.subtotal = document.createElement('span');
-			self.UI.subtotal.innerHTML = config.strings.subtotal;
+			self.UI.subtotal.innerHTML = config.strings.subtotal || 'Subtotal: ';
 	
 			self.UI.subtotalAmount = document.createElement('span');
 			self.UI.subtotalAmount.innerHTML = '0.00';
@@ -321,7 +321,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			self.UI.shipping = document.createElement('span');
 			self.UI.shipping.className = 'shipping';
-			self.UI.shipping.innerHTML = config.strings.shipping;
+			self.UI.shipping.innerHTML = config.strings.shipping || 'does not include shipping & tax';
 			self.UI.summary.appendChild(self.UI.shipping);
 			
 			// Workaround: IE 6 and IE 7/8 in quirks mode do not support position:fixed in CSS
@@ -1028,7 +1028,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			// Discount
 			if (this.details.discount_amount) { 
-				this.metaNode.innerHTML += '<br>' + config.strings.discount + currencies[this.settings.currency_code] + this.details.discount_amount;
+				this.metaNode.innerHTML += '<br>';
+				this.metaNode.innerHTML += config.strings.discount || 'Discount: ';
+				this.metaNode.innerHTML += currencies[this.settings.currency_code];
+				this.metaNode.innerHTML += this.details.discount_amount;
 			}
 
 			// Quantity
