@@ -133,14 +133,14 @@
         test('content', 6, function() {
             var product1 = cart.products[0];
             var product2 = cart.products[1];
-            console.log(product1.quantityNode.value);
+            
             ok(product1.priceNode.innerHTML == '\u00A54.50', 'Product 1 price was updated correctly');
             ok(product1.quantityNode.value == '3', 'Product 1 quantity was updated correctly');
-            ok(product2.nameNode.innerHTML == 'Product 2<span><br>#12345<br>Color: Green<br>Discount: \u00A51.00</span>', 'Product 2 description was updated correctly');
+            ok(product2.nameNode.innerHTML.toLowerCase() == 'product 2<span><br>#12345<br>color: green<br>discount: \u00a51.00</span>', 'Product 2 description was updated correctly');
             ok(product2.quantityNode.value == '2', 'Product 2 quantity was updated correctly');
             ok(product2.priceNode.innerHTML == '\u00A54.00', 'Product 2 price was updated correctly');
-            ok(cart.UI.subtotalAmount.innerHTML == '\u00A58.50 JPY', 'Subtotal was updated correctly');
-            
+            ok(cart.UI.subtotalAmount.innerHTML == '\u00A58.50 JPY', 'Subtotal was updated correctly');         
+                        
             testUserRemoveProducts(cart);
         });
         
