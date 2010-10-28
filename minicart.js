@@ -407,15 +407,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			// Update other windows when HTML5 localStorage is updated
 			if (window.attachEvent && !window.opera) {
-    			$.event.add(document, 'storage', function (e) {
-    			    // IE (unimplemented)
-    			});		    
+			    // IE (unimplemented)
+    			//$.event.add(document, 'storage', function (e) {
+    			//});		    
 		    } else {
     			$.event.add(window, 'storage', function (e) {
-    				// Firefox (unimplemented)
-    				if (!e.key) {
-    				// Safari and Chrome	
-    				} else if (e.key == config.name) {
+    				// Safari, Chrome, and Opera	
+    				// Firefox (unimplemented since e.key is not passed)
+    			    if (e.key && e.key == config.name) {
     					self.products = [];
     					self.UI.itemList.innerHTML = '';
     					self.UI.subtotalAmount.innerHTML = '';
