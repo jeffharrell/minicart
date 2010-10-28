@@ -178,7 +178,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var hash,
 				cmd,
 				key,
-				length,
 				i;
 				
 			// Overwrite default configuration with user settings
@@ -427,7 +426,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Loads the stored data and builds the cart
 		 */
 		var _parseStorage = function () {
-			var data;
+			var data, length;
 			
 			if ((data = $.storage.load())) {
 				length = data.length;
