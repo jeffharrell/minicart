@@ -191,7 +191,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 					config[key] = userConfig[key];
 				}
 			}
-			
+
+			// Render the cart UI
+			_render();
+		
+			// Process any stored data 
+			_parseStorage();
+						
 			// Check if a transaction was completed
 			hash = location.hash.substring(1);
 			
@@ -203,13 +209,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					location.hash = '';
 				}
 			}
-		
-			// Render the cart UI
-			_render();
-		
-			// Process any stored data 
-			_parseStorage();
-			
+					
 			// Update the UI
 			if (self.isShowing) {
                 setTimeout(function () {
@@ -883,15 +883,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 			
 			self.products = [];
-						
+
 			if (self.isShowing) {
 				self.UI.itemList.innerHTML = '';
 				self.UI.subtotalAmount.innerHTML = '';
 				self.hide(null, true);
 			}
-			
+	
 			$.storage.remove();
-			
+		
 			if (typeof config.events.afterReset === 'function') {
 				config.events.afterReset.call(self);
 			}

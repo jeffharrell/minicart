@@ -21,18 +21,11 @@
         
         test('afterRender', function() {
             ok(miniCartEl, 'Cart DOM element present');
-            
-            // let's fake some user activity now that the cart's ready
-            testUserAddProducts(self);
         });
     }
 
     function testOnHide(e) {
         var showing = this.isShowing;
-        
-        // placeholder
-        //test('onHide', function() {  
-        //});
     }
 
     function testAfterHide(e) {
@@ -45,10 +38,6 @@
 
     function testOnShow(e) {
         var showing = this.isShowing;
-
-        // placeholder
-        //test('onShow', function() {
-        //});
     }
 
     function testAfterShow(e) {
@@ -110,9 +99,22 @@
         var self = this;
         
         test('onReset', function() {
-            ok(self.products.length === 0, 'Begin with an empty array for products');
-            ok(self.UI.itemList.innerHTML === '', 'Begin with an empty cart UI');
-            ok(!self.showing, 'Begin with the cart hiding');
+            ok(self.products.length === 0, 'Cart products array is empty');
+            ok(self.UI.itemList.innerHTML === '', 'Cart product UI is empty');
+            ok(!self.showing, 'Cart is hiding');
+        });
+    }
+
+    function testAfterReset() {
+        var self = this;
+        
+        test('afterReset', function() {
+            ok(self.products.length === 0, 'Cart products array is empty');
+            ok(self.UI.itemList.innerHTML === '', 'Cart product UI is empty');
+            ok(!self.showing, 'Cart is hiding');
+            
+            // let's fake some user activity now that the cart's ready
+            testUserAddProducts(self);
         });
     }
 
@@ -160,8 +162,6 @@
             });
         }, 1000);
     }
-
-    
     
     // utility method to similate events
     function fakeEvent(el, type) {
@@ -182,6 +182,7 @@
         }
     }
     
+    
 
     // initialize the Mini Cart and get started
     PAYPAL.apps.MiniCart.render({
@@ -199,7 +200,8 @@
             onRemoveFromCart: testOnRemoveFromCart,
             afterRemoveFromCart: testAfterRemoveFromCart,
             onCheckout: testOnCheckout,
-            onReset: testOnReset
+            onReset: testOnReset,
+            afterReset: testAfterReset
         }
     });
         
