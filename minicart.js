@@ -247,17 +247,17 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _addCSS = function () {
 			var head, style, css, name = config.name;
 						
-			css	 = '#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/paypal_logo.gif) no-repeat 10px 15px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ';
+			css	 = '#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ';
 			css += '#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ';
 			css += '#' + name + ' li { position:relative; margin:-1px 0 0; padding:6px 5px 6px 0; border-top:1px solid #f2f2f2; } ';
 			css += '#' + name + ' li a { color:#333; text-decoration:none; } ';
 			css += '#' + name + ' li a span { color:#999; font-size:10px; } ';
 			css += '#' + name + ' li .quantity { position:absolute; top:.5em; right:78px; width:22px; padding:1px; border:1px solid #83a8cc; text-align:right; } ';
 			css += '#' + name + ' li .price { position:absolute; top:.5em; right:4px; } ';
-			css += '#' + name + ' li .remove { position:absolute; top:.6em; right:63px; cursor:pointer; } ';
-			css += '#' + name + ' p { margin:0; padding:0 0 0 20px; background:url(' + config.assetURL + 'images/arrow_down.gif) no-repeat left center; font-size:13px; font-weight:bold; } ';
+			css += '#' + name + ' li .remove { position:absolute; top:9px; right:60px; width:14px; height:14px; background:url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -134px -4px; border:0; cursor:pointer; } ';
+			css += '#' + name + ' p { margin:0; padding:0 0 0 20px; background:url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat; font-size:13px; font-weight:bold; } ';
 			css += '#' + name + ' p:hover { cursor:pointer; } ';
-			css += '#' + name + ' p input { float:right; margin:4px 0 0; padding:1px 4px; text-decoration:none; font-weight:normal; color:#333; background:#ffa822 url(' + config.assetURL + 'images/button_submit.gif) repeat-x left center; border:1px solid #d5bd98; border-right-color:#935e0d; border-bottom-color:#935e0d; -moz-border-radius:2px; -webkit-border-radius:2px; border-radius:2px; } ';
+			css += '#' + name + ' p input { float:right; margin:4px 0 0; padding:1px 4px; text-decoration:none; font-weight:normal; color:#333; background:#ffa822 url(' + config.assetURL + 'images/minicart_sprite.png) repeat-x left center; border:1px solid #d5bd98; border-right-color:#935e0d; border-bottom-color:#935e0d; -moz-border-radius:2px; -webkit-border-radius:2px; border-radius:2px; } ';
 			css += '#' + name + ' p .shipping { display:block; font-size:10px; font-weight:normal; color:#999; } ';
 
 			style = document.createElement('style');
@@ -818,7 +818,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 			});
 			
-			self.UI.summary.style.backgroundImage = 'url(' + config.assetURL + 'images/arrow_up.gif)';
+			self.UI.summary.style.backgroundPosition = '-195px 2px';
 			self.isShowing = true;
 		};
 		
@@ -855,7 +855,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}	
 			});
 			
-			self.UI.summary.style.backgroundImage = 'url(' + config.assetURL + 'images/arrow_down.gif)';
+			self.UI.summary.style.backgroundPosition = '-195px -32px';
 			self.isShowing = false;
 		};
 		
@@ -1002,7 +1002,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.metaNode = document.createElement('span');
 			this.priceNode = document.createElement('span');
 			this.quantityNode = document.createElement('input');
-			this.removeNode = document.createElement('img');
+			this.removeNode = document.createElement('input');
 			
 				
 			// Don't add blank products
@@ -1051,7 +1051,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.quantityNode.className = 'quantity';
 
 			// Remove button
-			this.removeNode.src = config.assetURL + 'images/x.gif';
+			this.removeNode.type = 'button';
 			this.removeNode.className = 'remove';
 			
 			// Price
