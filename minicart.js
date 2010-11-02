@@ -19,12 +19,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	/**
 	 * Default configuration
 	 */
-	var config = {		
-		/**
-		 * The URL of the paypal website
-		 */
-		paypalURL: 'https://www.paypal.com/cgi-bin/webscr',
-			    
+	var config = {		    
 		/**
 		 * Edge of the window to pin the cart to
 		 */
@@ -54,6 +49,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Unique ID used on the wrapper element 
 		 */		
 		name: 'PPMiniCart',
+
+		/**
+		 * The URL of the paypal website
+		 */
+		paypalURL: 'https://www.paypal.com/cgi-bin/webscr',		
 		
 		/**
 		 * The base URL to the visual assets

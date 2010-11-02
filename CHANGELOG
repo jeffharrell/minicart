@@ -1,3 +1,16 @@
+Version 2.0.2
+Updates include:
+ - Enhancement to redraw the contents of the cart in all browser windows whenever the products are modified in one (supported in Chrome, Safari, and Opera)
+ - Combined Mini Cart visual assets into a single image
+ - Moved onReset execution earlier in the process; created an afterReset method
+ - Fixed an issue where customizing a single value in the strings property caused the others to appear as undefined
+ - Added a paypalURL property which can be used to point the Mini Cart to PayPal's sandbox URL
+ - Fixed an issue where hardcoded quantities would not be added up correctly
+ - Fixed incorrect test case in Internet Explorer
+ 
+
+
+
 Version 2.0.1
 Updates include:
  - Fix to correct link behavior when the Mini Cart is displayed
