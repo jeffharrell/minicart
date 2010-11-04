@@ -58,7 +58,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * The base URL to the visual assets
 		 */		
-		assetURL: 'https://minicart.paypal-labs.com/',
+		assetURL: 'https://minicart.paypal-labs.com/build/',
 		
 		events: {
 			/**

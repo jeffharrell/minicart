@@ -1,3 +1,9 @@
+Version 2.0.3
+Updates include:
+ - Resolved an issue where the image assets wouldn't load correctly
+
+
+
 Version 2.0.2
 Updates include:
  - Enhancement to redraw the contents of the cart in all browser windows whenever the products are modified in one (supported in Chrome, Safari, and Opera)
