@@ -428,9 +428,9 @@ PAYPAL.apps = PAYPAL.apps || {};
     			//});		    
 		    } else {
     			$.event.add(window, 'storage', function (e) {
-    				// Safari, Chrome, and Opera	
-    				// Firefox (unimplemented since e.key is not passed)
-    			    if (e.key && e.key == config.name) {
+    				// Safari, Chrome, and Opera can filter on updated storage key	
+					// Firefox can't so it uses a brute force approach
+    			    if ((e.key && e.key == config.name) || !e.key) {
     					self.products = [];
     					self.UI.itemList.innerHTML = '';
     					self.UI.subtotalAmount.innerHTML = '';
