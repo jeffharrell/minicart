@@ -624,7 +624,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 			$.util.animate(product.liNode, 'opacity', { from: 1, to: 0 }, function () {
 				$.util.animate(product.liNode, 'height', { from: 18, to: 0 }, function () {
-					product.liNode.parentNode.removeChild(product.liNode);
+					try {
+						product.liNode.parentNode.removeChild(product.liNode);
+					} catch (e) {
+						// fail
+					}
 					
 					// regenerate the form element indexes
 					var products = self.UI.cart.getElementsByTagName('li'),
