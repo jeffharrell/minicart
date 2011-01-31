@@ -54,6 +54,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Unique ID used on the wrapper element 
 		 */		
 		name: 'PPMiniCart',
+		
+		/**
+		 * Boolean to determine if the cart should "peek" when it's hidden with items
+		 */
+		peekEnabled: true,
 
 		/**
 		 * The URL of the paypal website
@@ -842,7 +847,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				to;
 
 			// make the cart fully hidden
-			if (fully) {
+			if (fully || !config.peekEnabled) {
 				to = cartHeight * -1;
 			// otherwise only show a little teaser portion of it
 			} else {
