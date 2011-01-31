@@ -21,6 +21,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 	 */
 	var config = {		    
 		/**
+		 * The parent element the cart should "pin" to
+		 */
+		parent: document.body,
+		
+		/**
 		 * Edge of the window to pin the cart to
 		 */
 		displayEdge: 'right',
@@ -344,7 +349,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 			}
 			
-			document.body.appendChild(self.UI.wrapper);
+			var parent = (typeof config.parent === 'string') ? document.getElementById(config.parent) : config.parent;		
+			parent.appendChild(self.UI.wrapper);
 		};
 		
 		
@@ -936,9 +942,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			 * Hides the cart 
 			 *
 			 * @param e {event} Optional
+			 * @param fully {boolean) Optional. If true, the cart will completely hide
 			 */
-			hide: function (e) {
-				self.hide(e);
+			hide: function (e, fully) {
+				self.hide(e, fully);
 			},
 			
 			
