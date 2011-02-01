@@ -1,4 +1,4 @@
-/** 
+/*!
  * The PayPal Mini Cart 
  * Visit https://minicart.paypal-labs.com/ for details
  * Use subject to license agreement as set forth at the link below
