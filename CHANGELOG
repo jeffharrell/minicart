@@ -1,3 +1,12 @@
+Version 2.0.4
+Updates include:
+ - Enhancement to redraw the contents of the cart in all browser windows whenever the products are modified in one (IE 8 and Firefox)
+ - Adding configuration property for adding the Mini Cart as a child of an element other than document.body
+ - Adding configuration property to have the cart hide instead of "peek" when it contains products 
+ - Added 'charset' to the list of global form settings which get parsed 
+
+
+
 Version 2.0.3
 Updates include:
  - Resolved an issue where the image assets wouldn't load correctly
