@@ -19,7 +19,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	/**
 	 * Default configuration
 	 */
-	var config = {		    
+	var config = {			
 		/**
 		 * The parent element the cart should "pin" to
 		 */
@@ -222,12 +222,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 					
 			// Update the UI
 			if (self.isShowing) {
-                setTimeout(function () {
-                    self.hide(null);
-                }, 500);
-            } else {
-                $.storage.remove();
-            }
+				setTimeout(function () {
+					self.hide(null);
+				}, 500);
+			} else {
+				$.storage.remove();
+			}
 
 			self.updateSubtotal();
 		};
@@ -422,24 +422,30 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}); 
 
 			// Update other windows when HTML5 localStorage is updated
+			function redrawCartItems() {
+				console.log('redraw');
+				self.products = [];
+				self.UI.itemList.innerHTML = '';
+				self.UI.subtotalAmount.innerHTML = '';
+		
+				_parseStorage();
+				self.updateSubtotal();
+			}
+			
 			if (window.attachEvent && !window.opera) {
-			    // IE (unimplemented)
-    			//$.event.add(document, 'storage', function (e) {
-    			//});		    
-		    } else {
-    			$.event.add(window, 'storage', function (e) {
-    				// Safari, Chrome, and Opera can filter on updated storage key	
+				$.event.add(document, 'storage', function (e) {
+					// IE needs a delay in order to properly see the change
+					setTimeout(redrawCartItems, 100);
+				});			
+			} else {
+				$.event.add(window, 'storage', function (e) {
+					// Safari, Chrome, and Opera can filter on updated storage key	
 					// Firefox can't so it uses a brute force approach
-    			    if ((e.key && e.key == config.name) || !e.key) {
-    					self.products = [];
-    					self.UI.itemList.innerHTML = '';
-    					self.UI.subtotalAmount.innerHTML = '';
-					
-    					_parseStorage();
-    					self.updateSubtotal();
-    				}
-    			});
-            }
+					if ((e.key && e.key == config.name) || !e.key) {
+						redrawCartItems();
+					}
+				});
+			}
 		};
 
 
