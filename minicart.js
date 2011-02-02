@@ -978,7 +978,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			 * Resets the cart, emptying and hiding it
 			 */
 			 reset: function () {
-			   self.reset();
+			 	self.reset();
 			 }
 		};
 	}());
@@ -1156,28 +1156,69 @@ PAYPAL.apps = PAYPAL.apps || {};
 	 * Map of currency codes and their symbols 
 	 */ 
 	var currencies = {
-		USD: '$',
+		AED: '\u062c',
+		ANG: '',
 		ARS: '$',
 		AUD: '$',
-		CAD: '$',
+		AWG: '',
+		BBD: '',
+		BGN: '',
+		BMD: '',
+		BND: '',
 		BRL: 'R$',
+		BSD: '',
+		CAD: '$',
+		CHF: '',
+		CLP: '$',
+		CNY: '\u00A5',
+		COP: '$',
+		CRC: '\u20A1',
 		CZK: 'Kc',
 		DKK: 'kr',
+		DOP: '$',
+		EEK: '',
 		EUR: '\u20AC',
-		HKD: '$',
-		HUF: 'Ft',
-		MYR: 'RM',
-		NZD: '$',
-		NOK: 'kr',
-		PHP: 'Php',
 		GBP: '\u00A3',
+		GTQ: 'Q',
+		HKD: '$',
+		HRK: '',
+		HUF: 'Ft',
+		IDR: '',
+		ILS: '\u20AA',
+		INR: 'Rs.',
+		ISK: '',
+		JMD: '',
+		JPY: '\u00A5',
+		KRW: '\u20A9',
+		KYD: '',
+		LTL: '',
+		LVL: '',
+		MVR: '',
+		MXN: '$',
+		MYR: 'RM',
+		NOK: 'kr',	
+		NZD: '$',
+		PEN: 'S/',
+		PHP: 'Php',
 		PLN: 'z',
-		SGD: '$',
+		QAR: '',
+		RON: '',
+		RUB: '',
+		SAR: '',
 		SEK: 'kr',
-		CHF: '',
-		TWD: 'NT$',
+		SGD: '$',
 		THB: '\u0E3F',
-		JPY: '\u00A5'
+		TRY: '',
+		TTD: '',
+		TWD: 'NT$',
+		UAH: '',
+		USD: '$',
+		UYU: '$U',
+		VEF: '',
+		VND: '',
+		XCD: '',
+		XPF: '',
+		ZAR: 'R'		
 	};
 	
 	
