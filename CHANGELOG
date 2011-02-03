@@ -4,6 +4,8 @@ Updates include:
  - Adding configuration property for adding the Mini Cart as a child of an element other than document.body
  - Adding configuration property to have the cart hide instead of "peek" when it contains products 
  - Added 'charset' to the list of global form settings which get parsed 
+ - Adding support for 40 currency symbols
+ - Fix for unknown currency codes
 
 
 

@@ -735,19 +735,17 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			if (self.UI.cart.elements.currency_code) {
 				currency_code = self.UI.cart.elements.currency_code.value || self.UI.cart.elements.currency_code;
-				currency_symbol = currencies[currency_code];
 			} else {			
 				for (i = 0, len = self.UI.cart.elements.length; i < len; i++) {
 					if (self.UI.cart.elements[i].name == 'currency_code') {
 						currency_code = self.UI.cart.elements[i].value || self.UI.cart.elements[i];
-						currency_symbol = currencies[currency_code];
 						break;
 					}
 				}
 			}
 		   
-			// Update the UI
-			self.UI.subtotalAmount.innerHTML = currency_symbol + subtotal + ' ' + currency_code; 
+			// Update the UI		
+			self.UI.subtotalAmount.innerHTML = $.util.formatCurrency(subtotal, currency_code) + ' ' + currency_code; 
 		
 			// Yellow fade on update
 			(function () {
@@ -1061,8 +1059,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			if (this.details.discount_amount) { 
 				this.metaNode.innerHTML += '<br>';
 				this.metaNode.innerHTML += config.strings.discount || 'Discount: ';
-				this.metaNode.innerHTML += currencies[this.settings.currency_code];
-				this.metaNode.innerHTML += this.details.discount_amount;
+				this.metaNode.innerHTML += $.util.formatCurrency(this.details.discount_amount, this.settings.currency_code);
 			}
 
 			// Quantity
@@ -1083,7 +1080,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				price -= this.details.discount_amount;
 			}
 			
-			this.priceNode.innerHTML = currencies[this.settings.currency_code] + (price * parseFloat(this.details.quantity, 10)).toFixed(2);
+			this.priceNode.innerHTML = $.util.formatCurrency((price * parseFloat(this.details.quantity, 10)).toFixed(2), this.settings.currency_code);
 			this.priceNode.className = 'price';
 			
 			// Build out the DOM
@@ -1136,8 +1133,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		setPrice: function (value) {
 			value = parseFloat(value, 10);
-			
-			this.priceNode.innerHTML = currencies[this.settings.currency_code] + parseFloat(value, 10).toFixed(2);
+						
+			this.priceNode.innerHTML = $.util.formatCurrency(parseFloat(value, 10).toFixed(2), this.settings.currency_code);
 		},
 		
 		
@@ -1151,75 +1148,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 		}
 	};
 	
-
-	/**
-	 * Map of currency codes and their symbols 
-	 */ 
-	var currencies = {
-		AED: '\u062c',
-		ANG: '',
-		ARS: '$',
-		AUD: '$',
-		AWG: '',
-		BBD: '',
-		BGN: '',
-		BMD: '',
-		BND: '',
-		BRL: 'R$',
-		BSD: '',
-		CAD: '$',
-		CHF: '',
-		CLP: '$',
-		CNY: '\u00A5',
-		COP: '$',
-		CRC: '\u20A1',
-		CZK: 'Kc',
-		DKK: 'kr',
-		DOP: '$',
-		EEK: '',
-		EUR: '\u20AC',
-		GBP: '\u00A3',
-		GTQ: 'Q',
-		HKD: '$',
-		HRK: '',
-		HUF: 'Ft',
-		IDR: '',
-		ILS: '\u20AA',
-		INR: 'Rs.',
-		ISK: '',
-		JMD: '',
-		JPY: '\u00A5',
-		KRW: '\u20A9',
-		KYD: '',
-		LTL: '',
-		LVL: '',
-		MVR: '',
-		MXN: '$',
-		MYR: 'RM',
-		NOK: 'kr',	
-		NZD: '$',
-		PEN: 'S/',
-		PHP: 'Php',
-		PLN: 'z',
-		QAR: '',
-		RON: '',
-		RUB: '',
-		SAR: '',
-		SEK: 'kr',
-		SGD: '$',
-		THB: '\u0E3F',
-		TRY: '',
-		TTD: '',
-		TWD: 'NT$',
-		UAH: '',
-		USD: '$',
-		UYU: '$U',
-		VEF: '',
-		VND: '',
-		XCD: '',
-		XPF: '',
-		ZAR: 'R'		
-	};
 	
 	
 	/** UTILITY METHODS **/
@@ -1493,6 +1421,95 @@ PAYPAL.apps = PAYPAL.apps || {};
 					return input.value;
 				}
 			}
+		},
+		
+		
+		/**
+		 * Formats a float into a currency 
+		 *
+		 * @param amount {float} The currency amount
+		 * @param code {string} The three letter currency code
+		 */
+		formatCurrency: function (amount, code) {
+			var currencies = {
+				AED: { before: '\u062c' },
+				ANG: { before: '\u0192' },
+				ARS: { before: '$' },
+				AUD: { before: '$' },
+				AWG: { before: '\u0192' },
+				BBD: { before: '$' },
+				BGN: { before: '\u043b\u0432' },
+				BMD: { before: '$' },
+				BND: { before: '$' },
+				BRL: { before: 'R$' },
+				BSD: { before: '$' },
+				CAD: { before: '$' },
+				CHF: { before: '' },
+				CLP: { before: '$' },
+				CNY: { before: '\u00A5' },
+				COP: { before: '$' },
+				CRC: { before: '\u20A1' },
+				CZK: { before: 'Kc' },
+				DKK: { before: 'kr' },
+				DOP: { before: '$' },
+				EEK: { before: 'kr' },
+				EUR: { before: '\u20AC' },
+				GBP: { before: '\u00A3' },
+				GTQ: { before: 'Q' },
+				HKD: { before: '$' },
+				HRK: { before: 'kn' },
+				HUF: { before: 'Ft' },
+				IDR: { before: 'Rp' },
+				ILS: { before: '\u20AA' },
+				INR: { before: 'Rs.' },
+				ISK: { before: 'kr' },
+				JMD: { before: 'J$' },
+				JPY: { before: '\u00A5' },
+				KRW: { before: '\u20A9' },
+				KYD: { before: '$' },
+				LTL: { before: 'Lt' },
+				LVL: { before: 'Ls' },
+				MXN: { before: '$' },
+				MYR: { before: 'RM' },
+				NOK: { before: 'kr' },	
+				NZD: { before: '$' },
+				PEN: { before: 'S/' },
+				PHP: { before: 'Php' },
+				PLN: { before: 'z' },
+				QAR: { before: '\ufdfc' },
+				RON: { before: 'lei' },
+				RUB: { before: '\u0440\u0443\u0431' },
+				SAR: { before: '\ufdfc' },
+				SEK: { before: 'kr' },
+				SGD: { before: '$' },
+				THB: { before: '\u0E3F' },
+				TRY: { before: 'TL' },
+				TTD: { before: 'TT$' },
+				TWD: { before: 'NT$' },
+				UAH: { before: '\u20b4' },
+				USD: { before: '$' },
+				UYU: { before: '$U' },
+				VEF: { before: 'Bs' },
+				VND: { before: '\u20ab' },
+				XCD: { before: '$' },
+				ZAR: { before: 'R' }			
+			};
+	
+			var currency = currencies[code],
+				before = '', 
+				after = '';
+			
+			if (currency) {
+				if (currency.before) {
+					before = currency.before;
+				}
+	
+				if (currency.after) {
+					before = currency.after;
+				}
+			}
+	
+			return before + amount + after;
 		}
 	};
 	
