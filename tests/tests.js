@@ -141,7 +141,7 @@
             ok(product2.nameNode.innerHTML.toLowerCase() == 'product 2<span><br>#12345<br>color: green<br>discount: \u00a51.00</span>', 'Product 2 description was updated correctly');
             ok(product2.quantityNode.value == '2', 'Product 2 quantity was updated correctly');
             ok(product2.priceNode.innerHTML == '\u00A54.00', 'Product 2 price was updated correctly');
-            ok(cart.UI.subtotalAmount.innerHTML == '\u00A58.50 JPY', 'Subtotal was updated correctly');         
+            ok(cart.UI.subtotalAmount.innerHTML == '\u00A58.50', 'Subtotal was updated correctly');         
                         
             testUserRemoveProducts(cart);
         });
