@@ -745,7 +745,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 		   
 			// Update the UI		
-			self.UI.subtotalAmount.innerHTML = $.util.formatCurrency(subtotal, currency_code) + ' ' + currency_code; 
+			self.UI.subtotalAmount.innerHTML = $.util.formatCurrency(subtotal, currency_code); 
 		
 			// Yellow fade on update
 			(function () {
@@ -1431,6 +1431,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param code {string} The three letter currency code
 		 */
 		formatCurrency: function (amount, code) {
+			// TODO: The supportd currency patterns need to be refined and
+			// should support values for before, after, decimal, and separator.
 			var currencies = {
 				AED: { before: '\u062c' },
 				ANG: { before: '\u0192' },
