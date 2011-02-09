@@ -423,7 +423,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			// Update other windows when HTML5 localStorage is updated
 			function redrawCartItems() {
-				console.log('redraw');
 				self.products = [];
 				self.UI.itemList.innerHTML = '';
 				self.UI.subtotalAmount.innerHTML = '';
@@ -593,11 +592,17 @@ PAYPAL.apps = PAYPAL.apps || {};
 				});
 			
 				// Event for changing quantities
+				var currentValue = product.quantityNode.value;
+				
 				$.event.add(product.quantityNode, 'keyup', function () {
-					var value = parseInt(this.value, 10);
+					var that = this;
 					
-					if (!isNaN(value)) {
-						keyupTimer = setTimeout(function () {
+					keyupTimer = setTimeout(function () {
+						var value = parseInt(that.value, 10);
+						
+						if (!isNaN(value) && value != currentValue) {
+							currentValue = value;
+							
 							product.setQuantity(value);
 
 							// Delete the product
@@ -607,8 +612,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 							self.updateSubtotal();
 							$.storage.save(self.products);
-						}, 250);
-					}
+						}
+					}, 250);
 				});
 			
 				// Add the item and fade it in
@@ -1068,6 +1073,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.quantityNode.name = 'quantity_' + position;
 			this.quantityNode.value = this.details.quantity ? this.details.quantity : 1;
 			this.quantityNode.className = 'quantity';
+			this.quantityNode.setAttribute('autocomplete', 'off');
 
 			// Remove button
 			this.removeNode.type = 'button';
@@ -1111,7 +1117,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 		setQuantity: function (value) {
 			value = parseInt(value, 10);
 			
-			this.details.quantity = this.quantityNode.value = value;	
+			this.details.quantity = value;	
+			
+			if (this.quantityNode.value != value) {
+				this.quantityNode.value = value;
+			}
+			
 			this.setPrice(this.details.amount * value);
 		},
 		
