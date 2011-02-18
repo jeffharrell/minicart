@@ -1442,7 +1442,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param code {string} The three letter currency code
 		 */
 		formatCurrency: function (amount, code) {
-			// TODO: The supportd currency patterns need to be refined and
+			// TODO: The supported currency patterns need to be refined and
 			// should support values for before, after, decimal, and separator.
 			var currencies = {
 				AED: { before: '\u062c' },
