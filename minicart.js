@@ -112,28 +112,28 @@ PAYPAL.apps = PAYPAL.apps || {};
 			/**
 			 * Custom event fired before a product is added to the cart
 			 *
-			 * @param data {object} Product object. See _dataFilter for format
+			 * @param data {object} Product object
 			 */
 			onAddToCart: null,
 			
 			/**
 			 * Custom event fired after a product is added to the cart
 			 *
-			 * @param data {object} Product object. See _dataFilter for format
+			 * @param data {object} Product object
 			 */
 			afterAddToCart: null,
 			
 			/**
 			 * Custom event fired before a product is removed from the cart
 			 *
-			 * @param data {object} Product object. See _dataFilter for format
+			 * @param data {object} Product object
 			 */
 			onRemoveFromCart: null,
 			
 			/**
 			 * Custom event fired after a product is removed from the cart
 			 *
-			 * @param data {object} Product object. See _dataFilter for format
+			 * @param data {object} Product object
 			 */
 			afterRemoveFromCart: null,
 			
@@ -165,6 +165,16 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		var self = arguments.callee;
 		
+		/**
+		 * Regex filter for product values, which appear multiple times in a cart
+		 */
+		var productFilter = /^(?:item_number|item_name|amount|quantity|on|os|option_|tax|weight|handling|shipping|discount)/;
+		
+		/**
+		 * Regex filter for cart settings, which appear only once in a cart
+		 */
+		var settingFilter = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
+
 		/**
 		 * Array of ProductBuilders
 		 */
@@ -377,7 +387,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 					if (form.add) {
 						$.event.add(form, 'submit', function (e) {
 							e.preventDefault(e);
-							self.addToCart(e.target.elements);
+							
+							var data = _parseForm(e.target);
+							self.addToCart(data);
 						});
 					} else if (form.display) {
 						$.event.add(form, 'submit', function (e) {
@@ -456,7 +468,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			if ((data = $.storage.load())) {
 				length = data.length;
-			
+				
 				for (i = 0; i < length; i++) {
 					if (_renderProduct(data[i])) {
 						self.isShowing = true;
@@ -467,58 +479,72 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 		
 		/**
-		 * Default data filter used for WPS xclick style forms
+		 * Data parser used for forms
 		 * 
-		 * @param raw {object} An object of raw data to add to the cart 
+		 * @param form {HTMLElement} An HTML form  
 		 * @return {object} 
-		 */
-		var _dataFilter = function (raw) {
-			var data = {}, 
-				settings = {},
-				productFilter = /^(?:item_number|item_name|amount|quantity|on|os|option_|tax|weight|handling|shipping|discount)/,
-				settingFilter = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/,
-				length = raw.length,
+		 */		
+		var _parseForm = function (form) {
+			var raw = form.elements,
+				data = [],
 				pair,
 				value,
-				existing,
-				option_index, 
+				length,
 				i;
 			
-			for (i = 0; i < length; i++) {
+			for (i = 0, len = raw.length; i < len; i++) {
 				pair = raw[i];
 				
-				if (productFilter.test(pair.name)) {
-					value = $.util.getInputValue(pair);
-					
-					if (value) {
-						data[pair.name] = value;
-					}
-				} else if (settingFilter.test(pair.name)) {
-					value = $.util.getInputValue(pair);
-					
-					if (value) {
-						settings[pair.name] = value;
-					}
+				if ((value = $.util.getInputValue(pair))) {
+					data[pair.name] = value;
 				}
-			}			 
+			}
+			
+			return data;
+		}
+		
+				
+		/**
+		 * Massage's a object's data in preparation for adding it to the user's cart
+		 * 
+		 * @param data {object} An object of WPS xclick style data to add to the cart. The format is { product: '', settings: '' }.
+		 * @return {object} 
+		 */
+		var _parseData = function (data) {
+			var product = {}, 
+				settings = {},
+				existing,
+				option_index, 
+				key,
+				len,
+				i;
+			
+			// Parse the data into a two categories: product and settings
+			for (key in data) {
+				if (productFilter.test(key)) {
+					product[key] = data[key];
+				} else if (settingFilter.test(key)) {
+					settings[key] = data[key];
+				}
+			}
 			
 			// Check the products to see if this variation already exists; if it does update it's offset
-			for (i = 0, length = self.products.length; i < length; i++) {
-				existing = self.products[i].details;
+			for (i = 0, len = self.products.length; i < len; i++) {
+				existing = self.products[i].product;
 				
-				if ((!data.item_name || data.item_name === existing.item_name) &&
-					(!data.item_number || data.item_number === existing.item_number) && 
-					(!data.os0 || data.os0 === existing.os0) &&
-					(!data.os1 || data.os1 === existing.os1)) {
-						data.offset = existing.offset;
+				if ((!product.item_name || product.item_name === existing.item_name) &&
+					(!product.item_number || product.item_number === existing.item_number) && 
+					(!product.os0 || product.os0 === existing.os0) &&
+					(!product.os1 || product.os1 === existing.os1)) {
+						product.offset = existing.offset;
 						break;
 				}
 			}
 				  
 			// Normalize the values	 
-			data.href = data.href || window.location.href;
-			data.quantity = data.quantity || 1;
-			data.amount = data.amount || 0;
+			product.href = product.href || window.location.href;
+			product.quantity = product.quantity || 1;
+			product.amount = product.amount || 0;
 			
 			// Add Mini Cart specific settings
 			if (settings['return'] && settings['return'].indexOf('#') == -1) {
@@ -526,15 +552,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 			
 			// Add option amounts to the total amount
-			option_index = (data.option_index) ? data.option_index : 0;
+			option_index = (product.option_index) ? product.option_index : 0;
 
-			while (raw['os' + option_index]) {
+			while (product['os' + option_index]) {
 				i = 0;
 				
-				while (typeof data['option_select' + i] != 'undefined') {
-					if (data['option_select' + i] == data['os' + option_index]) {
+				while (typeof product['option_select' + i] != 'undefined') {
+					if (product['option_select' + i] == product['os' + option_index]) {
 						
-						data.amount = data.amount + parseFloat(data['option_amount' + i]);
+						product.amount = product.amount + parseFloat(product['option_amount' + i]);
 						break;
 					}
 					
@@ -545,7 +571,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 			
 			return {
-				details: data,
+				product: product,
 				settings: settings
 			};
 		};
@@ -559,7 +585,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _renderProduct = function (data) {
 			var keyupTimer,
 				product = new ProductBuilder(data, self.UI.itemList.children.length + 1),
-				offset = data.details.offset;
+				offset = data.product.offset;
 				
 			self.products[offset] = product;
 			
@@ -672,8 +698,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				});
 			});
 		
-			self.products[offset].details.item_name = '';
-			self.products[offset].details.item_number = '';
+			self.products[offset].product.item_name = '';
+			self.products[offset].product.item_number = '';
 		
 			self.updateSubtotal();
 			$.storage.save(self.products);
@@ -701,14 +727,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		self.calculateSubtotal = function () {
 			var i,
-				length,
+				len,
 				product,
 				price,
 				discount,
 				amount = 0;
 				
-			for (i = 0, length = self.products.length; i < length; i++) {
-				if ((product = self.products[i].details)) {
+			for (i = 0, len = self.products.length; i < len; i++) {
+				if ((product = self.products[i].product)) {
 					if (product.amount) {
 						price = product.amount;
 						discount = (product.discount_amount) ? product.discount_amount : 0;
@@ -778,7 +804,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Adds a product to the cart 
 		 *
-		 * @param data {object} Product object. See _dataFilter for format
+		 * @param data {object} Product object. See _parseData for format
 		 * @return {boolean} True if the product was added, false otherwise
 		 */
 		self.addToCart = function (data) {
@@ -791,20 +817,20 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 			}
 			
-			data = _dataFilter(data);
-			offset = data.details.offset;
+			data = _parseData(data);
+			offset = data.product.offset;
 			
 			// Check if the product has already been added; update if so
 			if (typeof offset != 'undefined' && self.products[offset]) {
-				self.products[offset].details.quantity += parseInt(data.details.quantity || 1, 10);
+				self.products[offset].product.quantity += parseInt(data.product.quantity || 1, 10);
 				
-				self.products[offset].setPrice(data.details.amount * self.products[offset].details.quantity);
-				self.products[offset].setQuantity(self.products[offset].details.quantity);
+				self.products[offset].setPrice(data.product.amount * self.products[offset].product.quantity);
+				self.products[offset].setQuantity(self.products[offset].product.quantity);
 				
 				success = true;
 			// Add a new DOM element for the product
 			} else {	
-				data.details.offset = self.products.length; 
+				data.product.offset = self.products.length; 
 				success = _renderProduct(data); 
 			}	
 				
@@ -939,7 +965,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			/**
 			 * Adds a product to the cart 
 			 *
-			 * @param data {object} Product object. See _dataFilter for format
+			 * @param data {object} Product object. See _parseData for format
 			 */
 			addToCart: function (data) {
 				self.addToCart(data);
@@ -995,7 +1021,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	 * @param position {number} The product number
 	 */
 	var ProductBuilder = function (data, position) {
-		this.details = null;
+		this.product = null;
 		this.settings = null;
 		this.liNode = null;
 		this.nameNode = null;
@@ -1019,7 +1045,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		_init: function (data, position) {
 			var shortName, fullName, price, hiddenInput, key, i;
 
-			this.details = data.details;
+			this.product = data.product;
 			this.settings = data.settings;
 			
 			this.liNode = document.createElement('li');
@@ -1029,49 +1055,48 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.quantityNode = document.createElement('input');
 			this.removeNode = document.createElement('input');
 			
-				
 			// Don't add blank products
-			if (!this.details.item_name && !this.details.item_number) { 
+			if (!this.product.item_name && !this.product.item_number) { 
 				this.isPlaceholder = true;
 				return;
 			}
 
 			// Name
-			if (this.details.item_name) { 
-				fullName = this.details.item_name; 
+			if (this.product.item_name) { 
+				fullName = this.product.item_name; 
 				shortName = (fullName.length > 20) ? fullName.substr(0, 20) + '...' : fullName;
 			}
 			
 			this.nameNode.innerHTML = shortName;
 			this.nameNode.title = fullName;
-			this.nameNode.href = this.details.href;
+			this.nameNode.href = this.product.href;
 			this.nameNode.appendChild(this.metaNode);	
 			
 			// Meta info
-			if (this.details.item_number) { 
-				this.metaNode.innerHTML = '<br>#' + this.details.item_number;
+			if (this.product.item_number) { 
+				this.metaNode.innerHTML = '<br>#' + this.product.item_number;
 			}
 	
 			// Options
 			i = 0;
 			
-			while (typeof this.details['on' + i] !== 'undefined') {
-				this.metaNode.innerHTML += '<br>' + this.details['on' + i] + ': ' + this.details['os' + i];	  
+			while (typeof this.product['on' + i] !== 'undefined') {
+				this.metaNode.innerHTML += '<br>' + this.product['on' + i] + ': ' + this.product['os' + i];	  
 				i++;
 			}
 
 			// Discount
-			if (this.details.discount_amount) { 
+			if (this.product.discount_amount) { 
 				this.metaNode.innerHTML += '<br>';
 				this.metaNode.innerHTML += config.strings.discount || 'Discount: ';
-				this.metaNode.innerHTML += $.util.formatCurrency(this.details.discount_amount, this.settings.currency_code);
+				this.metaNode.innerHTML += $.util.formatCurrency(this.product.discount_amount, this.settings.currency_code);
 			}
 
 			// Quantity
-			this.details.quantity = parseInt(this.details.quantity, 10);
+			this.product.quantity = parseInt(this.product.quantity, 10);
 			
 			this.quantityNode.name = 'quantity_' + position;
-			this.quantityNode.value = this.details.quantity ? this.details.quantity : 1;
+			this.quantityNode.value = this.product.quantity ? this.product.quantity : 1;
 			this.quantityNode.className = 'quantity';
 			this.quantityNode.setAttribute('autocomplete', 'off');
 
@@ -1080,13 +1105,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.removeNode.className = 'remove';
 			
 			// Price
-			price = parseFloat(this.details.amount, 10);
+			price = parseFloat(this.product.amount, 10);
 			
-			if (this.details.discount_amount) {
-				price -= this.details.discount_amount;
+			if (this.product.discount_amount) {
+				price -= this.product.discount_amount;
 			}
 			
-			this.priceNode.innerHTML = $.util.formatCurrency((price * parseFloat(this.details.quantity, 10)).toFixed(2), this.settings.currency_code);
+			this.priceNode.innerHTML = $.util.formatCurrency((price * parseFloat(this.product.quantity, 10)).toFixed(2), this.settings.currency_code);
 			this.priceNode.className = 'price';
 			
 			// Build out the DOM
@@ -1096,12 +1121,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.liNode.appendChild(this.priceNode);	
 			
 			// Add in hidden product data
-			for (key in this.details) {
+			for (key in this.product) {
 				if (key !== 'quantity') {
 					hiddenInput = document.createElement('input');
 					hiddenInput.type = 'hidden';
 					hiddenInput.name = key + '_' + position;
-					hiddenInput.value = this.details[key];
+					hiddenInput.value = this.product[key];
 				
 					this.liNode.appendChild(hiddenInput);
 				}
@@ -1117,13 +1142,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 		setQuantity: function (value) {
 			value = parseInt(value, 10);
 			
-			this.details.quantity = value;	
+			this.product.quantity = value;	
 			
 			if (this.quantityNode.value != value) {
 				this.quantityNode.value = value;
 			}
 			
-			this.setPrice(this.details.amount * value);
+			this.setPrice(this.product.amount * value);
 		},
 		
 		
@@ -1155,7 +1180,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @return {number} 
 		 */
 		getPrice: function () {
-			return (this.details.amount * this.getQuantity());
+			return (this.product.amount * this.getQuantity());
 		}
 	};
 	
@@ -1191,20 +1216,20 @@ PAYPAL.apps = PAYPAL.apps || {};
 				/**
 				 * Saves the data
 				 *
-				 * @param products {object} The list of products to save
+				 * @param items {object} The list of items to save
 				 */
-				save: function (products) {
+				save: function (items) {
 					var data = [],
-						product,
+						item,
 						len,
 						i;
 					
-					if (products) {
-						for (i = 0, len = products.length; i < len; i++) {
-							product = products[i];
+					if (items) {
+						for (i = 0, len = items.length; i < len; i++) { 
+							item = items[i];
 							data.push({
-								details: product.details,
-								settings: product.settings
+								product: item.product,
+								settings: item.settings
 							});
 						}
 			
@@ -1263,21 +1288,21 @@ PAYPAL.apps = PAYPAL.apps || {};
 				/**
 				 * Saves the data
 				 *
-				 * @param products {object} The list of products to save
+				 * @param items {object} The list of items to save
 				 */
-				save: function (products, duration) {
+				save: function (items, duration) {
 					var date = new Date(),
 						data = [],
-						product,
+						item,
 						len,
 						i;
 
-					if (products) {
-						for (i = 0, len = products.length; i < len; i++) {
-							product = products[i];
+					if (items) {
+						for (i = 0, len = items.length; i < len; i++) {
+							item = items[i];
 							data.push({
-								details: product.details,
-								settings: product.settings
+								product: item.product,
+								settings: item.settings
 							});
 						}
 					
