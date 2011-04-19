@@ -13,6 +13,79 @@ Interested? Let’s get you setup
 4. It’s as simple as that! Now the Mini Cart will appear when a user adds a product to, views, or has an item in their cart.
 
 
+Customization
+
+You can customize the script to make it work for your site by passing a JavaScript object as an argument, setting any of the following optional properties:
+
+parent
+The HTMLElement the Mini Cart should render as a child of. Default document.body.
+
+displayEdge
+The edge of the page the cart should pin to. Set to left or right. Default right.
+
+edgeDistance
+Distance from the edge the cart should appear. Default 50px.
+
+cookiePath
+The base path of your website to set the cookie to (useful for shared website hosting)
+
+peekEnabled
+Boolean to determine if the cart should "peek" when it's hidden with items. Default true.
+
+paypalURL
+The PayPal URL to use if you are accessing sandbox or another version of the PayPal website. Defaults to https://www.paypal.com/cgi-bin/webscr.
+
+strings
+An object of localizable text strings used:
+	button: The checkout button text
+	subtotal: The subtotal text
+	discount: The discount text
+	shipping: The shipping text
+
+events
+An object of customizable callbacks:
+	onRender: Event before the cart is rendered
+	afterRender: Event after the cart is rendered
+	onHide: Event before the cart is hidden
+	afterHide: Event after the cart is hidden
+	onShow: Event before the cart is shown
+	afterShow: Event after the cart is shown
+	onAddToCart: Event before a product is added to the cart
+	afterAddToCart: Event after a product is added to the cart
+	onCheckout: Event before the checkout action takes place
+	onReset: Event before the cart is emptied (typically when a transaction is completed)
+	afterReset: Event after the cart is emptied (typically when a transaction is completed)
+
+The scope of all events is adjusted to the Mini Cart to allow access to the products, UI, and certain functions. See below for an example:
+
+<script type="text/javascript">
+    PAYPAL.apps.MiniCart.render({
+    	displayEdge: 'right',
+    	edgeDistance: '50px',
+    	cookiePath: '/'
+    });
+</script>
+
+
+Localization
+
+Localization and adaption are supported in the Mini Cart using the configuration strings object. For example, if we wanted the cart to appear in French we would need to pass our configuration like this:
+
+<script type="text/javascript">
+    PAYPAL.apps.MiniCart.render({
+    	strings: {
+	    	button: 'Caisse',
+	    	subtotal: 'Total',
+	    	shipping: 'ne comprend pas les frais de port et d'impôt'	
+    	}
+    });
+</script>
+
+The currency symbol will be automatically adjusted based on the currency_code setting of your button.
+
+
+
+
 FAQ
 
 Is the Mini Cart free? How is it licensed?
