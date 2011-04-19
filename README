@@ -84,6 +84,27 @@ Localization and adaption are supported in the Mini Cart using the configuration
 The currency symbol will be automatically adjusted based on the currency_code setting of your button.
 
 
+JavaScript API
+
+The Mini Cart has a rich JavaScript API which allows you to control it using the following methods:
+
+render()
+Renders the cart element to the page.
+
+addToCart()
+Custom method used to add a product to the cart (advanced uses only). See _dataFilter for format.
+
+reset()
+Resets the cart, emptying and hiding it.
+
+hide(null, fully)
+Hides the cart. If the cart contains products then it will "peek" from the top of the window. Set fully to true to override this.
+
+show()
+Shows the cart.
+
+toggle()
+Toggles the visibility of the cart.
 
 
 FAQ
