@@ -73,9 +73,9 @@ The scope of all events is adjusted to the Mini Cart to allow access to the prod
 
     <script type="text/javascript">
         PAYPAL.apps.MiniCart.render({
-            displayEdge: 'right',
-            edgeDistance: '50px',
-            cookiePath: '/'
+            displayEdge: "right",
+            edgeDistance: "50px",
+            cookiePath: "/"
         });
     </script> 
 
@@ -89,9 +89,9 @@ Localization and adaption are supported in the Mini Cart using the configuration
     <script type="text/javascript"> 
         PAYPAL.apps.MiniCart.render({
             strings: {
-                button: 'Caisse',  
-                subtotal: 'Total',
-                shipping: 'ne comprend pas les frais de port et d'impôt' 	
+                button: "Caisse",  
+                subtotal: "Total ",
+                shipping: "ne comprend pas les frais de port et d'impôt" 	
             }
         });
     </script>
