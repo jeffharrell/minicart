@@ -333,7 +333,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			self.UI.shipping = document.createElement('span');
 			self.UI.shipping.className = 'shipping';
-			self.UI.shipping.innerHTML = config.strings.shipping || 'does not include shipping & tax';
+			self.UI.shipping.innerHTML = config.strings.shipping || 'does not include shipping &amp; tax';
 			self.UI.summary.appendChild(self.UI.shipping);
 			
 			// Workaround: IE 6 and IE 7/8 in quirks mode do not support position:fixed in CSS
@@ -1086,20 +1086,20 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Meta info
 			if (this.product.item_number) { 
-				this.metaNode.innerHTML = '<br>#' + this.product.item_number;
+				this.metaNode.innerHTML = '<br />#' + this.product.item_number;
 			}
 	
 			// Options
 			i = 0;
 			
 			while (typeof this.product['on' + i] !== 'undefined') {
-				this.metaNode.innerHTML += '<br>' + this.product['on' + i] + ': ' + this.product['os' + i];	  
+				this.metaNode.innerHTML += '<br />' + this.product['on' + i] + ': ' + this.product['os' + i];	  
 				i++;
 			}
 
 			// Discount
 			if (this.product.discount_amount) { 
-				this.metaNode.innerHTML += '<br>';
+				this.metaNode.innerHTML += '<br />';
 				this.metaNode.innerHTML += config.strings.discount || 'Discount: ';
 				this.metaNode.innerHTML += $.util.formatCurrency(this.product.discount_amount, this.settings.currency_code);
 			}
