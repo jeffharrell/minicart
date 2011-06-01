@@ -69,13 +69,17 @@ An object of customizable callbacks:
 * `onReset` - Event before the cart is emptied (typically when a transaction is completed)  
 * `afterReset` - Event after the cart is emptied (typically when a transaction is completed)  
 
-The scope of all events is adjusted to the Mini Cart to allow access to the products, UI, and certain functions. See below for an example:
+The scope of all events is adjusted to the Mini Cart to allow access to the products, UI, and certain functions. See below for an example of a custom configuration:
 
     <script type="text/javascript">
         PAYPAL.apps.MiniCart.render({
             displayEdge: "right",
             edgeDistance: "50px",
-            cookiePath: "/"
+			events: {
+				afterAddToCart: function () {
+					alert("There's now " + this.products.length + " unique product(s) in the cart.\nThat's a total of " + this.calculateSubtotal() + "!");
+				}
+			}
         });
     </script> 
 
