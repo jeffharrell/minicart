@@ -234,16 +234,20 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Renders the cart to the page and sets up it's events 
 		 */
 		var _render = function () {
-			if (typeof config.events.onRender == 'function') {
-				config.events.onRender.call(self);
+			var events = config.events,
+				onRender = events.onRender,
+				afterRender = events.afterRender;
+			
+			if (typeof onRender == 'function') {
+				onRender.call(self);
 			}
 			
 			_addCSS();
 			_buildDOM();
 			_bindEvents();
 			
-			if (typeof config.events.afterRender == 'function') {
-				config.events.afterRender.call(self);
+			if (typeof afterRender == 'function') {
+				afterRender.call(self);
 			}
 		};
 		
@@ -252,7 +256,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Adds the cart's CSS to the page
 		 */
 		var _addCSS = function () {
-			var head, style, css, name = config.name;
+			var name = config.name,
+				head, 
+				style, 
+				css;
 						
 			css	 = '#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ';
 			css += '#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ';
@@ -285,10 +292,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Builds the DOM elements required by the cart 
 		 */
 		var _buildDOM = function () {
-			var cmd, type, bn;
+			var UI = self.UI,
+				cmd, 
+				type, 
+				bn,
+				parent;
 			
-			self.UI.wrapper = document.createElement('div');
-			self.UI.wrapper.id	= config.name;
+			UI.wrapper = document.createElement('div');
+			UI.wrapper.id = config.name;
 			
 			cmd = document.createElement('input');
 			cmd.type = 'hidden';
@@ -303,38 +314,38 @@ PAYPAL.apps = PAYPAL.apps || {};
 			bn.name = 'bn';
 			bn.value = 'MiniCart_AddToCart_WPS_US';
 			
-			self.UI.cart = document.createElement('form');
-			self.UI.cart.method = 'post';
-			self.UI.cart.action = config.paypalURL;
-			self.UI.cart.appendChild(cmd);
-			self.UI.cart.appendChild(type);
-			self.UI.cart.appendChild(bn);
-			self.UI.wrapper.appendChild(self.UI.cart);
+			UI.cart = document.createElement('form');
+			UI.cart.method = 'post';
+			UI.cart.action = config.paypalURL;
+			UI.cart.appendChild(cmd);
+			UI.cart.appendChild(type);
+			UI.cart.appendChild(bn);
+			UI.wrapper.appendChild(UI.cart);
 			
-			self.UI.itemList = document.createElement('ul');
-			self.UI.cart.appendChild(self.UI.itemList);
+			UI.itemList = document.createElement('ul');
+			UI.cart.appendChild(UI.itemList);
 			
-			self.UI.summary = document.createElement('p');
-			self.UI.cart.appendChild(self.UI.summary);
+			UI.summary = document.createElement('p');
+			UI.cart.appendChild(UI.summary);
 			
-			self.UI.button = document.createElement('input');
-			self.UI.button.type = 'submit';
-			self.UI.button.value = config.strings.button || 'Checkout';
-			self.UI.summary.appendChild(self.UI.button);
+			UI.button = document.createElement('input');
+			UI.button.type = 'submit';
+			UI.button.value = config.strings.button || 'Checkout';
+			UI.summary.appendChild(UI.button);
 			
-			self.UI.subtotal = document.createElement('span');
-			self.UI.subtotal.innerHTML = config.strings.subtotal || 'Subtotal: ';
+			UI.subtotal = document.createElement('span');
+			UI.subtotal.innerHTML = config.strings.subtotal || 'Subtotal: ';
 	
-			self.UI.subtotalAmount = document.createElement('span');
-			self.UI.subtotalAmount.innerHTML = '0.00';
+			UI.subtotalAmount = document.createElement('span');
+			UI.subtotalAmount.innerHTML = '0.00';
 			
-			self.UI.subtotal.appendChild(self.UI.subtotalAmount);
-			self.UI.summary.appendChild(self.UI.subtotal);
+			UI.subtotal.appendChild(UI.subtotalAmount);
+			UI.summary.appendChild(UI.subtotal);
 			
-			self.UI.shipping = document.createElement('span');
-			self.UI.shipping.className = 'shipping';
-			self.UI.shipping.innerHTML = config.strings.shipping || 'does not include shipping &amp; tax';
-			self.UI.summary.appendChild(self.UI.shipping);
+			UI.shipping = document.createElement('span');
+			UI.shipping.className = 'shipping';
+			UI.shipping.innerHTML = config.strings.shipping || 'does not include shipping &amp; tax';
+			UI.summary.appendChild(UI.shipping);
 			
 			// Workaround: IE 6 and IE 7/8 in quirks mode do not support position:fixed in CSS
 			if (window.attachEvent && !window.opera) {
@@ -344,15 +355,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 					version = parseFloat(version[1]);
 				
 					if (version < 7 || (version >= 7 && document.compatMode === 'BackCompat')) {
-						self.UI.cart.style.position = 'absolute';
-						self.UI.wrapper.style[config.displayEdge] = '0';
-						self.UI.wrapper.style.setExpression('top', 'x = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop');
+						UI.cart.style.position = 'absolute';
+						UI.wrapper.style[config.displayEdge] = '0';
+						UI.wrapper.style.setExpression('top', 'x = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop');
 					}
 				}
 			}
 			
-			var parent = (typeof config.parent === 'string') ? document.getElementById(config.parent) : config.parent;		
-			parent.appendChild(self.UI.wrapper);
+			parent = (typeof config.parent === 'string') ? document.getElementById(config.parent) : config.parent;		
+			parent.appendChild(UI.wrapper);
 		};
 		
 		
@@ -645,8 +656,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param offset {Number} The offset for the prduct in the cart
 		 */
 		var _removeProduct = function (product, offset) {
-			if (typeof config.events.onRemoveFromCart == 'function') {
-				config.events.onRemoveFromCart.call(self, product);
+			var events = config.events,
+				onRemoveFromCart = events.onRemoveFromCart,
+				afterRemoveFromCart = events.afterRemoveFromCart;
+				
+			if (typeof onRemoveFromCart == 'function') {
+				onRemoveFromCart.call(self, product);
 			}
 			
 			product.setQuantity(0);
@@ -685,8 +700,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 						k++;
 					}
 					
-					if (typeof config.events.afterRemoveFromCart == 'function') {
-						config.events.afterRemoveFromCart.call(self, product);
+					if (typeof afterRemoveFromCart == 'function') {
+						afterRemoveFromCart.call(self, product);
 					}
 				});
 			});
@@ -705,8 +720,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param e {event} The form submission event
 		 */
 		var _checkout = function (e) {
-			if (typeof config.events.onCheckout == 'function') {
-				config.events.onCheckout.call(self, e);
+			var onCheckout = config.events.onCheckout;
+			
+			if (typeof onCheckout == 'function') {
+				onCheckout.call(self, e);
 			}
 		};
 		
@@ -738,12 +755,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @return {number} The subtotal
 		 */
 		self.calculateSubtotal = function () {
-			var i,
-				len,
+			var amount = 0,
 				product,
 				price,
 				discount,
-				amount = 0;
+				len,
+				i;
 				
 			for (i = 0, len = self.products.length; i < len; i++) {
 				if ((product = self.products[i].product)) {
@@ -820,11 +837,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @return {boolean} True if the product was added, false otherwise
 		 */
 		self.addToCart = function (data) {
-			var success = false,
+			var events = config.events,
+				onAddToCart = events.onAddToCart,
+				afterAddToCart = events.afterAddToCart,
+				success = false,
 				offset;
 			
-			if (typeof config.events.onAddToCart === 'function') {
-				if (config.events.onAddToCart.call(self, data) === false) {
+			if (typeof onAddToCart === 'function') {
+				if (onAddToCart.call(self, data) === false) {
 					return;
 				}
 			}
@@ -851,8 +871,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			$.storage.save(self.products);
 		
-			if (typeof config.events.afterAddToCart === 'function') {
-				config.events.afterAddToCart.call(self, data);
+			if (typeof afterAddToCart === 'function') {
+				afterAddToCart.call(self, data);
 			}
 			
 			return success;
@@ -866,17 +886,20 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		self.show = function (e) {
 			var from = parseInt(self.UI.cart.offsetTop, 10),
-				to = 0;
+				to = 0,
+				events = config.events,
+				onShow = events.onShow,
+				afterShow = events.afterShow;
 				
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
-			if (typeof config.events.onShow == 'function') {
-				config.events.onShow.call(self, e);
+			if (typeof onShow == 'function') {
+				onShow.call(self, e);
 			}
 					
 			$.util.animate(self.UI.cart, 'top', { from: from, to: to }, function () {
-				if (typeof config.events.afterShow == 'function') {
-					config.events.afterShow.call(self, e);
+				if (typeof afterShow == 'function') {
+					afterShow.call(self, e);
 				}
 			});
 			
@@ -895,6 +918,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var cartHeight = (self.UI.cart.offsetHeight) ? self.UI.cart.offsetHeight : document.defaultView.getComputedStyle(self.UI.cart, '').getPropertyValue('height'),
 				summaryHeight = (self.UI.summary.offsetHeight) ? self.UI.summary.offsetHeight : document.defaultView.getComputedStyle(self.UI.summary, '').getPropertyValue('height'),
 				from = parseInt(self.UI.cart.offsetTop, 10),
+				events = config.events,
+				onHide = events.onHide,
+				afterHide = events.afterHide,
 				to;
 
 			// make the cart fully hidden
@@ -907,13 +933,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
-			if (typeof config.events.onHide == 'function') {
-				config.events.onHide.call(self, e);
+			if (typeof onHide == 'function') {
+				onHide.call(self, e);
 			}
 			
 			$.util.animate(self.UI.cart, 'top', { from: from, to: to }, function () {
-				if (typeof config.events.afterHide == 'function') {
-					config.events.afterHide.call(self, e);
+				if (typeof afterHide == 'function') {
+					afterHide.call(self, e);
 				}	
 			});
 			
@@ -939,9 +965,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Resets the cart to it's intial state
 		 */
-		self.reset = function () {			  
-			if (typeof config.events.onReset === 'function') {
-				config.events.onReset.call(self);
+		self.reset = function () {	
+			var events = config.events,
+			 	onReset = events.onReset,
+				afterReset = events.afterReset;
+				
+			if (typeof onReset === 'function') {
+				onReset.call(self);
 			}
 			
 			self.products = [];
@@ -954,14 +984,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 	
 			$.storage.remove();
 		
-			if (typeof config.events.afterReset === 'function') {
-				config.events.afterReset.call(self);
+			if (typeof afterReset === 'function') {
+				afterReset.call(self);
 			}
 		};
 		
 		
 		
-		/** PUBLIC -- Can be called directly from teh MiniCart object **/
+		/** PUBLIC -- Can be called directly from the MiniCart object **/
 		return {
 			
 			/**
@@ -1463,8 +1493,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			} else {
 				if (input.type == 'radio') {
 					return (input.checked) ? input.value : null;
-				} else	if (input.type == 'checkbox') {
-						return (input.checked) ? input.value : null;
+				} else if (input.type == 'checkbox') {
+					return (input.checked) ? input.value : null;
 				} else {
 					return input.value;
 				}
@@ -1482,81 +1512,75 @@ PAYPAL.apps = PAYPAL.apps || {};
 			// TODO: The supported currency patterns need to be refined and
 			// should support values for before, after, decimal, and separator.
 			var currencies = {
-				AED: { before: '\u062c' },
-				ANG: { before: '\u0192' },
-				ARS: { before: '$' },
-				AUD: { before: '$' },
-				AWG: { before: '\u0192' },
-				BBD: { before: '$' },
-				BGN: { before: '\u043b\u0432' },
-				BMD: { before: '$' },
-				BND: { before: '$' },
-				BRL: { before: 'R$' },
-				BSD: { before: '$' },
-				CAD: { before: '$' },
-				CHF: { before: '' },
-				CLP: { before: '$' },
-				CNY: { before: '\u00A5' },
-				COP: { before: '$' },
-				CRC: { before: '\u20A1' },
-				CZK: { before: 'Kc' },
-				DKK: { before: 'kr' },
-				DOP: { before: '$' },
-				EEK: { before: 'kr' },
-				EUR: { before: '\u20AC' },
-				GBP: { before: '\u00A3' },
-				GTQ: { before: 'Q' },
-				HKD: { before: '$' },
-				HRK: { before: 'kn' },
-				HUF: { before: 'Ft' },
-				IDR: { before: 'Rp' },
-				ILS: { before: '\u20AA' },
-				INR: { before: 'Rs.' },
-				ISK: { before: 'kr' },
-				JMD: { before: 'J$' },
-				JPY: { before: '\u00A5' },
-				KRW: { before: '\u20A9' },
-				KYD: { before: '$' },
-				LTL: { before: 'Lt' },
-				LVL: { before: 'Ls' },
-				MXN: { before: '$' },
-				MYR: { before: 'RM' },
-				NOK: { before: 'kr' },	
-				NZD: { before: '$' },
-				PEN: { before: 'S/' },
-				PHP: { before: 'Php' },
-				PLN: { before: 'z' },
-				QAR: { before: '\ufdfc' },
-				RON: { before: 'lei' },
-				RUB: { before: '\u0440\u0443\u0431' },
-				SAR: { before: '\ufdfc' },
-				SEK: { before: 'kr' },
-				SGD: { before: '$' },
-				THB: { before: '\u0E3F' },
-				TRY: { before: 'TL' },
-				TTD: { before: 'TT$' },
-				TWD: { before: 'NT$' },
-				UAH: { before: '\u20b4' },
-				USD: { before: '$' },
-				UYU: { before: '$U' },
-				VEF: { before: 'Bs' },
-				VND: { before: '\u20ab' },
-				XCD: { before: '$' },
-				ZAR: { before: 'R' }			
-			};
-	
-			var currency = currencies[code],
-				before = '', 
-				after = '';
+					AED: { before: '\u062c' },
+					ANG: { before: '\u0192' },
+					ARS: { before: '$' },
+					AUD: { before: '$' },
+					AWG: { before: '\u0192' },
+					BBD: { before: '$' },
+					BGN: { before: '\u043b\u0432' },
+					BMD: { before: '$' },
+					BND: { before: '$' },
+					BRL: { before: 'R$' },
+					BSD: { before: '$' },
+					CAD: { before: '$' },
+					CHF: { before: '' },
+					CLP: { before: '$' },
+					CNY: { before: '\u00A5' },
+					COP: { before: '$' },
+					CRC: { before: '\u20A1' },
+					CZK: { before: 'Kc' },
+					DKK: { before: 'kr' },
+					DOP: { before: '$' },
+					EEK: { before: 'kr' },
+					EUR: { before: '\u20AC' },
+					GBP: { before: '\u00A3' },
+					GTQ: { before: 'Q' },
+					HKD: { before: '$' },
+					HRK: { before: 'kn' },
+					HUF: { before: 'Ft' },
+					IDR: { before: 'Rp' },
+					ILS: { before: '\u20AA' },
+					INR: { before: 'Rs.' },
+					ISK: { before: 'kr' },
+					JMD: { before: 'J$' },
+					JPY: { before: '\u00A5' },
+					KRW: { before: '\u20A9' },
+					KYD: { before: '$' },
+					LTL: { before: 'Lt' },
+					LVL: { before: 'Ls' },
+					MXN: { before: '$' },
+					MYR: { before: 'RM' },
+					NOK: { before: 'kr' },	
+					NZD: { before: '$' },
+					PEN: { before: 'S/' },
+					PHP: { before: 'Php' },
+					PLN: { before: 'z' },
+					QAR: { before: '\ufdfc' },
+					RON: { before: 'lei' },
+					RUB: { before: '\u0440\u0443\u0431' },
+					SAR: { before: '\ufdfc' },
+					SEK: { before: 'kr' },
+					SGD: { before: '$' },
+					THB: { before: '\u0E3F' },
+					TRY: { before: 'TL' },
+					TTD: { before: 'TT$' },
+					TWD: { before: 'NT$' },
+					UAH: { before: '\u20b4' },
+					USD: { before: '$' },
+					UYU: { before: '$U' },
+					VEF: { before: 'Bs' },
+					VND: { before: '\u20ab' },
+					XCD: { before: '$' },
+					ZAR: { before: 'R' }			
+				},
+				currency = currencies[code],
+				before, 
+				after;
 			
 			if (currency) {
-				if (currency.before) {
-					before = currency.before;
-				}
-	
-				if (currency.after) {
-					after = currency.after;
-				}
+				before = currency.before || '';
+				after = currency.after || '';
 			}
 	
 			return before + amount + after;
