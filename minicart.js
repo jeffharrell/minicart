@@ -1543,7 +1543,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 	
 				if (currency.after) {
-					before = currency.after;
+					after = currency.after;
 				}
 			}
 	
