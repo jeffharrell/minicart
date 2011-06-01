@@ -164,35 +164,22 @@ PAYPAL.apps = PAYPAL.apps || {};
 	PAYPAL.apps.MiniCart = (function () {
 		
 		var self = arguments.callee;
+				
+				
+		/** PRIVATE **/
+		
 		
 		/**
 		 * Regex filter for product values, which appear multiple times in a cart
 		 */
 		var productFilter = /^(?:item_number|item_name|amount|quantity|on|os|option_|tax|weight|handling|shipping|discount)/;
 		
+		
 		/**
 		 * Regex filter for cart settings, which appear only once in a cart
 		 */
 		var settingFilter = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
-
-		/**
-		 * Array of ProductBuilders
-		 */
-		self.products = [];
 		
-		/**
-		 * Container for UI elements
-		 */
-		self.UI = {};
-		
-		/**
-		 * Flag to determine if the cart is currently showing
-		 */
-		self.isShowing = false;
-		
-		
-		
-		/** PRIVATE METHODS **/
 		
 		/**
 		 * Initializs the config, renders the cart and loads the data 
@@ -501,7 +488,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 			
 			return data;
-		}
+		};
 		
 				
 		/**
@@ -650,7 +637,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 		};
 		
-		
+
+		/**
+		 * Removes a product from the cart
+		 *
+		 * @param product {ProductBuilder} The product object
+		 * @param offset {Number} The offset for the prduct in the cart
+		 */
 		var _removeProduct = function (product, offset) {
 			if (typeof config.events.onRemoveFromCart == 'function') {
 				config.events.onRemoveFromCart.call(self, product);
@@ -718,7 +711,26 @@ PAYPAL.apps = PAYPAL.apps || {};
 		};
 		
 		
-		/** "PROTECTED" METHODS -- Can be used in callbacks **/
+		/** PROTECTED -- Can be used in event callbacks **/
+
+		
+		/**
+		 * Array of ProductBuilders
+		 */
+		self.products = [];
+		
+		
+		/**
+		 * Container for UI elements
+		 */
+		self.UI = {};
+		
+		
+		/**
+		 * Flag to determine if the cart is currently showing
+		 */
+		self.isShowing = false;
+		
 		
 		/**
 		 * Iterates over each product and calculates the subtotal
@@ -949,7 +961,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		
-		/** PUBLIC METHODS **/
+		/** PUBLIC -- Can be called directly from teh MiniCart object **/
 		return {
 			
 			/**
@@ -1186,7 +1198,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	
 	
 	
-	/** UTILITY METHODS **/
+	/** UTILITY **/
 	
 	var $ = {};
 	
@@ -1341,9 +1353,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param scope {object} Object to adjust the scope to (optional)
 		 */
 		add: function (obj, type, fn, scope) {
-			scope = scope || obj; 
-
 			var wrappedFn;
+						
+			scope = scope || obj; 
 
 			if (obj.addEventListener) {
 				wrappedFn = function (e) { fn.call(scope, e); };
