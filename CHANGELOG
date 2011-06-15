@@ -1,3 +1,13 @@
+Version 2.0.5
+Updates include:
+ - Adding support for pages served as application/xhtml+xml (thank you willearp!)
+ - Fixing currency logic to correctly return "after" content for currencies (thank you mraygoza!)
+ - Fixing addToCart external method so you can dynamically add products to the cart
+ - README updated with more examples, corrections and links
+ - Master Github repository moved to https://github.com/jeffharrell/MiniCart
+
+
+
 Version 2.0.4
 Updates include:
  - Enhancement to redraw the contents of the cart in all browser windows whenever the products are modified in one (IE 8 and Firefox)

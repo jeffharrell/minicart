@@ -9,7 +9,7 @@ Interested? Let’s get you setup
 -------------------------------
 
 1. Start with a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
-2. Download the [Mini Cart JavaScript](http://github.com/PayPal/MiniCart/zipball/master)
+2. Download the [Mini Cart JavaScript](https://github.com/jeffharrell/MiniCart)
 3. Next, include the following snippet of JavaScript code into your HTML file before the closing &lt;/body&gt; tag. Make sure to point to your downloaded copy of minicart.js!
 
 Code: 
@@ -133,13 +133,13 @@ FAQ
 ---
 
 **Is the Mini Cart free? How is it licensed?**  
-Yes, it’s free and licensed using an [eBay Open Source License Agreement](https://github.com/PayPal/MiniCart/blob/master/LICENSE).
+Yes, it’s free and licensed using an [eBay Open Source License Agreement](https://github.com/jeffharrell/MiniCart/blob/master/LICENSE).
 
 **I have special integration / translation needs. Are there advanced settings?**  
-Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/PayPal/MiniCart) for more details.
+Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/jeffharrell/MiniCart) for more details.
 
 **I found a bug / I have an issue!**  
-Please log the issue on the [Mini Cart’s issue tracker](https://github.com/PayPal/MiniCart/issues), including a link or sample code that reproduces it if possible.
+Please log the issue on the [Mini Cart’s issue tracker](https://github.com/jeffharrell/MiniCart/issues), including a link or sample code that reproduces it if possible.
 
 **I installed the Mini Cart, but my website still redirects to PayPal when clicking on a button. Why?**  
 The Mini Cart doesn’t yet work with what PayPal’s call their “hosted” or “encrypted” buttons which is why this is most likely happening. To fix your buttons, you’ll need to log into paypal.com and do the following steps:

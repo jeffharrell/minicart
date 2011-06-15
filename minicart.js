@@ -4,8 +4,7 @@
  * Use subject to license agreement as set forth at the link below
  * 
  * @author Jeff Harrell
- * @version 
- * @license https://minicart.paypal-labs.com/LICENSE eBay Open Source License Agreement
+ * @license https://github.com/jeffharrell/MiniCart/blob/master/LICENSE eBay Open Source License Agreement
  */
 if (typeof PAYPAL == 'undefined' || !PAYPAL) {
 	var PAYPAL = {};
