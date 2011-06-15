@@ -9,7 +9,7 @@ Interested? Let’s get you setup
 -------------------------------
 
 1. Start with a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
-2. Download the [Mini Cart JavaScript](https://github.com/jeffharrell/MiniCart)
+2. Download the [Mini Cart JavaScript](https://github.com/jeffharrell/MiniCart/archives/master)
 3. Next, include the following snippet of JavaScript code into your HTML file before the closing &lt;/body&gt; tag. Make sure to point to your downloaded copy of minicart.js!
 
 Code: 
@@ -136,7 +136,7 @@ FAQ
 Yes, it’s free and licensed using an [eBay Open Source License Agreement](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE).
 
 **I have special integration / translation needs. Are there advanced settings?**  
-Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/jeffharrell/MiniCart) for more details.
+Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/jeffharrell/MiniCart#readme) for more details.
 
 **I found a bug / I have an issue!**  
 Please log the issue on the [Mini Cart’s issue tracker](https://github.com/jeffharrell/MiniCart/issues), including a link or sample code that reproduces it if possible.
