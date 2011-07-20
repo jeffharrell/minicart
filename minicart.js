@@ -1199,7 +1199,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @return {number}
 		 */
 		getQuantity: function () {
-			return (parseFloat(this.quantityNode.value, 10) || 1);
+			return parseFloat(this.quantityNode.value, 10);
 		},
 		
 		
