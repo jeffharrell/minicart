@@ -186,10 +186,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param userConfig {object} User settings which override the default configuration
 		 */
 		var _init = function (userConfig) {
-			var hash,
-				cmd,
-				key,
-				i;
+			var hash, cmd, key, i;
 				
 			// Overwrite default configuration with user settings
 			for (key in userConfig) {
@@ -256,9 +253,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var _addCSS = function () {
 			var name = config.name,
-				head, 
-				style, 
-				css;
+				head, style, css;
 						
 			css	 = '#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; text-align:left; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ';
 			css += '#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ';
@@ -292,10 +287,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var _buildDOM = function () {
 			var UI = self.UI,
-				cmd, 
-				type, 
-				bn,
-				parent;
+				cmd, type, bn, parent;
 			
 			UI.wrapper = document.createElement('div');
 			UI.wrapper.id = config.name;
@@ -370,9 +362,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Attaches the cart events to it's DOM elements 
 		 */
 		var _bindEvents =function () {
-			var forms,
-				form,
-				i;
+			var forms, form, i;
 			
 			// Look for all "Cart" and "Buy Now" forms on the page and attach events
 			forms = document.getElementsByTagName('form');
@@ -484,10 +474,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _parseForm = function (form) {
 			var raw = form.elements,
 				data = [],
-				pair,
-				value,
-				length,
-				i;
+				pair, value, length, i;
 			
 			for (i = 0, len = raw.length; i < len; i++) {
 				pair = raw[i];
@@ -510,11 +497,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _parseData = function (data) {
 			var product = {}, 
 				settings = {},
-				existing,
-				option_index, 
-				key,
-				len,
-				i;
+				existing, option_index, key, len, match, i, j;
 			
 			// Parse the data into a two categories: product and settings
 			for (key in data) {
@@ -525,16 +508,32 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 			}
 			
-			// Check the products to see if this variation already exists; if it does update it's offset
+			// Check the products to see if this variation already exists
+			// If it does then reuse the same object
 			for (i = 0, len = self.products.length; i < len; i++) {
 				existing = self.products[i].product;
 				
-				if ((!product.item_name || product.item_name === existing.item_name) &&
-					(!product.item_number || product.item_number === existing.item_number) && 
-					(!product.os0 || product.os0 === existing.os0) &&
-					(!product.os1 || product.os1 === existing.os1)) {
+				// Do the product name and number match
+				if (product.item_name === existing.item_name && 
+					product.item_number === existing.item_number
+				) {
+					// Do all of the products options match
+					match = true;
+					j = 0;
+					
+					while (existing['os' + j]) {
+						if (product['os' + j] !== existing['os' + j]) {
+							match = false;
+							break;
+						}
+						
+						j++;
+					}
+					
+					if (match) {
 						product.offset = existing.offset;
 						break;
+					}
 				}
 			}
 				  
@@ -556,7 +555,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 				
 				while (typeof product['option_select' + i] != 'undefined') {
 					if (product['option_select' + i] == product['os' + option_index]) {
-						
 						product.amount = product.amount + parseFloat(product['option_amount' + i]);
 						break;
 					}
@@ -755,11 +753,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		self.calculateSubtotal = function () {
 			var amount = 0,
-				product,
-				price,
-				discount,
-				len,
-				i;
+				product, price, discount, len, i;
 				
 			for (i = 0, len = self.products.length; i < len; i++) {
 				if ((product = self.products[i].product)) {
@@ -784,9 +778,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				currency_symbol,
 				subtotal = self.calculateSubtotal(),
 				level = 1,
-				hex,
-				len,
-				i;
+				hex, len, i;
 
 			// Get the currency
 			currency_code = '';
@@ -1261,9 +1253,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 */
 				save: function (items) {
 					var data = [],
-						item,
-						len,
-						i;
+						item, len, i;
 					
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) { 
@@ -1298,12 +1288,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 * @return {object}
 				 */
 				load: function () {
-					var data, 
-						cookies, 
-						cookie, 
-						key = name + '=', 
-						value, 
-						i;
+					var key = name + '=', 
+						data, cookies, cookie, value, i;
 
 					try {
 						cookies = document.cookie.split(';');
@@ -1334,9 +1320,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				save: function (items, duration) {
 					var date = new Date(),
 						data = [],
-						item,
-						len,
-						i;
+						item, len, i;
 
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) {
