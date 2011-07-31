@@ -517,7 +517,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				if (product.item_name === existing.item_name && 
 					product.item_number === existing.item_number
 				) {
-					// Do all of the products options match
+					// Products are a match so far; Now do all of the products options match?
 					match = true;
 					j = 0;
 					
@@ -757,11 +757,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 				
 			for (i = 0, len = self.products.length; i < len; i++) {
 				if ((product = self.products[i].product)) {
-					if (product.amount) {
+					if (product.quantity && product.amount) {
 						price = product.amount;
 						discount = (product.discount_amount) ? product.discount_amount : 0;
 						
-						amount += parseFloat((price - discount) * product.quantity);
+						amount += parseFloat((price * product.quantity) - discount);
 					}
 				}
 			}
@@ -1076,7 +1076,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param position {number} The product number
 		 */
 		_init: function (data, position) {
-			var shortName, fullName, price, hiddenInput, key, i;
+			var shortName, fullName, price, discount = 0, hiddenInput, key, i;
 
 			this.product = data.product;
 			this.settings = data.settings;
@@ -1141,10 +1141,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			price = parseFloat(this.product.amount, 10);
 			
 			if (this.product.discount_amount) {
-				price -= this.product.discount_amount;
+				discount = this.product.discount_amount;
 			}
 			
-			this.priceNode.innerHTML = $.util.formatCurrency((price * parseFloat(this.product.quantity, 10)).toFixed(2), this.settings.currency_code);
+			this.priceNode.innerHTML = $.util.formatCurrency((price * parseFloat(this.product.quantity, 10) - discount).toFixed(2), this.settings.currency_code);
 			this.priceNode.className = 'price';
 			
 			// Build out the DOM
