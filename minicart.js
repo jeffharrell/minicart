@@ -501,10 +501,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Parse the data into a two categories: product and settings
 			for (key in data) {
-				if (productFilter.test(key)) {
-					product[key] = data[key];
-				} else if (settingFilter.test(key)) {
+				if (settingFilter.test(key)) {
 					settings[key] = data[key];
+				} else if (productFilter.test(key)) {
+					product[key] = data[key];
 				}
 			}
 			
