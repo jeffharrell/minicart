@@ -473,7 +473,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */		
 		var _parseForm = function (form) {
 			var raw = form.elements,
-				data = [],
+				data = {},
 				pair, value, length, i;
 			
 			for (i = 0, len = raw.length; i < len; i++) {
