@@ -134,36 +134,36 @@ Toggles the visibility of the cart.
 FAQ
 ---
 
-1. **Is the Mini Cart free? How is it licensed?**  
+**Is the Mini Cart free? How is it licensed?**  
 Yes, it’s free and licensed using an [eBay Open Source License Agreement](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE).
 
-2. **I have special integration / translation needs. Are there advanced settings?**  
+**I have special integration / translation needs. Are there advanced settings?**  
 Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/jeffharrell/MiniCart#readme) for more details.
 
-3. **I found a bug / I have an issue!**  
+**I found a bug / I have an issue!**  
 Please log the issue on the [Mini Cart’s issue tracker](https://github.com/jeffharrell/MiniCart/issues), including a link or sample code that reproduces it if possible.
 
-4. **I installed the Mini Cart, but my website still redirects to PayPal when clicking on a button. Why?**  
+**I installed the Mini Cart, but my website still redirects to PayPal when clicking on a button. Why?**  
 There's two causes for this. The first is quite easy and it's that you have inserted the Mini Cart JavaScript in the document head or at the top of your page. It needs to be inserted before the closing body element so that it can "see" the PayPal forms.
 
 The other cause is that the Mini Cart doesn’t yet work with what PayPal’s call their “hosted” or “encrypted” buttons which is why this is most likely happening. To fix your buttons, you’ll need to log into paypal.com and do the following steps:
 
-    1. Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
-    2. Once you’ve created the button click Remove code protection before copying your button’s code.
+1. Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
+2. Once you’ve created the button click Remove code protection before copying your button’s code.
 
-5. **The Mini Cart isn’t emptying after a transaction is completed. Why?**  
+**The Mini Cart isn’t emptying after a transaction is completed. Why?**  
 The Mini Cart appends a fragment to your button’s return URL which sends a command to it when the user successfully returns from a transaction. If this is not working properly you should make sure that your are setting the value correctly and that it does not already contain a fragment.
 
-6. **Is non-JavaScript supported?**  
+**Is non-JavaScript supported?**  
 If your users do not have a JavaScript-capable browser, they will still be able to see your cart buttons and make purchases, but the user interface will gracefully degrade to the standard PayPal Cart.
 
-7. **My website uses frames / iframes for it’s products. How can I make the Mini Cart work?**  
+**My website uses frames / iframes for it’s products. How can I make the Mini Cart work?**  
 Depending upon how your site is setup the Mini Cart isn’t always compatible with websites containing frames. To ensure that it works you need to have the product buttons on the same frame as the main window.
 
-8. **The Mini Cart isn’t appearing the same as on this page. Why?**  
+**The Mini Cart isn’t appearing the same as on this page. Why?**  
 This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). Example issues include appearing in the bottom left of the browser, not scrolling properly, or having rendering issues. To check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
 
-9. **The Mini Cart is appearing behind objects on my page!**  
+**The Mini Cart is appearing behind objects on my page!**  
 This happens when you have the position and z-index CSS properties set on an element. If you need to use z-index then you will need to add the following code to your CSS styles:
 
     #PPMiniCart { position: relative; z-index: 100; }
