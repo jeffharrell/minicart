@@ -148,8 +148,8 @@ There's two causes for this. The first is quite easy and it's that you have inse
 
 The other cause is that the Mini Cart doesn’t yet work with what PayPal’s call their “hosted” or “encrypted” buttons which is why this is most likely happening. To fix your buttons, you’ll need to log into paypal.com and do the following steps:
 
-1. Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
-2. Once you’ve created the button click Remove code protection before copying your button’s code.
+    1. Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
+    2. Once you’ve created the button click Remove code protection before copying your button’s code.
 
 5. **The Mini Cart isn’t emptying after a transaction is completed. Why?**  
 The Mini Cart appends a fragment to your button’s return URL which sends a command to it when the user successfully returns from a transaction. If this is not working properly you should make sure that your are setting the value correctly and that it does not already contain a fragment.
