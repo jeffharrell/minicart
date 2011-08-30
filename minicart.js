@@ -255,7 +255,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var name = config.name,
                 css = [],
 				style, head;
-			
 
 			css.push('#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; text-align:left; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ');
 			css.push('#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ');
@@ -453,7 +452,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Loads the stored data and builds the cart
 		 */
 		var _parseStorage = function () {
-			var data, length;
+			var data, length, i;
 			
 			if ((data = $.storage.load())) {
 				length = data.length;
@@ -476,7 +475,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _parseForm = function (form) {
 			var raw = form.elements,
 				data = {},
-				pair, value, length, i;
+				pair, value, length, i, len;
 			
 			for (i = 0, len = raw.length; i < len; i++) {
 				pair = raw[i];
@@ -583,7 +582,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var keyupTimer,
 				product = new ProductBuilder(data, that.UI.itemList.children.length + 1),
 				offset = data.product.offset,
-                key;
+                hiddenInput, key;
 				
 			that.products[offset] = product;
 			
@@ -1242,7 +1241,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					var data = localStorage.getItem(name); 
 					
 					if (data) {
-						data = JSON.parse(unescape(data));
+						data = JSON.parse(decodeURIComponent(data));
 					}
 					
 					return data;
@@ -1267,7 +1266,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 							});
 						}
 			
-						data = escape(JSON.stringify(data));
+						data = encodeURIComponent(JSON.stringify(data));
 						localStorage.setItem(name, data);
 					}
 				},
@@ -1306,7 +1305,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 							if (cookie.indexOf(key) === 0) {
 								value = cookie.substring(key.length, cookie.length);
-								data = JSON.parse(unescape(value));
+								data = JSON.parse(decodeURIComponent(value));
 							}
 						}					
 					} catch (e) {}
@@ -1337,7 +1336,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 						duration = duration || 30;
 						date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
 
-						document.cookie = config.name + '=' + escape(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
+						document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
 					}
 				},
 
