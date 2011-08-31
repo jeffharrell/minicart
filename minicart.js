@@ -581,7 +581,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _renderProduct = function (data) {
 			var keyupTimer,
 				product = new ProductBuilder(data, that.UI.itemList.children.length + 1),
-				offset = data.product.offset,
+				offset = data.product && data.product.offset,
                 hiddenInput, key;
 				
 			that.products[offset] = product;
@@ -1091,7 +1091,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.removeNode = document.createElement('input');
 			
 			// Don't add blank products
-			if (!this.product.item_name && !this.product.item_number) { 
+			if (!this.product || (!this.product.item_name && !this.product.item_number)) { 
 				this.isPlaceholder = true;
 				return;
 			}
