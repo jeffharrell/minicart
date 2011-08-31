@@ -160,9 +160,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 	/**
 	 * Mini Cart application 
 	 */
-	PAYPAL.apps.MiniCart = new (function () {
+	PAYPAL.apps.MiniCart = (function () {
 		
-		var minicart = this,
+		var minicart = {},
             isShowing = false
         ;
 				
@@ -331,20 +331,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				form = forms[i];
 				
 				if (form.cmd && (form.cmd.value === '_cart' || form.cmd.value === '_xclick')) {
-					if (form.add) {
-						$.event.add(form, 'submit', function (e) {
-							e.preventDefault(e);
-							
-							var data = _parseForm(e.target);
-							minicart.addToCart(data);
-						});
-					} else if (form.display) {
-						$.event.add(form, 'submit', function (e) {
-							e.preventDefault();
-							minicart.show(e);
-						});
-					}
-				}
+			        minicart.bindForm(form);	
+                }
 			}
 			
 			// Hide the Mini Cart for all non-cart related clicks
@@ -539,7 +527,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var _renderProduct = function (data) {
 			var keyupTimer,
-				product = new ProductBuilder(data, minicart.UI.itemList.children.length + 1),
+				product = new ProductNode(data, minicart.UI.itemList.children.length + 1),
 				offset = data.product.offset,
                 hiddenInput, key
             ;
@@ -611,7 +599,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Removes a product from the cart
 		 *
-		 * @param product {ProductBuilder} The product object
+		 * @param product {ProductNode} The product object
 		 * @param offset {Number} The offset for the product in the cart
 		 */
 		var _removeProduct = function (product, offset) {
@@ -693,7 +681,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 		
 		/**
-		 * Array of ProductBuilders
+		 * Array of ProductNode
 		 */
 		minicart.products = [];
 		
@@ -703,7 +691,129 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		minicart.UI = {};
 		
+
+        /**
+		 * Renders the cart, creates the configuration and loads the data
+		 *
+		 * @param userConfig {object} User settings which override the default configuration
+		 */
+        minicart.render = function (userConfig) {
+			var hash, cmd, key, i;
+				
+			// Overwrite default configuration with user settings
+			for (key in userConfig) {
+				if (config[key]) {
+					config[key] = userConfig[key];
+				}
+			}
+
+			// Render the cart UI
+			_render();
 		
+			// Process any stored data
+			_parseStorage();
+						
+			// Check if a transaction was completed
+			hash = location.hash.substring(1);
+			
+			if (hash.indexOf(config.name + '=') === 0) {
+				cmd = hash.split('=')[1];
+				
+				if (cmd == 'reset') {
+					minicart.reset();
+					location.hash = '';
+				}
+			}
+					
+			// Update the UI
+			if (isShowing) {
+				setTimeout(function () {
+					minicart.hide(null);
+                }, 500);
+			} else {
+				$.storage.remove();
+			}
+
+			minicart.updateSubtotal();
+		};
+
+
+        /**
+         * Binds a form to the Mini Cart
+         *
+         * @param form {HTMLElement} The form element to bind
+         */
+        minicart.bindForm = function (form) {
+            if (form.add) {
+                $.event.add(form, 'submit', function (e) {
+                    e.preventDefault(e);
+
+                    var data = _parseForm(e.target);
+                    minicart.addToCart(data);
+                });
+            } else if (form.display) {
+                $.event.add(form, 'submit', function (e) {
+                    e.preventDefault();
+                    minicart.show(e);
+                });
+            } else {
+                return false;
+            }
+
+            return true;
+        };
+
+
+        /**
+		 * Adds a product to the cart
+		 *
+		 * @param data {object} Product object. See _parseData for format
+		 * @return {boolean} True if the product was added, false otherwise
+		 */
+		minicart.addToCart = function (data) {
+			var events = config.events,
+				onAddToCart = events.onAddToCart,
+				afterAddToCart = events.afterAddToCart,
+				success = false,
+				offset
+            ;
+			
+			if (typeof onAddToCart === 'function') {
+				if (onAddToCart.call(minicart, data) === false) {
+					return;
+				}
+			}
+			
+			data = _parseData(data);
+			offset = data.product.offset;
+			
+			// Check if the product has already been added; update if so
+			if (typeof offset != 'undefined' && minicart.products[offset]) {
+				minicart.products[offset].product.quantity += parseInt(data.product.quantity || 1, 10);
+				
+				minicart.products[offset].setPrice(data.product.amount * minicart.products[offset].product.quantity);
+				minicart.products[offset].setQuantity(minicart.products[offset].product.quantity);
+				
+				success = true;
+			// Add a new DOM element for the product
+			} else {	
+				data.product.offset = minicart.products.length; 
+				success = _renderProduct(data); 
+			}	
+				
+			minicart.updateSubtotal();
+			minicart.show(null);
+			
+			$.storage.save(minicart.products);
+		
+			if (typeof afterAddToCart === 'function') {
+				afterAddToCart.call(minicart, data);
+			}
+			
+			return success;
+		};
+
+
 		/**
 		 * Iterates over each product and calculates the subtotal
 		 *
@@ -779,104 +889,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				setTimeout(arguments.callee, 30);
 			})();
 		};
-		
-		
-		/**
-		 * Adds a product to the cart
-		 *
-		 * @param data {object} Product object. See _parseData for format
-		 * @return {boolean} True if the product was added, false otherwise
-		 */
-		minicart.addToCart = function (data) {
-			var events = config.events,
-				onAddToCart = events.onAddToCart,
-				afterAddToCart = events.afterAddToCart,
-				success = false,
-				offset
-            ;
-			
-			if (typeof onAddToCart === 'function') {
-				if (onAddToCart.call(minicart, data) === false) {
-					return;
-				}
-			}
-			
-			data = _parseData(data);
-			offset = data.product.offset;
-			
-			// Check if the product has already been added; update if so
-			if (typeof offset != 'undefined' && minicart.products[offset]) {
-				minicart.products[offset].product.quantity += parseInt(data.product.quantity || 1, 10);
 				
-				minicart.products[offset].setPrice(data.product.amount * minicart.products[offset].product.quantity);
-				minicart.products[offset].setQuantity(minicart.products[offset].product.quantity);
-				
-				success = true;
-			// Add a new DOM element for the product
-			} else {	
-				data.product.offset = minicart.products.length; 
-				success = _renderProduct(data); 
-			}	
-				
-			minicart.updateSubtotal();
-			minicart.show(null);
-			
-			$.storage.save(minicart.products);
-		
-			if (typeof afterAddToCart === 'function') {
-				afterAddToCart.call(minicart, data);
-			}
-			
-			return success;
-		};
-		
 
-        /**
-		 * Renders the cart, creates the configuration and loads the data
-		 *
-		 * @param userConfig {object} User settings which override the default configuration
-		 */
-        minicart.render = function (userConfig) {
-			var hash, cmd, key, i;
-				
-			// Overwrite default configuration with user settings
-			for (key in userConfig) {
-				if (config[key]) {
-					config[key] = userConfig[key];
-				}
-			}
-
-			// Render the cart UI
-			_render();
-		
-			// Process any stored data
-			_parseStorage();
-						
-			// Check if a transaction was completed
-			hash = location.hash.substring(1);
-			
-			if (hash.indexOf(config.name + '=') === 0) {
-				cmd = hash.split('=')[1];
-				
-				if (cmd == 'reset') {
-					minicart.reset();
-					location.hash = '';
-				}
-			}
-					
-			// Update the UI
-			if (isShowing) {
-				setTimeout(function () {
-					minicart.hide(null);
-                }, 500);
-			} else {
-				$.storage.remove();
-			}
-
-			minicart.updateSubtotal();
-		};
-
-		
 		/**
 		 * Shows the cart
 		 *
@@ -990,7 +1004,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 		};
 		
-		
+
+        // Expose the object as public methods
         return minicart;
     })();
 
@@ -1002,7 +1017,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	 * @param data {object} The data for the product
 	 * @param position {number} The product number
 	 */
-	var ProductBuilder = function (data, position) {
+	var ProductNode = function (data, position) {
 		this.product = null;
 		this.settings = null;
 		this.liNode = null;
@@ -1017,7 +1032,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	};
 	
 	
-	ProductBuilder.prototype = {		
+	ProductNode.prototype = {		
 		/**
 		 * Creates the DOM nodes and adds the product content
 		 *
