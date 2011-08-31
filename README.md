@@ -109,22 +109,24 @@ JavaScript API
 
 The Mini Cart has a rich JavaScript API which allows you to control it using the following methods:
 
-`render()`  
-Renders the cart element to the page.
+`PAYPAL.apps.MiniCart.render()`  
+Renders the cart element to the page. This method is required to see the Mini Cart.
 
-`addToCart()`  
-Custom method used to add a product to the cart (advanced uses only). See _dataFilter for format.
+`PAYPAL.apps.MiniCart.addToCart(data)`  
+Allows you to manually add a product to your cart, e.g. directly using JavaScript and not through a PayPal form. The parameter `data` is an key / value pair object of parameters and their value. For example: 
 
-`reset()`  
+    {"business":"user@example.com","item_name":"Test Product","amount":"5.00","currency_code":"USD"}
+
+`PAYPAL.apps.MiniCart.reset()`  
 Resets the cart, emptying and hiding it.
 
-`hide(null, fully)`  
-Hides the cart. If the cart contains products then it will "peek" from the top of the window. Set fully to true to override this.
+`PAYPAL.apps.MiniCart.hide(null, fully)`  
+Hides the cart. If the cart contains products then it will "peek" from the top of the window. Set the parameter `fully` to true to override this and have it fully hidden.
 
-`show()`  
+`PAYPAL.apps.MiniCart.show()`  
 Shows the cart.
 
-`toggle()`  
+`PAYPAL.apps.MiniCart.toggle()`  
 Toggles the visibility of the cart.
 
 
