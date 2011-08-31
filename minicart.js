@@ -50,7 +50,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		},
 		
 		/**
-		 * Unique ID used on the wrapper element 
+		 * Unique ID used on the wrapper element
 		 */		
 		name: 'PPMiniCart',
 		
@@ -60,7 +60,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		peekEnabled: true,
 
 		/**
-		 * The URL of the paypal website
+		 * The URL of the PayPal website
 		 */
 		paypalURL: 'https://www.paypal.com/cgi-bin/webscr',		
 		
@@ -90,7 +90,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			/**
 			 * Custom event fired after the cart is hidden
 			 *
-			 * @param e {event} The triggering event			 
+			 * @param e {event} The triggering event
 			 */
 			afterHide: null,
 			
@@ -104,7 +104,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			/**
 			 * Custom event fired after the cart is shown
 			 *
-			 * @param e {event} The triggering event			 
+			 * @param e {event} The triggering event
 			 */
 			afterShow: null,
 			
@@ -160,9 +160,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 	/**
 	 * Mini Cart application 
 	 */
-	PAYPAL.apps.MiniCart = (function () {
+	PAYPAL.apps.MiniCart = new (function () {
 		
-		var self = arguments.callee;
+		var minicart = this,
+            isShowing = false
+        ;
 				
 				
 		/** PRIVATE **/
@@ -179,63 +181,18 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var settingFilter = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
 		
-		
-		/**
-		 * Initializs the config, renders the cart and loads the data 
-		 *
-		 * @param userConfig {object} User settings which override the default configuration
-		 */
-		var _init = function (userConfig) {
-			var hash, cmd, key, i;
-				
-			// Overwrite default configuration with user settings
-			for (key in userConfig) {
-				if (config[key]) {
-					config[key] = userConfig[key];
-				}
-			}
-
-			// Render the cart UI
-			_render();
-		
-			// Process any stored data 
-			_parseStorage();
-						
-			// Check if a transaction was completed
-			hash = location.hash.substring(1);
 			
-			if (hash.indexOf(config.name + '=') === 0) {
-				cmd = hash.split('=')[1];
-				
-				if (cmd == 'reset') {
-					self.reset();
-					location.hash = '';
-				}
-			}
-					
-			// Update the UI
-			if (self.isShowing) {
-				setTimeout(function () {
-					self.hide(null);
-				}, 500);
-			} else {
-				$.storage.remove();
-			}
-
-			self.updateSubtotal();
-		};
-		
-		
 		/**
-		 * Renders the cart to the page and sets up it's events 
+		 * Renders the cart to the page and sets up it's events
 		 */
 		var _render = function () {
 			var events = config.events,
 				onRender = events.onRender,
-				afterRender = events.afterRender;
+				afterRender = events.afterRender
+            ;
 			
 			if (typeof onRender == 'function') {
-				onRender.call(self);
+				onRender.call(minicart);
 			}
 			
 			_addCSS();
@@ -243,7 +200,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			_bindEvents();
 			
 			if (typeof afterRender == 'function') {
-				afterRender.call(self);
+				afterRender.call(minicart);
 			}
 		};
 		
@@ -254,7 +211,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _addCSS = function () {
 			var name = config.name,
                 css = [],
-				style, head;
+				style, head
+            ;
 
 			css.push('#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; text-align:left; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ');
 			css.push('#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ');
@@ -284,11 +242,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		/**
-		 * Builds the DOM elements required by the cart 
+		 * Builds the DOM elements required by the cart
 		 */
 		var _buildDOM = function () {
-			var UI = self.UI,
-				cmd, type, bn, parent;
+			var UI = minicart.UI,
+				cmd, type, bn, parent, version
+            ;
 			
 			UI.wrapper = document.createElement('div');
 			UI.wrapper.id = config.name;
@@ -341,7 +300,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Workaround: IE 6 and IE 7/8 in quirks mode do not support position:fixed in CSS
 			if (window.attachEvent && !window.opera) {
-				var version = navigator.userAgent.match(/MSIE\s([^;]*)/);
+				version = navigator.userAgent.match(/MSIE\s([^;]*)/);
 				
 				if (version) {
 					version = parseFloat(version[1]);
@@ -360,7 +319,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		/**
-		 * Attaches the cart events to it's DOM elements 
+		 * Attaches the cart events to it's DOM elements
 		 */
 		var _bindEvents =function () {
 			var forms, form, i;
@@ -377,58 +336,58 @@ PAYPAL.apps = PAYPAL.apps || {};
 							e.preventDefault(e);
 							
 							var data = _parseForm(e.target);
-							self.addToCart(data);
+							minicart.addToCart(data);
 						});
 					} else if (form.display) {
 						$.event.add(form, 'submit', function (e) {
 							e.preventDefault();
-							self.show(e);
+							minicart.show(e);
 						});
 					}
 				}
 			}
 			
-			// Hide the Mini Cart for all non-cart related clicks 
+			// Hide the Mini Cart for all non-cart related clicks
 			$.event.add(document, 'click', function (e) {
-				if (self.isShowing) {
+				if (isShowing) {
 					var target = e.target;
 
 					if (!(/input|button|select|option/i.test(target.tagName))) {
 						while (target.nodeType === 1) {
-							if (target === self.UI.cart) {
+							if (target === minicart.UI.cart) {
 								return;
 							}
 
 							target = target.parentNode;
 						}
 						
-						self.hide(null);
+						minicart.hide(null);
 					}
 				}
 			});
 			
 			// Run the checkout code when submitting the form
-			$.event.add(self.UI.cart, 'submit', function (e) {
+			$.event.add(minicart.UI.cart, 'submit', function (e) {
 				_checkout(e);
 			});
 			
-			// Show the cart when clicking on the summary 
-			$.event.add(self.UI.summary, 'click', function (e) {
+			// Show the cart when clicking on the summary
+			$.event.add(minicart.UI.summary, 'click', function (e) {
 				var target = e.target;
 				
-				if (target !== self.UI.button) {
-					self.toggle(e);
+				if (target !== minicart.UI.button) {
+					minicart.toggle(e);
 				}
 			}); 
 
 			// Update other windows when HTML5 localStorage is updated
 			function redrawCartItems() {
-				self.products = [];
-				self.UI.itemList.innerHTML = '';
-				self.UI.subtotalAmount.innerHTML = '';
+				minicart.products = [];
+				minicart.UI.itemList.innerHTML = '';
+				minicart.UI.subtotalAmount.innerHTML = '';
 		
 				_parseStorage();
-				self.updateSubtotal();
+				minicart.updateSubtotal();
 			}
 			
 			if (window.attachEvent && !window.opera) {
@@ -459,7 +418,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				
 				for (i = 0; i < length; i++) {
 					if (_renderProduct(data[i])) {
-						self.isShowing = true;
+						isShowing = true;
 					}
 				}
 			}
@@ -468,14 +427,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		/**
 		 * Data parser used for forms
-		 * 
-		 * @param form {HTMLElement} An HTML form  
+		 *
+		 * @param form {HTMLElement} An HTML form
 		 * @return {object} 
 		 */		
 		var _parseForm = function (form) {
 			var raw = form.elements,
 				data = {},
-				pair, value, length, i, len;
+				pair, value, length, i, len
+            ;
 			
 			for (i = 0, len = raw.length; i < len; i++) {
 				pair = raw[i];
@@ -491,14 +451,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 				
 		/**
 		 * Massage's a object's data in preparation for adding it to the user's cart
-		 * 
+		 *
 		 * @param data {object} An object of WPS xclick style data to add to the cart. The format is { product: '', settings: '' }.
-		 * @return {object} 
+		 * @return {object}
 		 */
 		var _parseData = function (data) {
-			var product = {}, 
+			var product = {},
 				settings = {},
-				existing, option_index, key, len, match, i, j;
+				existing, option_index, key, len, match, i, j
+            ;
 			
 			// Parse the data into a two categories: product and settings
 			for (key in data) {
@@ -511,13 +472,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Check the products to see if this variation already exists
 			// If it does then reuse the same object
-			for (i = 0, len = self.products.length; i < len; i++) {
-				existing = self.products[i].product;
+			for (i = 0, len = minicart.products.length; i < len; i++) {
+				existing = minicart.products[i].product;
 				
 				// Do the product name and number match
-				if (product.item_name === existing.item_name && 
-					product.item_number === existing.item_number
-				) {
+				if (product.item_name === existing.item_name && product.item_number === existing.item_number) {
 					// Products are a match so far; Now do all of the products options match?
 					match = true;
 					j = 0;
@@ -537,8 +496,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 					}
 				}
 			}
-				  
-			// Normalize the values	 
+
+			// Normalize the values
 			product.href = product.href || window.location.href;
 			product.quantity = product.quantity || 1;
 			product.amount = product.amount || 0;
@@ -580,24 +539,20 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var _renderProduct = function (data) {
 			var keyupTimer,
-<<<<<<< HEAD
-				product = new ProductBuilder(data, that.UI.itemList.children.length + 1),
-				offset = data.product && data.product.offset,
-                hiddenInput, key;
-=======
-				product = new ProductBuilder(data, self.UI.itemList.children.length + 1),
-				offset = data.product.offset;
->>>>>>> parent of c2c3586... Refactoring references from 'self' to 'that'
+				product = new ProductBuilder(data, minicart.UI.itemList.children.length + 1),
+				offset = data.product.offset,
+                hiddenInput, key
+            ;
 				
-			self.products[offset] = product;
+			minicart.products[offset] = product;
 			
 			// Add hidden settings data to parent form
 			for (key in data.settings) {
-				if (self.UI.cart.elements[key]) {
-					if (self.UI.cart.elements[key].value) {
-						self.UI.cart.elements[key].value = data.settings[key];
+				if (minicart.UI.cart.elements[key]) {
+					if (minicart.UI.cart.elements[key].value) {
+						minicart.UI.cart.elements[key].value = data.settings[key];
 					} else {
-						self.UI.cart.elements[key] = data.settings[key];
+						minicart.UI.cart.elements[key] = data.settings[key];
 					}
 				} else {
 					hiddenInput = document.createElement('input');
@@ -605,7 +560,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					hiddenInput.name = key;
 					hiddenInput.value = data.settings[key];
 			
-					self.UI.cart.appendChild(hiddenInput);
+					minicart.UI.cart.appendChild(hiddenInput);
 				}
 			}
 			
@@ -614,7 +569,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				return false;
 			// otherwise, setup the new element
 			} else {
-				// Click event for "x" 
+				// Click event for "x"
 				$.event.add(product.removeNode, 'click', function () {
 					_removeProduct(product, offset);
 				});
@@ -638,14 +593,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 								_removeProduct(product, offset);
 							}
 
-							self.updateSubtotal();
-							$.storage.save(self.products);
+							minicart.updateSubtotal();
+							$.storage.save(minicart.products);
 						}
 					}, 250);
 				});
 			
 				// Add the item and fade it in
-				self.UI.itemList.appendChild(product.liNode);
+				minicart.UI.itemList.appendChild(product.liNode);
 				$.util.animate(product.liNode, 'opacity', { from: 0, to: 1 });
 				
 				return true;	
@@ -657,15 +612,16 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Removes a product from the cart
 		 *
 		 * @param product {ProductBuilder} The product object
-		 * @param offset {Number} The offset for the prduct in the cart
+		 * @param offset {Number} The offset for the product in the cart
 		 */
 		var _removeProduct = function (product, offset) {
 			var events = config.events,
 				onRemoveFromCart = events.onRemoveFromCart,
-				afterRemoveFromCart = events.afterRemoveFromCart;
+				afterRemoveFromCart = events.afterRemoveFromCart
+            ;
 				
 			if (typeof onRemoveFromCart == 'function') {
-				onRemoveFromCart.call(self, product);
+				onRemoveFromCart.call(minicart, product);
 			}
 			
 			product.setQuantity(0);
@@ -680,13 +636,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 					}
 					
 					// regenerate the form element indexes
-					var products = self.UI.cart.getElementsByTagName('li'),
+					var products = minicart.UI.cart.getElementsByTagName('li'),
 						products_len = products.length,
 						inputs,
 						inputs_len,
 						input,
 						matches,
-						i, j, k = 1;
+						i, j, k = 1
+                    ;
 					
 					for (i = 0 ; i < products_len; i++) {
 						inputs = products[i].getElementsByTagName('input');
@@ -705,21 +662,21 @@ PAYPAL.apps = PAYPAL.apps || {};
 					}
 					
 					if (typeof afterRemoveFromCart == 'function') {
-						afterRemoveFromCart.call(self, product);
+						afterRemoveFromCart.call(minicart, product);
 					}
 				});
 			});
 		
-			self.products[offset].product.item_name = '';
-			self.products[offset].product.item_number = '';
+			minicart.products[offset].product.item_name = '';
+			minicart.products[offset].product.item_number = '';
 		
-			self.updateSubtotal();
-			$.storage.save(self.products);
+			minicart.updateSubtotal();
+			$.storage.save(minicart.products);
 		};
 		
 		
 		/**
-		 * Event when the cart form is submitted 
+		 * Event when the cart form is submitted
 		 *
 		 * @param e {event} The form submission event
 		 */
@@ -727,30 +684,24 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var onCheckout = config.events.onCheckout;
 			
 			if (typeof onCheckout == 'function') {
-				onCheckout.call(self, e);
+				onCheckout.call(minicart, e);
 			}
 		};
 		
 		
-		/** PROTECTED -- Can be used in event callbacks **/
+		/** PUBLIC **/
 
 		
 		/**
 		 * Array of ProductBuilders
 		 */
-		self.products = [];
+		minicart.products = [];
 		
 		
 		/**
 		 * Container for UI elements
 		 */
-		self.UI = {};
-		
-		
-		/**
-		 * Flag to determine if the cart is currently showing
-		 */
-		self.isShowing = false;
+		minicart.UI = {};
 		
 		
 		/**
@@ -758,12 +709,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 *
 		 * @return {number} The subtotal
 		 */
-		self.calculateSubtotal = function () {
+		minicart.calculateSubtotal = function () {
 			var amount = 0,
-				product, price, discount, len, i;
+				product, price, discount, len, i
+            ;
 				
-			for (i = 0, len = self.products.length; i < len; i++) {
-				if ((product = self.products[i].product)) {
+			for (i = 0, len = minicart.products.length; i < len; i++) {
+				if ((product = minicart.products[i].product)) {
 					if (product.quantity && product.amount) {
 						price = product.amount;
 						discount = (product.discount_amount) ? product.discount_amount : 0;
@@ -780,69 +732,71 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Updates the UI with the current subtotal and currency code
 		 */
-		self.updateSubtotal = function () {
+		minicart.updateSubtotal = function () {
 			var currency_code,
 				currency_symbol,
-				subtotal = self.calculateSubtotal(),
+				subtotal = minicart.calculateSubtotal(),
 				level = 1,
-				hex, len, i;
+				hex, len, i
+            ;
 
 			// Get the currency
 			currency_code = '';
 			currency_symbol = '';
 
-			if (self.UI.cart.elements.currency_code) {
-				currency_code = self.UI.cart.elements.currency_code.value || self.UI.cart.elements.currency_code;
+			if (minicart.UI.cart.elements.currency_code) {
+				currency_code = minicart.UI.cart.elements.currency_code.value || minicart.UI.cart.elements.currency_code;
 			} else {			
-				for (i = 0, len = self.UI.cart.elements.length; i < len; i++) {
-					if (self.UI.cart.elements[i].name == 'currency_code') {
-						currency_code = self.UI.cart.elements[i].value || self.UI.cart.elements[i];
+				for (i = 0, len = minicart.UI.cart.elements.length; i < len; i++) {
+					if (minicart.UI.cart.elements[i].name == 'currency_code') {
+						currency_code = minicart.UI.cart.elements[i].value || minicart.UI.cart.elements[i];
 						break;
 					}
 				}
 			}
-		   
+
 			// Update the UI		
-			self.UI.subtotalAmount.innerHTML = $.util.formatCurrency(subtotal, currency_code); 
+			minicart.UI.subtotalAmount.innerHTML = $.util.formatCurrency(subtotal, currency_code); 
 		
 			// Yellow fade on update
 			(function () {
 				hex = level.toString(16);
 				level++;
 				
-				self.UI.subtotalAmount.style.backgroundColor = '#ff' + hex;
+				minicart.UI.subtotalAmount.style.backgroundColor = '#ff' + hex;
 
 				if (level >= 15) {
-					self.UI.subtotalAmount.style.backgroundColor = 'transparent';
+					minicart.UI.subtotalAmount.style.backgroundColor = 'transparent';
 					
 					// hide the cart if there's no total
 					if (subtotal == '0.00') {
-						self.hide(null, true);
+						minicart.hide(null, true);
 					}
 					
 					return;
 				}
 
 				setTimeout(arguments.callee, 30);
-			}());
+			})();
 		};
 		
 		
 		/**
-		 * Adds a product to the cart 
+		 * Adds a product to the cart
 		 *
 		 * @param data {object} Product object. See _parseData for format
 		 * @return {boolean} True if the product was added, false otherwise
 		 */
-		self.addToCart = function (data) {
+		minicart.addToCart = function (data) {
 			var events = config.events,
 				onAddToCart = events.onAddToCart,
 				afterAddToCart = events.afterAddToCart,
 				success = false,
-				offset;
+				offset
+            ;
 			
 			if (typeof onAddToCart === 'function') {
-				if (onAddToCart.call(self, data) === false) {
+				if (onAddToCart.call(minicart, data) === false) {
 					return;
 				}
 			}
@@ -851,58 +805,105 @@ PAYPAL.apps = PAYPAL.apps || {};
 			offset = data.product.offset;
 			
 			// Check if the product has already been added; update if so
-			if (typeof offset != 'undefined' && self.products[offset]) {
-				self.products[offset].product.quantity += parseInt(data.product.quantity || 1, 10);
+			if (typeof offset != 'undefined' && minicart.products[offset]) {
+				minicart.products[offset].product.quantity += parseInt(data.product.quantity || 1, 10);
 				
-				self.products[offset].setPrice(data.product.amount * self.products[offset].product.quantity);
-				self.products[offset].setQuantity(self.products[offset].product.quantity);
+				minicart.products[offset].setPrice(data.product.amount * minicart.products[offset].product.quantity);
+				minicart.products[offset].setQuantity(minicart.products[offset].product.quantity);
 				
 				success = true;
 			// Add a new DOM element for the product
 			} else {	
-				data.product.offset = self.products.length; 
+				data.product.offset = minicart.products.length; 
 				success = _renderProduct(data); 
 			}	
 				
-			self.updateSubtotal();
-			self.show(null);
+			minicart.updateSubtotal();
+			minicart.show(null);
 			
-			$.storage.save(self.products);
+			$.storage.save(minicart.products);
 		
 			if (typeof afterAddToCart === 'function') {
-				afterAddToCart.call(self, data);
+				afterAddToCart.call(minicart, data);
 			}
 			
 			return success;
 		};
 		
+
+        /**
+		 * Renders the cart, creates the configuration and loads the data
+		 *
+		 * @param userConfig {object} User settings which override the default configuration
+		 */
+        minicart.render = function (userConfig) {
+			var hash, cmd, key, i;
+				
+			// Overwrite default configuration with user settings
+			for (key in userConfig) {
+				if (config[key]) {
+					config[key] = userConfig[key];
+				}
+			}
+
+			// Render the cart UI
+			_render();
+		
+			// Process any stored data
+			_parseStorage();
+						
+			// Check if a transaction was completed
+			hash = location.hash.substring(1);
+			
+			if (hash.indexOf(config.name + '=') === 0) {
+				cmd = hash.split('=')[1];
+				
+				if (cmd == 'reset') {
+					minicart.reset();
+					location.hash = '';
+				}
+			}
+					
+			// Update the UI
+			if (isShowing) {
+				setTimeout(function () {
+					minicart.hide(null);
+                }, 500);
+			} else {
+				$.storage.remove();
+			}
+
+			minicart.updateSubtotal();
+		};
+
 		
 		/**
 		 * Shows the cart
 		 *
 		 * @param e {event} The triggering event
 		 */
-		self.show = function (e) {
-			var from = parseInt(self.UI.cart.offsetTop, 10),
+		minicart.show = function (e) {
+			var from = parseInt(minicart.UI.cart.offsetTop, 10),
 				to = 0,
 				events = config.events,
 				onShow = events.onShow,
-				afterShow = events.afterShow;
+				afterShow = events.afterShow
+            ;
 				
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
 			if (typeof onShow == 'function') {
-				onShow.call(self, e);
+				onShow.call(minicart, e);
 			}
 					
-			$.util.animate(self.UI.cart, 'top', { from: from, to: to }, function () {
+			$.util.animate(minicart.UI.cart, 'top', { from: from, to: to }, function () {
 				if (typeof afterShow == 'function') {
-					afterShow.call(self, e);
+					afterShow.call(minicart, e);
 				}
 			});
 			
-			self.UI.summary.style.backgroundPosition = '-195px 2px';
-			self.isShowing = true;
+			minicart.UI.summary.style.backgroundPosition = '-195px 2px';
+			minicart.isShowing = true;
 		};
 		
 		
@@ -912,14 +913,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param e {event} The triggering event
 		 * @param fully {boolean} Should the cart be fully hidden? Optional. Defaults to false.
 		 */
-		self.hide = function (e, fully) {
-			var cartHeight = (self.UI.cart.offsetHeight) ? self.UI.cart.offsetHeight : document.defaultView.getComputedStyle(self.UI.cart, '').getPropertyValue('height'),
-				summaryHeight = (self.UI.summary.offsetHeight) ? self.UI.summary.offsetHeight : document.defaultView.getComputedStyle(self.UI.summary, '').getPropertyValue('height'),
-				from = parseInt(self.UI.cart.offsetTop, 10),
+		minicart.hide = function (e, fully) {
+			var cartHeight = (minicart.UI.cart.offsetHeight) ? minicart.UI.cart.offsetHeight : document.defaultView.getComputedStyle(minicart.UI.cart, '').getPropertyValue('height'),
+				summaryHeight = (minicart.UI.summary.offsetHeight) ? minicart.UI.summary.offsetHeight : document.defaultView.getComputedStyle(minicart.UI.summary, '').getPropertyValue('height'),
+				from = parseInt(minicart.UI.cart.offsetTop, 10),
 				events = config.events,
 				onHide = events.onHide,
 				afterHide = events.afterHide,
-				to;
+				to
+            ;
 
 			// make the cart fully hidden
 			if (fully || !config.peekEnabled) {
@@ -932,125 +934,65 @@ PAYPAL.apps = PAYPAL.apps || {};
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
 			if (typeof onHide == 'function') {
-				onHide.call(self, e);
+				onHide.call(minicart, e);
 			}
 			
-			$.util.animate(self.UI.cart, 'top', { from: from, to: to }, function () {
+			$.util.animate(minicart.UI.cart, 'top', { from: from, to: to }, function () {
 				if (typeof afterHide == 'function') {
-					afterHide.call(self, e);
+					afterHide.call(minicart, e);
 				}	
 			});
 			
-			self.UI.summary.style.backgroundPosition = '-195px -32px';
-			self.isShowing = false;
+			minicart.UI.summary.style.backgroundPosition = '-195px -32px';
+			isShowing = false;
 		};
 		
- 
+
 		/**
 		 * Toggles the display of the cart
 		 *
 		 * @param e {event} The triggering event
-		 */		  
-		self.toggle = function (e) {
-			if (self.isShowing) {
-				self.hide(e);
+		 */
+		minicart.toggle = function (e) {
+			if (isShowing) {
+				minicart.hide(e);
 			} else {
-				self.show(e);
+				minicart.show(e);
 			}
 		};
 				
 	
 		/**
-		 * Resets the cart to it's intial state
+		 * Resets the cart to it's initial state
 		 */
-		self.reset = function () {	
+		minicart.reset = function () {	
 			var events = config.events,
-			 	onReset = events.onReset,
-				afterReset = events.afterReset;
+                onReset = events.onReset,
+				afterReset = events.afterReset
+            ;
 				
 			if (typeof onReset === 'function') {
-				onReset.call(self);
+				onReset.call(minicart);
 			}
 			
-			self.products = [];
+			minicart.products = [];
 
-			if (self.isShowing) {
-				self.UI.itemList.innerHTML = '';
-				self.UI.subtotalAmount.innerHTML = '';
-				self.hide(null, true);
+			if (isShowing) {
+				minicart.UI.itemList.innerHTML = '';
+				minicart.UI.subtotalAmount.innerHTML = '';
+				minicart.hide(null, true);
 			}
 	
 			$.storage.remove();
 		
 			if (typeof afterReset === 'function') {
-				afterReset.call(self);
+				afterReset.call(minicart);
 			}
 		};
 		
 		
-		
-		/** PUBLIC -- Can be called directly from the MiniCart object **/
-		return {
-			
-			/**
-			 * Init method called when the cart should be rendered to the DOM 
-			 *
-			 * @param userConfig {object} Customized configuration settings
-			 */
-			render: function (userConfig) {
-				_init(userConfig);
-			},
-			
-			
-			/**
-			 * Adds a product to the cart 
-			 *
-			 * @param data {object} Product object. See _parseData for format
-			 */
-			addToCart: function (data) {
-				self.addToCart(data);
-			},
-			
-			
-			/**
-			 * Shows the cart 
-			 *
-			 * @param e {event} Optional
-			 */
-			show: function (e) {
-				self.show(e);
-			},
-			
-			
-			/**
-			 * Hides the cart 
-			 *
-			 * @param e {event} Optional
-			 * @param fully {boolean) Optional. If true, the cart will completely hide
-			 */
-			hide: function (e, fully) {
-				self.hide(e, fully);
-			},
-			
-			
-			/**
-			 * Toggles the visibility of the cart 
-			 *
-			 * @param e {event} Optional
-			 */
-			toggle: function (e) {
-				self.toggle();
-			}, 
-			
-			
-			/**
-			 * Resets the cart, emptying and hiding it
-			 */
-			 reset: function () {
-			 	self.reset();
-			 }
-		};
-	}());
+        return minicart;
+    })();
 
 	
 	
@@ -1121,7 +1063,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			i = 0;
 			
 			while (typeof this.product['on' + i] !== 'undefined') {
-				this.metaNode.innerHTML += '<br />' + this.product['on' + i] + ': ' + this.product['os' + i];	  
+				this.metaNode.innerHTML += '<br />' + this.product['on' + i] + ': ' + this.product['os' + i];
 				i++;
 			}
 
@@ -1156,7 +1098,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Build out the DOM
 			this.liNode.appendChild(this.nameNode);			
-			this.liNode.appendChild(this.quantityNode); 
+			this.liNode.appendChild(this.quantityNode);
 			this.liNode.appendChild(this.removeNode);
 			this.liNode.appendChild(this.priceNode);	
 			
@@ -1175,7 +1117,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		/**
-		 * Utility function to set the quantity of this product 
+		 * Utility function to set the quantity of this product
 		 *
 		 * @param value {number} The new value
 		 */
@@ -1203,7 +1145,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		/**
-		 * Utility function to set the price of this product 
+		 * Utility function to set the price of this product
 		 *
 		 * @param value {number} The new value
 		 */
@@ -1235,8 +1177,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		// Use HTML5 client side storage
 		if (window.localStorage) {
-			return {	  
-						  
+			return {
+
 				/**
 				 * Loads the saved data
 				 * 
@@ -1260,7 +1202,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 */
 				save: function (items) {
 					var data = [],
-						item, len, i;
+						item, len, i
+                    ;
 					
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) { 
@@ -1296,7 +1239,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 */
 				load: function () {
 					var key = name + '=', 
-						data, cookies, cookie, value, i;
+						data, cookies, cookie, value, i
+                    ;
 
 					try {
 						cookies = document.cookie.split(';');
@@ -1327,7 +1271,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				save: function (items, duration) {
 					var date = new Date(),
 						data = [],
-						item, len, i;
+						item, len, i
+                    ;
 
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) {
@@ -1354,7 +1299,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 			};
 		}
-	}());
+	})();
 	
 	
 	$.event = {
@@ -1446,8 +1391,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 			config.duration = config.duration || 10;
 			config.unit = (/top|bottom|left|right|width|height/.test(prop)) ? 'px' : '';
 
-			var step = (config.to - config.from) / 20;
-			var current = config.from;
+			var step = (config.to - config.from) / 20,
+                current = config.from
+            ;
 
 			(function () {
 				el.style[prop] = current + config.unit;
@@ -1580,7 +1526,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	
 	/**
 	 * JSON Parser - See http://www.json.org/js.html
-	 */ 
+	 */
 	if(!this.JSON){JSON={};}(function(){function f(n){return n<10?"0"+n:n;}if(typeof Date.prototype.toJSON!=="function"){Date.prototype.toJSON=function(key){return this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z";};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(key){return this.valueOf();};}var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={"\b":"\\b","\t":"\\t","\n":"\\n","\f":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"},rep;function quote(string){escapable.lastIndex=0;return escapable.test(string)?'"'+string.replace(escapable,function(a){var c=meta[a];return typeof c==="string"?c:"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4);})+'"':'"'+string+'"';}function str(key,holder){var i,k,v,length,mind=gap,partial,value=holder[key];if(value&&typeof value==="object"&&typeof value.toJSON==="function"){value=value.toJSON(key);}if(typeof rep==="function"){value=rep.call(holder,key,value);}switch(typeof value){case"string":return quote(value);case"number":return isFinite(value)?String(value):"null";case"boolean":case"null":return String(value);case"object":if(!value){return"null";}gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==="[object Array]"){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||"null";}v=partial.length===0?"[]":gap?"[\n"+gap+partial.join(",\n"+gap)+"\n"+mind+"]":"["+partial.join(",")+"]";gap=mind;return v;}if(rep&&typeof rep==="object"){length=rep.length;for(i=0;i<length;i+=1){k=rep[i];if(typeof k==="string"){v=str(k,value);if(v){partial.push(quote(k)+(gap?": ":":")+v);}}}}else{for(k in value){if(Object.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+(gap?": ":":")+v);}}}}v=partial.length===0?"{}":gap?"{\n"+gap+partial.join(",\n"+gap)+"\n"+mind+"}":"{"+partial.join(",")+"}";gap=mind;return v;}}if(typeof JSON.stringify!=="function"){JSON.stringify=function(value,replacer,space){var i;gap="";indent="";if(typeof space==="number"){for(i=0;i<space;i+=1){indent+=" ";}}else{if(typeof space==="string"){indent=space;}}rep=replacer;if(replacer&&typeof replacer!=="function"&&(typeof replacer!=="object"||typeof replacer.length!=="number")){throw new Error("JSON.stringify");}return str("",{"":value});};}if(typeof JSON.parse!=="function"){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k,v,value=holder[key];if(value&&typeof value==="object"){for(k in value){if(Object.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v;}else{delete value[k];}}}}return reviver.call(holder,key,value);}cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function(a){return"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4);});}if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,"@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:\s*\[)+/g,""))){j=eval("("+text+")");return typeof reviver==="function"?walk({"":j},""):j;}throw new SyntaxError("JSON.parse");};}}());
-   
-}());
+
+})();
