@@ -112,7 +112,10 @@ The Mini Cart has a rich JavaScript API which allows you to control it using the
 `PAYPAL.apps.MiniCart.render()`  
 Renders the cart element to the page. This method is required to see the Mini Cart.
 
-`PAYPAL.apps.MiniCart.addToCart(data)`  
+`PAYPAL.apps.MiniCart.bindForm(form)`  
+Binds a form DOM element's submit event to the Mini Cart. This is useful for forms which may have been added to the page after the initial load. 
+
+`PAYPAL.apps.MiniCart.addToCart(data)` 
 Allows you to manually add a product to your cart, e.g. directly using JavaScript and not through a PayPal form. The parameter `data` is an key / value pair object of parameters and their value. For example: 
 
     {"business":"user@example.com","item_name":"Test Product","amount":"5.00","currency_code":"USD"}

@@ -163,8 +163,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 	PAYPAL.apps.MiniCart = (function () {
 		
 		var minicart = {},
-            isShowing = false
-        ;
+			isShowing = false
+		;
 				
 				
 		/** PRIVATE **/
@@ -189,7 +189,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var events = config.events,
 				onRender = events.onRender,
 				afterRender = events.afterRender
-            ;
+			;
 			
 			if (typeof onRender == 'function') {
 				onRender.call(minicart);
@@ -210,9 +210,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var _addCSS = function () {
 			var name = config.name,
-                css = [],
+				css = [],
 				style, head
-            ;
+			;
 
 			css.push('#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; text-align:left; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ');
 			css.push('#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ');
@@ -247,7 +247,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _buildDOM = function () {
 			var UI = minicart.UI,
 				cmd, type, bn, parent, version
-            ;
+			;
 			
 			UI.wrapper = document.createElement('div');
 			UI.wrapper.id = config.name;
@@ -331,8 +331,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				form = forms[i];
 				
 				if (form.cmd && (form.cmd.value === '_cart' || form.cmd.value === '_xclick')) {
-			        minicart.bindForm(form);	
-                }
+					minicart.bindForm(form);	
+				}
 			}
 			
 			// Hide the Mini Cart for all non-cart related clicks
@@ -423,7 +423,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var raw = form.elements,
 				data = {},
 				pair, value, length, i, len
-            ;
+			;
 			
 			for (i = 0, len = raw.length; i < len; i++) {
 				pair = raw[i];
@@ -447,7 +447,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var product = {},
 				settings = {},
 				existing, option_index, key, len, match, i, j
-            ;
+			;
 			
 			// Parse the data into a two categories: product and settings
 			for (key in data) {
@@ -529,8 +529,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var keyupTimer,
 				product = new ProductNode(data, minicart.UI.itemList.children.length + 1),
 				offset = data.product.offset,
-                hiddenInput, key
-            ;
+				hiddenInput, key
+			;
 				
 			minicart.products[offset] = product;
 			
@@ -606,7 +606,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var events = config.events,
 				onRemoveFromCart = events.onRemoveFromCart,
 				afterRemoveFromCart = events.afterRemoveFromCart
-            ;
+			;
 				
 			if (typeof onRemoveFromCart == 'function') {
 				onRemoveFromCart.call(minicart, product);
@@ -631,7 +631,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 						input,
 						matches,
 						i, j, k = 1
-                    ;
+					;
 					
 					for (i = 0 ; i < products_len; i++) {
 						inputs = products[i].getElementsByTagName('input');
@@ -692,12 +692,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 		minicart.UI = {};
 		
 
-        /**
+		/**
 		 * Renders the cart, creates the configuration and loads the data
 		 *
 		 * @param userConfig {object} User settings which override the default configuration
 		 */
-        minicart.render = function (userConfig) {
+		minicart.render = function (userConfig) {
 			var hash, cmd, key, i;
 				
 			// Overwrite default configuration with user settings
@@ -729,7 +729,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			if (isShowing) {
 				setTimeout(function () {
 					minicart.hide(null);
-                }, 500);
+				}, 500);
 			} else {
 				$.storage.remove();
 			}
@@ -738,33 +738,33 @@ PAYPAL.apps = PAYPAL.apps || {};
 		};
 
 
-        /**
-         * Binds a form to the Mini Cart
-         *
-         * @param form {HTMLElement} The form element to bind
-         */
-        minicart.bindForm = function (form) {
-            if (form.add) {
-                $.event.add(form, 'submit', function (e) {
-                    e.preventDefault(e);
+		/**
+		 * Binds a form to the Mini Cart
+		 *
+		 * @param form {HTMLElement} The form element to bind
+		 */
+		minicart.bindForm = function (form) {
+			if (form.add) {
+				$.event.add(form, 'submit', function (e) {
+					e.preventDefault(e);
 
-                    var data = _parseForm(e.target);
-                    minicart.addToCart(data);
-                });
-            } else if (form.display) {
-                $.event.add(form, 'submit', function (e) {
-                    e.preventDefault();
-                    minicart.show(e);
-                });
-            } else {
-                return false;
-            }
+					var data = _parseForm(e.target);
+					minicart.addToCart(data);
+				});
+			} else if (form.display) {
+				$.event.add(form, 'submit', function (e) {
+					e.preventDefault();
+					minicart.show(e);
+				});
+			} else {
+				return false;
+			}
 
-            return true;
-        };
+			return true;
+		};
 
 
-        /**
+		/**
 		 * Adds a product to the cart
 		 *
 		 * @param data {object} Product object. See _parseData for format
@@ -776,7 +776,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				afterAddToCart = events.afterAddToCart,
 				success = false,
 				offset
-            ;
+			;
 			
 			if (typeof onAddToCart === 'function') {
 				if (onAddToCart.call(minicart, data) === false) {
@@ -822,7 +822,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		minicart.calculateSubtotal = function () {
 			var amount = 0,
 				product, price, discount, len, i
-            ;
+			;
 				
 			for (i = 0, len = minicart.products.length; i < len; i++) {
 				if ((product = minicart.products[i].product)) {
@@ -848,7 +848,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				subtotal = minicart.calculateSubtotal(),
 				level = 1,
 				hex, len, i
-            ;
+			;
 
 			// Get the currency
 			currency_code = '';
@@ -902,7 +902,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				events = config.events,
 				onShow = events.onShow,
 				afterShow = events.afterShow
-            ;
+			;
 				
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
@@ -935,7 +935,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				onHide = events.onHide,
 				afterHide = events.afterHide,
 				to
-            ;
+			;
 
 			// make the cart fully hidden
 			if (fully || !config.peekEnabled) {
@@ -981,9 +981,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		minicart.reset = function () {	
 			var events = config.events,
-                onReset = events.onReset,
+				onReset = events.onReset,
 				afterReset = events.afterReset
-            ;
+			;
 				
 			if (typeof onReset === 'function') {
 				onReset.call(minicart);
@@ -1005,9 +1005,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 		};
 		
 
-        // Expose the object as public methods
-        return minicart;
-    })();
+		// Expose the object as public methods
+		return minicart;
+	})();
 
 	
 	
@@ -1218,7 +1218,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				save: function (items) {
 					var data = [],
 						item, len, i
-                    ;
+					;
 					
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) { 
@@ -1255,7 +1255,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				load: function () {
 					var key = name + '=', 
 						data, cookies, cookie, value, i
-                    ;
+					;
 
 					try {
 						cookies = document.cookie.split(';');
@@ -1287,7 +1287,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					var date = new Date(),
 						data = [],
 						item, len, i
-                    ;
+					;
 
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) {
@@ -1407,8 +1407,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			config.unit = (/top|bottom|left|right|width|height/.test(prop)) ? 'px' : '';
 
 			var step = (config.to - config.from) / 20,
-                current = config.from
-            ;
+				current = config.from
+			;
 
 			(function () {
 				el.style[prop] = current + config.unit;
