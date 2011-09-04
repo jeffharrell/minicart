@@ -917,7 +917,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			});
 			
 			minicart.UI.summary.style.backgroundPosition = '-195px 2px';
-			minicart.isShowing = true;
+			isShowing = true;
 		};
 		
 		
