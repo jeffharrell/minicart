@@ -16,7 +16,7 @@
     }
 
     function testAfterRender() {
-        var self = this,
+        var that = this,
             miniCartEl = document.getElementById(miniCartId);
         
         test('afterRender', function() {
@@ -24,34 +24,26 @@
         });
     }
 
-    function testOnHide(e) {
-        var showing = this.isShowing;
-    }
+    function testOnHide(e) {}
 
     function testAfterHide(e) {
-        var showing = this.isShowing;
-        
         test('afterHide', function() {
-            ok(!showing, 'Cart is currently hiding');
+            ok(!isCartShowing(), 'Cart is currently hiding');
         });
     }
 
-    function testOnShow(e) {
-        var showing = this.isShowing;
-    }
+    function testOnShow(e) {}
 
     function testAfterShow(e) {
-        var showing = this.isShowing;
-
         test('afterShow', function() {
-            ok(showing, 'Cart is currently showing');
+            ok(isCartShowing(), 'Cart is currently showing');
         });
     }
 
     function testOnAddToCart(obj) {
-        var self = this;
+        var that = this;
         
-        productCount = self.products.length;
+        productCount = that.products.length;
         
         test('onAddToCart', function() {
             ok(!!obj, 'Product data was passed');
@@ -59,19 +51,19 @@
     }
 
     function testAfterAddToCart(obj) {
-        var self = this;
+        var that = this;
                 
         test('afterAddToCart', function() {
             ok(typeof obj == 'object', 'Product data was passed');
-            ok(self.products.length === productCount + 1, 'Product array grew by one');
-            ok(self.UI.itemList.children.length === productCount + 1, 'Product UI list grew by one');
+            ok(that.products.length === productCount + 1, 'Product array grew by one');
+            ok(that.UI.itemList.children.length === productCount + 1, 'Product UI list grew by one');
         });
     }
     
     function testOnRemoveFromCart(obj) {
-        var self = this;
+        var that = this;
         
-        productCount = self.products.length;
+        productCount = that.products.length;
         
         test('onRemoveFromCart', function() {
             ok(typeof obj == 'object', 'Product data was passed');
@@ -79,11 +71,11 @@
     }
 
     function testAfterRemoveFromCart(obj) {
-        var self = this;
+        var that = this;
                 
         test('afterRemoveFromCart', function() {
             ok(typeof obj == 'object', 'Product data was passed');
-            ok(self.UI.itemList.children.length < productCount, 'Product UI list shrunk by one');
+            ok(that.UI.itemList.children.length < productCount, 'Product UI list shrunk by one');
         });
     }
     
@@ -96,25 +88,25 @@
     }
 
     function testOnReset() {
-        var self = this;
+        var that = this;
         
         test('onReset', function() {
-            ok(self.products.length === 0, 'Cart products array is empty');
-            ok(self.UI.itemList.innerHTML === '', 'Cart product UI is empty');
-            ok(!self.showing, 'Cart is hiding');
+            ok(that.products.length === 0, 'Cart products array is empty');
+            ok(that.UI.itemList.innerHTML === '', 'Cart product UI is empty');
+            ok(!isCartShowing(), 'Cart is hiding');
         });
     }
 
     function testAfterReset() {
-        var self = this;
+        var that = this;
         
         test('afterReset', function() {
-            ok(self.products.length === 0, 'Cart products array is empty');
-            ok(self.UI.itemList.innerHTML === '', 'Cart product UI is empty');
-            ok(!self.showing, 'Cart is hiding');
+            ok(that.products.length === 0, 'Cart products array is empty');
+            ok(that.UI.itemList.innerHTML === '', 'Cart product UI is empty');
+            ok(!isCartShowing(), 'Cart is hiding');
             
             // let's fake some user activity now that the cart's ready
-            testUserAddProducts(self);
+            testUserAddProducts(that);
         });
     }
 
@@ -155,10 +147,8 @@
         
         // test if the cart hides when there are no products
         setTimeout(function () {
-            var showing = cart.isShowing;
-
             test('hideOnEmpty', function() {
-                ok(!showing, 'Cart is hidden after last product');
+                ok(!isCartShowing(), 'Cart is hidden after last product');
             });
         }, 1000);
     }
@@ -182,6 +172,10 @@
         }
     }
     
+	function isCartShowing() {
+		return (parseInt(PAYPAL.apps.MiniCart.UI.cart.style.top, 10) === 0);
+	}
+
     
 
     // initialize the Mini Cart and get started
