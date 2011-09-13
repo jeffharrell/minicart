@@ -1525,14 +1525,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 					XCD: { before: '$' },
 					ZAR: { before: 'R' }			
 				},
-				currency = currencies[code],
-				before, 
-				after;
-			
-			if (currency) {
-				before = currency.before || '';
-				after = currency.after || '';
-			}
+				currency = currencies[code] || {},
+				before = currency.before || '',
+				after = currency.after || ''
+			;
 	
 			return before + amount + after;
 		}
