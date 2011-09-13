@@ -938,7 +938,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			;
 
 			// make the cart fully hidden
-			if (fully || !config.peekEnabled) {
+			if (fully || minicart.products.length === 0 || !config.peekEnabled) {
 				to = cartHeight * -1;
 			// otherwise only show a little teaser portion of it
 			} else {
