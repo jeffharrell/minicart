@@ -152,6 +152,9 @@ Yes, there’s a rich API which can be used to customize the Mini Cart. See the 
 **I found a bug / I have an issue!**  
 Please log the issue on the [Mini Cart’s issue tracker](https://github.com/jeffharrell/MiniCart/issues), including a link or sample code that reproduces it if possible.
 
+**I made a change and want to integrate it back into the Mini Cart!**  
+Awesome! Thanks for helping out. Please fork the Mini Cart code on Github. Once you're done with the change you can submit a pull request back to me. If everything looks good and the change is beneficial all I will integrate it.
+
 **I installed the Mini Cart, but my website still redirects to PayPal when clicking on a button. Why?**  
 There's two causes for this. The first is quite easy and it's that you have inserted the Mini Cart JavaScript in the document head or at the top of your page. It needs to be inserted before the closing body element so that it can "see" the PayPal forms.
 
@@ -178,4 +181,12 @@ This happens when you have the position and z-index CSS properties set on an ele
     #PPMiniCart { position: relative; z-index: 100; }
 
 and set the value to correspond with your code.
+
+**I don't like the way the Mini Cart looks / How can I customize the Mini Cart more?**  
+The Mini Cart CSS is delivered as part of the code and shouldn't be changed. There are some values which can be changed via the config, e.g. the offset or position, but otherwise you'll need to override the Mini Cart's CSS in your own CSS using a higher CSS specificity. Here's an example if changing the height of the Mini Cart so that it grows as products are added:
+
+	#myPage #PPMiniCart ul { height: auto; min-height: 130px; max-height: 500px; }
+
+Note that using an additional id of #myPage in your CSS causes the rule to be more specific than the Mini Cart's and the bowser renders that instead.
+
 
