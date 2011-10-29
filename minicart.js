@@ -171,12 +171,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		/**
-		 * Regex filter for product values, which appear multiple times in a cart
-		 */
-		var productFilter = /^(?:item_number|item_name|amount|quantity|on|os|option_|tax|weight|handling|shipping|discount)/;
-		
-		
-		/**
 		 * Regex filter for cart settings, which appear only once in a cart
 		 */
 		var settingFilter = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
@@ -453,7 +447,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			for (key in data) {
 				if (settingFilter.test(key)) {
 					settings[key] = data[key];
-				} else if (productFilter.test(key)) {
+				} else {
 					product[key] = data[key];
 				}
 			}
