@@ -31,6 +31,9 @@ You can customize the script to make it work for your site by passing a JavaScri
 `parent`  
 The HTMLElement the Mini Cart should render as a child of. Default document.body.
 
+`formTarget`  
+The HTML target property for the checkout form.
+
 `displayEdge`  
 The edge of the page the cart should pin to. Set to left or right. Default right.
 

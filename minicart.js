@@ -35,6 +35,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 		edgeDistance: '50px',
 		
 		/**
+		 * HTML target property for the checkout form
+		 */
+		formTarget: null,
+		
+		/**
 		 * The base path of your website to set the cookie to
 		 */		
 		cookiePath: '/',
@@ -262,6 +267,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 			UI.cart = document.createElement('form');
 			UI.cart.method = 'post';
 			UI.cart.action = config.paypalURL;
+			
+			if (config.formTarget) {
+				UI.cart.target = config.formTarget;
+			}
+			
 			UI.cart.appendChild(cmd);
 			UI.cart.appendChild(type);
 			UI.cart.appendChild(bn);
@@ -696,7 +706,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				
 			// Overwrite default configuration with user settings
 			for (key in userConfig) {
-				if (config[key]) {
+				if (typeof config[key] !== undefined) {
 					config[key] = userConfig[key];
 				}
 			}
