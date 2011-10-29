@@ -143,6 +143,9 @@ FAQ
 **Is the Mini Cart free? How is it licensed?**  
 Yes, it’s free and licensed using an [eBay Open Source License Agreement](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE).
 
+**What browsers does the Mini Cart support?**  
+The Mini Cart is functionally supported by Chrome, Safari, Firefox, Opera, and Internet Explorer 6+. Older versions of IE use cookies for their data store while all other browsers use localStorage.
+
 **I have special integration / translation needs. Are there advanced settings?**  
 Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/jeffharrell/MiniCart#readme) for more details.
 

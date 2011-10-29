@@ -168,8 +168,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	PAYPAL.apps.MiniCart = (function () {
 		
 		var minicart = {},
-			isShowing = false
-		;
+			isShowing = false;
 				
 				
 		/** PRIVATE **/
@@ -187,8 +186,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _render = function () {
 			var events = config.events,
 				onRender = events.onRender,
-				afterRender = events.afterRender
-			;
+				afterRender = events.afterRender;
 			
 			if (typeof onRender == 'function') {
 				onRender.call(minicart);
@@ -210,8 +208,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _addCSS = function () {
 			var name = config.name,
 				css = [],
-				style, head
-			;
+				style, head;
 
 			css.push('#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; text-align:left; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ');
 			css.push('#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ');
@@ -245,8 +242,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var _buildDOM = function () {
 			var UI = minicart.UI,
-				cmd, type, bn, parent, version
-			;
+				cmd, type, bn, parent, version;
 			
 			UI.wrapper = document.createElement('div');
 			UI.wrapper.id = config.name;
@@ -426,8 +422,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _parseForm = function (form) {
 			var raw = form.elements,
 				data = {},
-				pair, value, length, i, len
-			;
+				pair, value, length, i, len;
 			
 			for (i = 0, len = raw.length; i < len; i++) {
 				pair = raw[i];
@@ -450,8 +445,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _parseData = function (data) {
 			var product = {},
 				settings = {},
-				existing, option_index, key, len, match, i, j
-			;
+				existing, option_index, key, len, match, i, j;
 			
 			// Parse the data into a two categories: product and settings
 			for (key in data) {
@@ -533,8 +527,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var keyupTimer,
 				product = new ProductNode(data, minicart.UI.itemList.children.length + 1),
 				offset = data.product.offset,
-				hiddenInput, key
-			;
+				hiddenInput, key;
 				
 			minicart.products[offset] = product;
 			
@@ -609,8 +602,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _removeProduct = function (product, offset) {
 			var events = config.events,
 				onRemoveFromCart = events.onRemoveFromCart,
-				afterRemoveFromCart = events.afterRemoveFromCart
-			;
+				afterRemoveFromCart = events.afterRemoveFromCart;
 				
 			if (typeof onRemoveFromCart == 'function') {
 				onRemoveFromCart.call(minicart, product);
@@ -634,8 +626,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 						inputs_len,
 						input,
 						matches,
-						i, j, k = 1
-					;
+						i, j, k = 1;
 					
 					for (i = 0 ; i < products_len; i++) {
 						inputs = products[i].getElementsByTagName('input');
@@ -779,8 +770,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				onAddToCart = events.onAddToCart,
 				afterAddToCart = events.afterAddToCart,
 				success = false,
-				offset
-			;
+				offset;
 			
 			if (typeof onAddToCart === 'function') {
 				if (onAddToCart.call(minicart, data) === false) {
@@ -825,8 +815,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		minicart.calculateSubtotal = function () {
 			var amount = 0,
-				product, price, discount, len, i
-			;
+				product, price, discount, len, i;
 				
 			for (i = 0, len = minicart.products.length; i < len; i++) {
 				if ((product = minicart.products[i].product)) {
@@ -851,8 +840,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				currency_symbol,
 				subtotal = minicart.calculateSubtotal(),
 				level = 1,
-				hex, len, i
-			;
+				hex, len, i;
 
 			// Get the currency
 			currency_code = '';
@@ -905,8 +893,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				to = 0,
 				events = config.events,
 				onShow = events.onShow,
-				afterShow = events.afterShow
-			;
+				afterShow = events.afterShow;
 				
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
@@ -938,8 +925,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				events = config.events,
 				onHide = events.onHide,
 				afterHide = events.afterHide,
-				to
-			;
+				to;
 
 			// make the cart fully hidden
 			if (fully || minicart.products.length === 0 || !config.peekEnabled) {
@@ -986,8 +972,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		minicart.reset = function () {	
 			var events = config.events,
 				onReset = events.onReset,
-				afterReset = events.afterReset
-			;
+				afterReset = events.afterReset;
 				
 			if (typeof onReset === 'function') {
 				onReset.call(minicart);
@@ -1221,8 +1206,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 */
 				save: function (items) {
 					var data = [],
-						item, len, i
-					;
+						item, len, i;
 					
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) { 
@@ -1258,8 +1242,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 */
 				load: function () {
 					var key = name + '=', 
-						data, cookies, cookie, value, i
-					;
+						data, cookies, cookie, value, i;
 
 					try {
 						cookies = document.cookie.split(';');
@@ -1290,8 +1273,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				save: function (items, duration) {
 					var date = new Date(),
 						data = [],
-						item, len, i
-					;
+						item, len, i;
 
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) {
@@ -1321,77 +1303,114 @@ PAYPAL.apps = PAYPAL.apps || {};
 	})();
 	
 	
-	$.event = {
+	$.event = (function () {
 		/**
 		 * Events are added here for easy reference
 		 */
-		cache: [],
+		var cache = [];
 		
-		
-		/**
-		 * Cross browser way to add an event to an object and optionally adjust it's scope
-		 *
-		 * @param obj {HTMLElement} The object to attach the event to
-		 * @param type {string} The type of event excluding "on"
-		 * @param fn {function} The function
-		 * @param scope {object} Object to adjust the scope to (optional)
-		 */
-		add: function (obj, type, fn, scope) {
-			var wrappedFn;
+		// Non-IE events
+		if (document.addEventListener) {
+			return {
+				/**
+				 * Add an event to an object and optionally adjust it's scope
+				 *
+				 * @param obj {HTMLElement} The object to attach the event to
+				 * @param type {string} The type of event excluding "on"
+				 * @param fn {function} The function
+				 * @param scope {object} Object to adjust the scope to (optional)
+				 */
+				add: function (obj, type, fn, scope) {
+					scope = scope || obj; 
+					
+					var wrappedFn = function (e) { fn.call(scope, e); };
 						
-			scope = scope || obj; 
+					obj.addEventListener(type, wrappedFn, false);
+					cache.push([obj, type, fn, wrappedFn]);
+				},
 
-			if (obj.addEventListener) {
-				wrappedFn = function (e) { fn.call(scope, e); };
-				obj.addEventListener(type, wrappedFn, false);
-			} else if (obj.attachEvent) {
-				wrappedFn = function () {
-					var e = window.event;
-					e.target = e.target || e.srcElement;
 
-					e.preventDefault = function () {
-						e.returnValue = false;
+				/**
+				 * Remove an event from an object
+				 *
+				 * @param obj {HTMLElement} The object to remove the event from
+				 * @param type {string} The type of event excluding "on"
+				 * @param fn {function} The function
+				 */
+				remove: function (obj, type, fn) {
+					var wrappedFn, item, len, i;
+
+					for (i = 0; i < cache.length; i++) {
+						item = cache[i];
+
+						if (item[0] == obj && item[1] == type && item[2] == fn) {
+							wrappedFn = item[3];
+
+							if (wrappedFn) {
+								obj.removeEventListener(type, wrappedFn, false);
+								delete cache[i];
+							}
+						}
+					}
+				}				
+			};
+			
+		// IE events
+		} else if (document.attachEvent) {
+			return {
+				/**
+				 * Add an event to an object and optionally adjust it's scope (IE)
+				 *
+				 * @param obj {HTMLElement} The object to attach the event to
+				 * @param type {string} The type of event excluding "on"
+				 * @param fn {function} The function
+				 * @param scope {object} Object to adjust the scope to (optional)
+				 */
+				add: function (obj, type, fn, scope) {
+					scope = scope || obj; 
+					
+					var wrappedFn = function () {
+						var e = window.event;
+						e.target = e.target || e.srcElement;
+
+						e.preventDefault = function () {
+							e.returnValue = false;
+						};
+
+						fn.call(scope, e);
 					};
 
-					fn.call(scope, e);
-				};
+					obj.attachEvent('on' + type, wrappedFn);
+					cache.push([obj, type, fn, wrappedFn]);
+				},
 
-				obj.attachEvent('on' + type, wrappedFn);
-			}
 
-			this.cache.push([obj, type, fn, wrappedFn]);
-		},
-		
-		
-		/**
-		 * Cross browser way to remove an event from an object
-		 *
-		 * @param obj {HTMLElement} The object to remove the event from
-		 * @param type {string} The type of event excluding "on"
-		 * @param fn {function} The function
-		 */
-		remove: function (obj, type, fn) {
-			var wrappedFn, item, len, i;
+				/**
+				 * Remove an event from an object (IE)
+				 *
+				 * @param obj {HTMLElement} The object to remove the event from
+				 * @param type {string} The type of event excluding "on"
+				 * @param fn {function} The function
+				 */
+				remove: function (obj, type, fn) {
+					var wrappedFn, item, len, i;
 
-			for (i = 0; i < this.cache.length; i++) {
-				item = this.cache[i];
+					for (i = 0; i < cache.length; i++) {
+						item = cache[i];
 
-				if (item[0] == obj && item[1] == type && item[2] == fn) {
-					wrappedFn = item[3];
+						if (item[0] == obj && item[1] == type && item[2] == fn) {
+							wrappedFn = item[3];
 
-					if (wrappedFn) {
-						if (obj.removeEventListener) {
-							obj.removeEventListener(type, wrappedFn, false);
-						} else if (obj.detachEvent) {
-							obj.detachEvent('on' + type, wrappedFn);
+							if (wrappedFn) {
+								obj.detachEvent('on' + type, wrappedFn);
+								delete cache[i];
+							}
 						}
-						
-						delete this.cache[i];
 					}
 				}
-			}
+			};
 		}
-	};
+	})();
 	
 	
 	$.util = {
@@ -1411,8 +1430,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			config.unit = (/top|bottom|left|right|width|height/.test(prop)) ? 'px' : '';
 
 			var step = (config.to - config.from) / 20,
-				current = config.from
-			;
+				current = config.from;
 
 			(function () {
 				el.style[prop] = current + config.unit;
@@ -1531,8 +1549,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				},
 				currency = currencies[code] || {},
 				before = currency.before || '',
-				after = currency.after || ''
-			;
+				after = currency.after || '';
 	
 			return before + amount + after;
 		}
