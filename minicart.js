@@ -177,7 +177,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Regex filter for cart settings, which appear only once in a cart
 		 */
-		var settingFilter = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
+		var SETTING_FILTER = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
 		
 			
 		/**
@@ -322,7 +322,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Attaches the cart events to it's DOM elements
 		 */
 		var _bindEvents =function () {
-			var forms, form, i;
+			var ui = minicart.UI,
+				forms, form, i;
 			
 			// Look for all "Cart" and "Buy Now" forms on the page and attach events
 			forms = document.getElementsByTagName('form');
@@ -338,11 +339,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 			// Hide the Mini Cart for all non-cart related clicks
 			$.event.add(document, 'click', function (e) {
 				if (isShowing) {
-					var target = e.target;
+					var target = e.target,
+						cartEl = ui.cart;
 
 					if (!(/input|button|select|option/i.test(target.tagName))) {
 						while (target.nodeType === 1) {
-							if (target === minicart.UI.cart) {
+							if (target === cartEl) {
 								return;
 							}
 
@@ -355,15 +357,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 			});
 			
 			// Run the checkout code when submitting the form
-			$.event.add(minicart.UI.cart, 'submit', function (e) {
+			$.event.add(ui.cart, 'submit', function (e) {
 				_checkout(e);
 			});
 			
 			// Show the cart when clicking on the summary
-			$.event.add(minicart.UI.summary, 'click', function (e) {
+			$.event.add(ui.summary, 'click', function (e) {
 				var target = e.target;
 				
-				if (target !== minicart.UI.button) {
+				if (target !== ui.button) {
 					minicart.toggle(e);
 				}
 			}); 
@@ -449,7 +451,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Parse the data into a two categories: product and settings
 			for (key in data) {
-				if (settingFilter.test(key)) {
+				if (SETTING_FILTER.test(key)) {
 					settings[key] = data[key];
 				} else {
 					product[key] = data[key];
@@ -524,20 +526,21 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param data {object} The data for the product
 		 */
 		var _renderProduct = function (data) {
-			var keyupTimer,
+			var ui = minicart.UI,
+				cartEl = ui.cart,
 				product = new ProductNode(data, minicart.UI.itemList.children.length + 1),
 				offset = data.product.offset,
-				hiddenInput, key;
+				keyupTimer, hiddenInput, key;
 				
 			minicart.products[offset] = product;
 			
 			// Add hidden settings data to parent form
 			for (key in data.settings) {
-				if (minicart.UI.cart.elements[key]) {
-					if (minicart.UI.cart.elements[key].value) {
-						minicart.UI.cart.elements[key].value = data.settings[key];
+				if (cartEl.elements[key]) {
+					if (cartEl.elements[key].value) {
+						cartEl.elements[key].value = data.settings[key];
 					} else {
-						minicart.UI.cart.elements[key] = data.settings[key];
+						cartEl.elements[key] = data.settings[key];
 					}
 				} else {
 					hiddenInput = document.createElement('input');
@@ -545,7 +548,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					hiddenInput.name = key;
 					hiddenInput.value = data.settings[key];
 			
-					minicart.UI.cart.appendChild(hiddenInput);
+					cartEl.appendChild(hiddenInput);
 				}
 			}
 			
@@ -585,7 +588,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				});
 			
 				// Add the item and fade it in
-				minicart.UI.itemList.appendChild(product.liNode);
+				ui.itemList.insertBefore(product.liNode, ui.itemList.firstChild);
 				$.util.animate(product.liNode, 'opacity', { from: 0, to: 1 });
 				
 				return true;	
@@ -770,7 +773,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				onAddToCart = events.onAddToCart,
 				afterAddToCart = events.afterAddToCart,
 				success = false,
-				offset;
+				productNode, offset;
 			
 			if (typeof onAddToCart === 'function') {
 				if (onAddToCart.call(minicart, data) === false) {
@@ -782,11 +785,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			offset = data.product.offset;
 			
 			// Check if the product has already been added; update if so
-			if (typeof offset != 'undefined' && minicart.products[offset]) {
-				minicart.products[offset].product.quantity += parseInt(data.product.quantity || 1, 10);
-				
-				minicart.products[offset].setPrice(data.product.amount * minicart.products[offset].product.quantity);
-				minicart.products[offset].setQuantity(minicart.products[offset].product.quantity);
+			if ((productNode = (typeof offset !== 'undefined' && minicart.products[offset]))) {
+				productNode.product.quantity += parseInt(data.product.quantity || 1, 10);
+				productNode.setPrice(data.product.amount * productNode.product.quantity);
+				productNode.setQuantity(productNode.product.quantity);
 				
 				success = true;
 			// Add a new DOM element for the product
@@ -815,10 +817,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		minicart.calculateSubtotal = function () {
 			var amount = 0,
+				products = minicart.products,
 				product, price, discount, len, i;
 				
-			for (i = 0, len = minicart.products.length; i < len; i++) {
-				if ((product = minicart.products[i].product)) {
+			for (i = 0, len = products.length; i < len; i++) {
+				if ((product = products[i].product)) {
 					if (product.quantity && product.amount) {
 						price = product.amount;
 						discount = (product.discount_amount) ? product.discount_amount : 0;
@@ -836,39 +839,40 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Updates the UI with the current subtotal and currency code
 		 */
 		minicart.updateSubtotal = function () {
-			var currency_code,
-				currency_symbol,
+			var ui = minicart.UI,
+				cartEl = ui.cart.elements,
+				subtotalEl = ui.subtotalAmount,
 				subtotal = minicart.calculateSubtotal(),
 				level = 1,
-				hex, len, i;
+				currency_code, currency_symbol, hex, len, i;
 
 			// Get the currency
 			currency_code = '';
 			currency_symbol = '';
 
-			if (minicart.UI.cart.elements.currency_code) {
-				currency_code = minicart.UI.cart.elements.currency_code.value || minicart.UI.cart.elements.currency_code;
+			if (cartEl.currency_code) {
+				currency_code = cartEl.currency_code.value || cartEl.currency_code;
 			} else {			
-				for (i = 0, len = minicart.UI.cart.elements.length; i < len; i++) {
-					if (minicart.UI.cart.elements[i].name == 'currency_code') {
-						currency_code = minicart.UI.cart.elements[i].value || minicart.UI.cart.elements[i];
+				for (i = 0, len = cartEl.length; i < len; i++) {
+					if (cartEl[i].name == 'currency_code') {
+						currency_code = cartEl[i].value || cartEl[i];
 						break;
 					}
 				}
 			}
 
 			// Update the UI		
-			minicart.UI.subtotalAmount.innerHTML = $.util.formatCurrency(subtotal, currency_code); 
+			subtotalEl.innerHTML = $.util.formatCurrency(subtotal, currency_code); 
 		
 			// Yellow fade on update
 			(function () {
 				hex = level.toString(16);
 				level++;
 				
-				minicart.UI.subtotalAmount.style.backgroundColor = '#ff' + hex;
+				subtotalEl.style.backgroundColor = '#ff' + hex;
 
 				if (level >= 15) {
-					minicart.UI.subtotalAmount.style.backgroundColor = 'transparent';
+					subtotalEl.style.backgroundColor = 'transparent';
 					
 					// hide the cart if there's no total
 					if (subtotal == '0.00') {
@@ -919,9 +923,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param fully {boolean} Should the cart be fully hidden? Optional. Defaults to false.
 		 */
 		minicart.hide = function (e, fully) {
-			var cartHeight = (minicart.UI.cart.offsetHeight) ? minicart.UI.cart.offsetHeight : document.defaultView.getComputedStyle(minicart.UI.cart, '').getPropertyValue('height'),
-				summaryHeight = (minicart.UI.summary.offsetHeight) ? minicart.UI.summary.offsetHeight : document.defaultView.getComputedStyle(minicart.UI.summary, '').getPropertyValue('height'),
-				from = parseInt(minicart.UI.cart.offsetTop, 10),
+			var ui = minicart.UI,
+				cartEl = ui.cart,
+				summaryEl = ui.summary,
+				cartHeight = (cartEl.offsetHeight) ? cartEl.offsetHeight : document.defaultView.getComputedStyle(cartEl, '').getPropertyValue('height'),
+				summaryHeight = (summaryEl.offsetHeight) ? summaryEl.offsetHeight : document.defaultView.getComputedStyle(summaryEl, '').getPropertyValue('height'),
+				from = parseInt(cartEl.offsetTop, 10),
 				events = config.events,
 				onHide = events.onHide,
 				afterHide = events.afterHide,
@@ -941,13 +948,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 				onHide.call(minicart, e);
 			}
 			
-			$.util.animate(minicart.UI.cart, 'top', { from: from, to: to }, function () {
+			$.util.animate(cartEl, 'top', { from: from, to: to }, function () {
 				if (typeof afterHide == 'function') {
 					afterHide.call(minicart, e);
 				}	
 			});
 			
-			minicart.UI.summary.style.backgroundPosition = '-195px -32px';
+			summaryEl.style.backgroundPosition = '-195px -32px';
 			isShowing = false;
 		};
 		
@@ -970,7 +977,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Resets the cart to it's initial state
 		 */
 		minicart.reset = function () {	
-			var events = config.events,
+			var ui = minicart.ui,
+				events = config.events,
 				onReset = events.onReset,
 				afterReset = events.afterReset;
 				
@@ -981,8 +989,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			minicart.products = [];
 
 			if (isShowing) {
-				minicart.UI.itemList.innerHTML = '';
-				minicart.UI.subtotalAmount.innerHTML = '';
+				ui.itemList.innerHTML = '';
+				ui.subtotalAmount.innerHTML = '';
 				minicart.hide(null, true);
 			}
 	
