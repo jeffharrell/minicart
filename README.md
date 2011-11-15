@@ -68,6 +68,8 @@ An object of customizable callbacks:
 * `afterShow` - Event after the cart is shown  
 * `onAddToCart` - Event before a product is added to the cart  
 * `afterAddToCart` - Event after a product is added to the cart  
+* `onRemoveFromCart` - Event before a product is removed from the cart  
+* `afterRemoveFromCart` - Event after a product is removed from the cart
 * `onCheckout` - Event before the checkout action takes place  
 * `onReset` - Event before the cart is emptied (typically when a transaction is completed)  
 * `afterReset` - Event after the cart is emptied (typically when a transaction is completed)  

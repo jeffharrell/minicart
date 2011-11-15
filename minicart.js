@@ -179,28 +179,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 */
 		var SETTING_FILTER = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
 		
-			
-		/**
-		 * Renders the cart to the page and sets up it's events
-		 */
-		var _render = function () {
-			var events = config.events,
-				onRender = events.onRender,
-				afterRender = events.afterRender;
-			
-			if (typeof onRender == 'function') {
-				onRender.call(minicart);
-			}
-			
-			_addCSS();
-			_buildDOM();
-			_bindEvents();
-			
-			if (typeof afterRender == 'function') {
-				afterRender.call(minicart);
-			}
-		};
-		
 		
 		/**
 		 * Adds the cart's CSS to the page
@@ -696,7 +674,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param userConfig {object} User settings which override the default configuration
 		 */
 		minicart.render = function (userConfig) {
-			var hash, cmd, key, i;
+			var events = config.events,
+				onRender = events.onRender,
+				afterRender = events.afterRender,
+				hash, cmd, key, i;
+				
+			if (typeof onRender == 'function') {
+				onRender.call(minicart);
+			}
 				
 			// Overwrite default configuration with user settings
 			for (key in userConfig) {
@@ -705,9 +690,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 			}
 
-			// Render the cart UI
-			_render();
-		
+			// Render the cart UI	
+			_addCSS();
+			_buildDOM();
+			_bindEvents();
+				
 			// Process any stored data
 			_parseStorage();
 						
@@ -733,6 +720,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 
 			minicart.updateSubtotal();
+			
+			if (typeof afterRender == 'function') {
+				afterRender.call(minicart);
+			}			
 		};
 
 
@@ -977,7 +968,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Resets the cart to it's initial state
 		 */
 		minicart.reset = function () {	
-			var ui = minicart.ui,
+			var ui = minicart.UI,
 				events = config.events,
 				onReset = events.onReset,
 				afterReset = events.afterReset;
