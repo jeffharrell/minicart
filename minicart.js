@@ -168,10 +168,16 @@ PAYPAL.apps = PAYPAL.apps || {};
 	PAYPAL.apps.MiniCart = (function () {
 		
 		var minicart = {},
-			isShowing = false;
+			isShowing = false,
+			isRendered = false;
 				
 				
 		/** PRIVATE **/
+		
+		/**
+		 * The form origin that is passed to PayPal
+		 */
+		var BN_VALUE = 'MiniCart_AddToCart_WPS_US';
 		
 		
 		/**
@@ -181,7 +187,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		/**
-		 * Adds the cart's CSS to the page
+		 * Adds the cart's CSS to the page in a <style> element.
+		 * The CSS lives in this file so that it can leverage properties from the config 
+		 * and doesn't require an additional down. To override the CSS see the FAQ.
 		 */
 		var _addCSS = function () {
 			var name = config.name,
@@ -236,7 +244,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			bn = cmd.cloneNode(false);
 			bn.name = 'bn';
-			bn.value = 'MiniCart_AddToCart_WPS_US';
+			bn.value = BN_VALUE;
 			
 			UI.cart = document.createElement('form');
 			UI.cart.method = 'post';
@@ -349,28 +357,33 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}); 
 
 			// Update other windows when HTML5 localStorage is updated
-			function redrawCartItems() {
-				minicart.products = [];
-				minicart.UI.itemList.innerHTML = '';
-				minicart.UI.subtotalAmount.innerHTML = '';
-		
-				_parseStorage();
-				minicart.updateSubtotal();
-			}
-			
 			if (window.attachEvent && !window.opera) {
 				$.event.add(document, 'storage', function (e) {
 					// IE needs a delay in order to properly see the change
-					setTimeout(redrawCartItems, 100);
+					setTimeout(_redrawCartItems, 100);
 				});			
 			} else {
 				$.event.add(window, 'storage', function (e) {
 					// Safari, Chrome, and Opera can filter on updated storage key	
 					// Firefox can't so it uses a brute force approach
 					if ((e.key && e.key == config.name) || !e.key) {
-						redrawCartItems();
+						_redrawCartItems();
 					}
 				});
+			}
+		};
+
+
+		/**
+		 * Parses the userConfig (if applicable) and overwrites the default values
+		 */
+		var _parseUserConfig = function (userConfig) {
+			var key;
+			
+			for (key in userConfig) {
+				if (typeof config[key] !== undefined) {
+					config[key] = userConfig[key];
+				}
 			}
 		};
 
@@ -495,6 +508,19 @@ PAYPAL.apps = PAYPAL.apps || {};
 				product: product,
 				settings: settings
 			};
+		};
+		
+
+		/**
+		 * Resets the card and renders the products
+		 */
+		var _redrawCartItems = function () {
+			minicart.products = [];
+			minicart.UI.itemList.innerHTML = '';
+			minicart.UI.subtotalAmount.innerHTML = '';
+	
+			_parseStorage();
+			minicart.updateSubtotal();
 		};
 		
 		
@@ -677,49 +703,54 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var events = config.events,
 				onRender = events.onRender,
 				afterRender = events.afterRender,
-				hash, cmd, key, i;
+				hash, cmd;
 				
 			if (typeof onRender == 'function') {
 				onRender.call(minicart);
 			}
 				
-			// Overwrite default configuration with user settings
-			for (key in userConfig) {
-				if (typeof config[key] !== undefined) {
-					config[key] = userConfig[key];
-				}
-			}
-
-			// Render the cart UI	
-			_addCSS();
-			_buildDOM();
-			_bindEvents();
+			if (!isRendered) {
+				// Overwrite default configuration with user settings
+				_parseUserConfig(userConfig);
 				
-			// Process any stored data
-			_parseStorage();
-						
-			// Check if a transaction was completed
-			hash = location.hash.substring(1);
+				// Render the cart UI
+				_addCSS();
+				_buildDOM();
+				_bindEvents();
+				
+				// Check if a transaction was completed
+				// The "return" form param is modified to contain a hash value
+				// with "PPMiniCart=reset". If this is seen then it's assumed
+				// that a transaction was completed and we should reset the cart. 
+				hash = location.hash.substring(1);
+				
+				if (hash.indexOf(config.name + '=') === 0) {
+					cmd = hash.split('=')[1];
+
+					if (cmd == 'reset') {
+						minicart.reset();
+						location.hash = '';
+					}
+				}
+			} 
 			
-			if (hash.indexOf(config.name + '=') === 0) {
-				cmd = hash.split('=')[1];
-				
-				if (cmd == 'reset') {
-					minicart.reset();
-					location.hash = '';
+			// Process any stored data and render it
+			// TODO: _parseStorage shouldn't be so tightly coupled here and one
+			// should be able to redraw without re-parsing the storage
+			_redrawCartItems();
+					
+			// Trigger the cart to peek on first load if any products were loaded
+			if (!isRendered) {
+				if (isShowing) {
+					setTimeout(function () {
+						minicart.hide(null);
+					}, 500);
+				} else {
+					$.storage.remove();
 				}
 			}
-					
-			// Update the UI
-			if (isShowing) {
-				setTimeout(function () {
-					minicart.hide(null);
-				}, 500);
-			} else {
-				$.storage.remove();
-			}
-
-			minicart.updateSubtotal();
+			
+			isRendered = true;
 			
 			if (typeof afterRender == 'function') {
 				afterRender.call(minicart);

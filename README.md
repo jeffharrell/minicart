@@ -192,3 +192,11 @@ The Mini Cart CSS is delivered as part of the code and shouldn't be changed. The
 Note that using an additional id of #myPage in your CSS causes the rule to be more specific than the Mini Cart's and the bowser renders that instead.
 
 
+
+Questions or comments
+---------------------
+
+We're working to create a perfect experience with the PayPal Mini Cart. If you have questions or suggestions, please use the [issue tracker](https://github.com/jeffharrell/MiniCart/issues) at Github.
+
+
+
