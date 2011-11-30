@@ -175,6 +175,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/** PRIVATE **/
 		
 		/**
+		 * PayPal form cmd values which are supported
+		 */
+		var SUPPORTED_CMDS = { _cart: true, _xclick: true };
+		
+		
+		/**
 		 * The form origin that is passed to PayPal
 		 */
 		var BN_VALUE = 'MiniCart_AddToCart_WPS_US';
@@ -317,7 +323,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			for (i = 0; i < forms.length; i++) {
 				form = forms[i];
 				
-				if (form.cmd && (form.cmd.value === '_cart' || form.cmd.value === '_xclick')) {
+				if (form.cmd && SUPPORTED_CMDS[form.cmd.value] !== -1) {
 					minicart.bindForm(form);	
 				}
 			}
