@@ -1,6 +1,6 @@
 /*!
  * The PayPal Mini Cart 
- * Visit https://minicart.paypal-labs.com/ for details
+ * Visit http://www.minicartjs.com/ for details
  * Use subject to license agreement as set forth at the link below
  * 
  * @author Jeff Harrell
