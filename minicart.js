@@ -323,7 +323,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			for (i = 0; i < forms.length; i++) {
 				form = forms[i];
 				
-				if (form.cmd && SUPPORTED_CMDS[form.cmd.value] !== -1) {
+				if (form.cmd && SUPPORTED_CMDS[form.cmd.value]) {
 					minicart.bindForm(form);	
 				}
 			}
