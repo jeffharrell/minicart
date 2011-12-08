@@ -386,6 +386,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		var _parseUserConfig = function (userConfig) {
 			var key;
 			
+			// TODO: This should recursively merge the config values
 			for (key in userConfig) {
 				if (typeof config[key] !== undefined) {
 					config[key] = userConfig[key];
@@ -846,13 +847,15 @@ PAYPAL.apps = PAYPAL.apps || {};
 		minicart.calculateSubtotal = function () {
 			var amount = 0,
 				products = minicart.products,
-				product, price, discount, len, i;
+				product, item, price, discount, len, i;
 				
 			for (i = 0, len = products.length; i < len; i++) {
-				if ((product = products[i].product)) {
+				item = products[i];
+				
+				if ((product = item.product)) {
 					if (product.quantity && product.amount) {
 						price = product.amount;
-						discount = (product.discount_amount) ? product.discount_amount : 0;
+						discount = item.getDiscount();
 						
 						amount += parseFloat((price * product.quantity) - discount);
 					}
@@ -1043,17 +1046,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 	 * @param position {number} The product number
 	 */
 	var ProductNode = function (data, position) {
-		this.product = null;
-		this.settings = null;
-		this.liNode = null;
-		this.nameNode = null;
-		this.metaNode = null;
-		this.priceNode = null;
-		this.quantityNode = null;
-		this.removeNode = null;
-		this.isPlaceholder = false;
-		
-		this._init(data, position);
+		this._view(data, position);
 	};
 	
 	
@@ -1064,8 +1057,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param data {object} The data for the product
 		 * @param position {number} The product number
 		 */
-		_init: function (data, position) {
-			var shortName, fullName, price, discount = 0, hiddenInput, key, i;
+		_view: function (data, position) {
+			var shortName, fullName, price, quantity, discount, discountNum, options, hiddenInput, key;
 
 			this.product = data.product;
 			this.settings = data.settings;
@@ -1073,6 +1066,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.liNode = document.createElement('li');
 			this.nameNode = document.createElement('a');
 			this.metaNode = document.createElement('span');
+			this.discountNode = document.createElement('span');
 			this.priceNode = document.createElement('span');
 			this.quantityNode = document.createElement('input');
 			this.removeNode = document.createElement('input');
@@ -1100,41 +1094,30 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 	
 			// Options
-			i = 0;
+			options = this.getOptions();
 			
-			while (typeof this.product['on' + i] !== 'undefined') {
-				this.metaNode.innerHTML += '<br />' + this.product['on' + i] + ': ' + this.product['os' + i];
-				i++;
+			for (key in options) {
+				this.metaNode.innerHTML += '<br />' + key + ': ' + options[key];
 			}
 
 			// Discount
-			if (this.product.discount_amount) { 
-				this.metaNode.innerHTML += '<br />';
-				this.metaNode.innerHTML += config.strings.discount || 'Discount: ';
-				this.metaNode.innerHTML += $.util.formatCurrency(this.product.discount_amount, this.settings.currency_code);
-			}
-
-			// Quantity
-			this.product.quantity = parseInt(this.product.quantity, 10);
+			discount = this.getDiscount();
+			this.metaNode.appendChild(this.discountNode);
 			
+			// Price
+			price = this.getPrice();
+			this.priceNode.className = 'price';
+			
+			// Quantity
+			quantity = this.getQuantity();
 			this.quantityNode.name = 'quantity_' + position;
-			this.quantityNode.value = this.product.quantity ? this.product.quantity : 1;
 			this.quantityNode.className = 'quantity';
 			this.quantityNode.setAttribute('autocomplete', 'off');
-
+			this.setQuantity(quantity);
+			
 			// Remove button
 			this.removeNode.type = 'button';
 			this.removeNode.className = 'remove';
-			
-			// Price
-			price = parseFloat(this.product.amount, 10);
-			
-			if (this.product.discount_amount) {
-				discount = this.product.discount_amount;
-			}
-			
-			this.priceNode.innerHTML = $.util.formatCurrency((price * parseFloat(this.product.quantity, 10) - discount).toFixed(2), this.settings.currency_code);
-			this.priceNode.className = 'price';
 			
 			// Build out the DOM
 			this.liNode.appendChild(this.nameNode);			
@@ -1157,17 +1140,85 @@ PAYPAL.apps = PAYPAL.apps || {};
 		
 		
 		/**
+		 * Calculates the discount for a product
+		 *
+		 * @return {Object} An object with the discount amount or percentage
+		 */
+		getDiscount: function () {
+			var data = {},
+				discount = 0,
+				discountNum = this.product.discount_num || -1;
+			
+			// Discounts: Amount-based
+			if (this.product.discount_amount) { 
+				// Discount amount for the first item
+				discount = parseFloat(this.product.discount_amount);
+
+				// Discount amount for each additional item
+				if (this.product.discount_amount2) {
+					quantity = this.getQuantity();
+					
+					if (quantity > 1) {
+						discount += Math.max(quantity - 1, discountNum) * parseFloat(this.product.discount_amount2);
+					}
+				} 
+
+			// Discounts: Percentage-based
+			} else if (this.product.discount_rate) { 
+				// Discount amount on the first item
+				discount = this.product.amount * parseFloat(this.product.discount_rate) / 100;
+				
+				// Discount amount for each additional item
+				if (this.product.discount_rate2) {
+					quantity = this.getQuantity();
+					
+					if (quantity > 1) {
+						discount += Math.max(quantity - 1, discountNum) * this.product.amount * parseFloat(this.product.discount_amount2) / 100;
+					}
+				}
+			}
+			
+			return discount && discount.toFixed(2);
+		},
+		
+		
+		/**
+		 * Returns an object of options for the product
+		 *
+		 * @return {Object} 
+		 */
+		getOptions: function () {
+			var options = {},
+				i = 0;
+			
+			while (typeof this.product['on' + i] !== 'undefined') {
+				options[this.product['on' + i]] = this.product['os' + i];
+				i++;
+			}
+			
+			return options;
+		},
+		
+		
+		/**
 		 * Utility function to set the quantity of this product
 		 *
 		 * @param value {number} The new value
 		 */
 		setQuantity: function (value) {
-			value = parseInt(value, 10);
+			var discount;
 			
+			value = parseInt(value, 10);
 			this.product.quantity = value;	
 			
 			if (this.quantityNode.value != value) {
 				this.quantityNode.value = value;
+				
+				if ((discount = this.getDiscount())) {
+					this.discountNode.innerHTML  = '<br />';
+					this.discountNode.innerHTML += config.strings.discount || 'Discount: ';
+					this.discountNode.innerHTML += $.util.formatCurrency(discount, this.settings.currency_code);
+				}
 			}
 			
 			this.setPrice(this.product.amount * value);
@@ -1180,7 +1231,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @return {number}
 		 */
 		getQuantity: function () {
-			return parseFloat(this.quantityNode.value, 10);
+			return (typeof this.product.quantity !== undefined) ? this.product.quantity : 1;
 		},
 		
 		
@@ -1192,7 +1243,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		setPrice: function (value) {
 			value = parseFloat(value, 10);
 						
-			this.priceNode.innerHTML = $.util.formatCurrency(parseFloat(value, 10).toFixed(2), this.settings.currency_code);
+			this.priceNode.innerHTML = $.util.formatCurrency(value.toFixed(2), this.settings.currency_code);
 		},
 		
 		
@@ -1202,7 +1253,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @return {number} 
 		 */
 		getPrice: function () {
-			return (this.product.amount * this.getQuantity());
+			return (this.product.amount * this.getQuantity()).toFixed(2);
 		}
 	};
 	
