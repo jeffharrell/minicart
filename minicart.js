@@ -205,7 +205,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			css.push('#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; text-align:left; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ');
 			css.push('#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ');
 			css.push('#' + name + ' li { position:relative; margin:-1px 0 0; padding:6px 5px 6px 0; border-top:1px solid #f2f2f2; } ');
-			css.push('#' + name + ' li a { color:#333; text-decoration:none; } ');
+			css.push('#' + name + ' li a { display: block; width: 155px; color:#333; text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } ');
 			css.push('#' + name + ' li a span { color:#999; font-size:10px; } ');
 			css.push('#' + name + ' li .quantity { position:absolute; top:.5em; right:78px; width:22px; padding:1px; border:1px solid #83a8cc; text-align:right; } ');
 			css.push('#' + name + ' li .price { position:absolute; top:.5em; right:4px; } ');
@@ -1058,7 +1058,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param position {number} The product number
 		 */
 		_view: function (data, position) {
-			var shortName, fullName, price, quantity, discount, discountNum, options, hiddenInput, key;
+			var name, price, quantity, discount, discountNum, options, hiddenInput, key;
 
 			this.product = data.product;
 			this.settings = data.settings;
@@ -1079,12 +1079,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			// Name
 			if (this.product.item_name) { 
-				fullName = this.product.item_name; 
-				shortName = (fullName.length > 20) ? fullName.substr(0, 20) + '...' : fullName;
+				name = this.product.item_name; 
 			}
 			
-			this.nameNode.innerHTML = shortName;
-			this.nameNode.title = fullName;
+			this.nameNode.innerHTML = name;
+			this.nameNode.title = name;
 			this.nameNode.href = this.product.href;
 			this.nameNode.appendChild(this.metaNode);	
 			
