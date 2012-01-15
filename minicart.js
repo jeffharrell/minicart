@@ -51,7 +51,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			button: '',
 			subtotal: '',
 			discount: '',
-			shipping: ''
+			shipping: '',
+			processing: ''
 		},
 		
 		/**
@@ -688,6 +689,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 					return;
 				}
 			}
+			
+			minicart.UI.button.value = config.strings.processing || 'Processing…';
 		};
 		
 		
