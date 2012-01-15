@@ -619,7 +619,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 				afterRemoveFromCart = events.afterRemoveFromCart;
 				
 			if (typeof onRemoveFromCart == 'function') {
-				onRemoveFromCart.call(minicart, product);
+				if (onRemoveFromCart.call(minicart, product) === false) {
+					return;
+				}
 			}
 			
 			product.setQuantity(0);
@@ -681,7 +683,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			var onCheckout = config.events.onCheckout;
 			
 			if (typeof onCheckout == 'function') {
-				onCheckout.call(minicart, e);
+				if (onCheckout.call(minicart, e) === false) {
+					e.preventDefault();
+					return;
+				}
 			}
 		};
 		
@@ -713,7 +718,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 				hash, cmd;
 				
 			if (typeof onRender == 'function') {
-				onRender.call(minicart);
+				if (onRender.call(minicart) === false) {
+					return;
+				}
 			}
 				
 			if (!isRendered) {
@@ -933,7 +940,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
 			if (typeof onShow == 'function') {
-				onShow.call(minicart, e);
+				if (onShow.call(minicart, e) === false) {
+					return;
+				}
 			}
 					
 			$.util.animate(minicart.UI.cart, 'top', { from: from, to: to }, function () {
@@ -976,7 +985,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 			if (e && e.preventDefault) { e.preventDefault(); }
 			
 			if (typeof onHide == 'function') {
-				onHide.call(minicart, e);
+				if (onHide.call(minicart, e) === false) {
+					return;
+				}
 			}
 			
 			$.util.animate(cartEl, 'top', { from: from, to: to }, function () {
@@ -1014,7 +1025,9 @@ PAYPAL.apps = PAYPAL.apps || {};
 				afterReset = events.afterReset;
 				
 			if (typeof onReset === 'function') {
-				onReset.call(minicart);
+				if (onReset.call(minicart) === false) {
+					return;
+				}
 			}
 			
 			minicart.products = [];
