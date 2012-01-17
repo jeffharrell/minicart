@@ -1,7 +1,7 @@
-Mini Cart
-=========
+The Mini Cart
+=============
 
-The PayPal Mini Cart is a great way to improve your PayPal integration by creating an overlay which appears as a user adds products to their cart. It’s a simple change that creates a wonderful new experience for your website!
+The Mini Cart is a great way to improve your PayPal integration by creating an overlay which appears as a user adds products to their cart. It’s a simple change that creates a wonderful new experience for your website!
 
 
 
@@ -10,9 +10,9 @@ Interested? Let’s get you setup
 
 1. Start with a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
 2. Download the [Mini Cart JavaScript](https://github.com/jeffharrell/MiniCart/archives/master)
-3. Next, include the following snippet of JavaScript code into your HTML file before the closing &lt;/body&gt; tag. Make sure to point to your downloaded copy of minicart.js!
+3. Next, include the following snippet of JavaScript code into your HTML file before the closing &lt;/body&gt; tag.
 
-Code: 
+Make sure to update the path to point to your downloaded copy of minicart.js!
 
     <script src="/path/to/minicart.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -82,7 +82,10 @@ The scope of all events is adjusted to the Mini Cart to allow access to the prod
             edgeDistance: "50px",
 			events: {
 				afterAddToCart: function () {
-					alert("There's now " + this.products.length + " unique product(s) in the cart.\nThat's a total of " + this.calculateSubtotal() + "!");
+					var msg = "There's now " + this.products.length + " unique product(s).";
+					msg += " That's a total of " + this.calculateSubtotal() + "!";
+					
+					alert(msg);
 				}
 			}
         });
@@ -120,10 +123,10 @@ Renders the cart element to the page. This method is required to see the Mini Ca
 `PAYPAL.apps.MiniCart.bindForm(form)`  
 Binds a form DOM element's submit event to the Mini Cart. This is useful for forms which may have been added to the page after the initial load. 
 
-`PAYPAL.apps.MiniCart.addToCart(data)` 
+`PAYPAL.apps.MiniCart.addToCart(data)`  
 Allows you to manually add a product to your cart, e.g. directly using JavaScript and not through a PayPal form. The parameter `data` is an key / value pair object of parameters and their value. For example: 
 
-    {"business":"user@example.com","item_name":"Test Product","amount":"5.00","currency_code":"USD"}
+    {"business":"user@example.com","item_name":"Product","amount":"5.00","currency_code":"USD"}
 
 `PAYPAL.apps.MiniCart.reset()`  
 Resets the cart, emptying and hiding it.
@@ -142,22 +145,22 @@ Toggles the visibility of the cart.
 FAQ
 ---
 
-**Is the Mini Cart free? How is it licensed?**  
+### Is the Mini Cart free? How is it licensed?
 Yes, it’s free and licensed using an [eBay Open Source License Agreement](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE).
 
-**What browsers does the Mini Cart support?**  
+### What browsers does the Mini Cart support?
 The Mini Cart is functionally supported by Chrome, Safari, Firefox, Opera, and Internet Explorer 6+. Older versions of IE use cookies for their data store while all other browsers use localStorage.
 
-**I have special integration / translation needs. Are there advanced settings?**  
+### I have special integration / translation needs. Are there advanced settings?
 Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/jeffharrell/MiniCart#readme) for more details.
 
-**I found a bug / I have an issue!**  
+### I found a bug / I have an issue!
 Please log the issue on the [Mini Cart’s issue tracker](https://github.com/jeffharrell/MiniCart/issues), including a link or sample code that reproduces it if possible.
 
-**I made a change and want to integrate it back into the Mini Cart!**  
+### I made a change and want to integrate it back into the Mini Cart!
 Awesome! Thanks for helping out. Please fork the Mini Cart code on Github. Once you're done with the change you can submit a pull request back to me. If everything looks good and the change is beneficial all I will integrate it.
 
-**I installed the Mini Cart, but my website still redirects to PayPal when clicking on a button. Why?**  
+### I installed the Mini Cart, but my website still redirects to PayPal when clicking on a button. Why?
 There's two causes for this. The first is quite easy and it's that you have inserted the Mini Cart JavaScript in the document head or at the top of your page. It needs to be inserted before the closing body element so that it can "see" the PayPal forms.
 
 The other cause is that the Mini Cart doesn’t yet work with what PayPal’s call their “hosted” or “encrypted” buttons which is why this is most likely happening. To fix your buttons, you’ll need to log into paypal.com and do the following steps:
@@ -165,27 +168,29 @@ The other cause is that the Mini Cart doesn’t yet work with what PayPal’s ca
 1. Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
 2. Once you’ve created the button click Remove code protection before copying your button’s code.
 
-**The Mini Cart isn’t emptying after a transaction is completed. Why?**  
+### The Mini Cart isn’t emptying after a transaction is completed. Why?
 The Mini Cart appends a fragment to your button’s return URL which sends a command to it when the user successfully returns from a transaction. If this is not working properly you should make sure that your are setting the value correctly and that it does not already contain a fragment.
 
-**Is non-JavaScript supported?**  
+### Is non-JavaScript supported?
 If your users do not have a JavaScript-capable browser, they will still be able to see your cart buttons and make purchases, but the user interface will gracefully degrade to the standard PayPal Cart.
 
-**My website uses frames / iframes for it’s products. How can I make the Mini Cart work?**  
+### My website uses frames / iframes for it’s products. How can I make the Mini Cart work?
 Depending upon how your site is setup the Mini Cart isn’t always compatible with websites containing frames. To ensure that it works you need to have the product buttons on the same frame as the main window.
 
-**The Mini Cart isn’t appearing the same as on this page. Why?**  
+### The Mini Cart isn’t appearing the same as on this page. Why?
 This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). Example issues include appearing in the bottom left of the browser, not scrolling properly, or having rendering issues. To check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
 
-**The Mini Cart is appearing behind objects on my page!**  
+### The Mini Cart is appearing behind objects on my page!
 This happens when you have the position and z-index CSS properties set on an element. If you need to use z-index then you will need to add the following code to your CSS styles:
 
     #PPMiniCart { position: relative; z-index: 100; }
 
 and set the value to correspond with your code.
 
-**I don't like the way the Mini Cart looks / How can I customize the Mini Cart more?**  
-The Mini Cart CSS is delivered as part of the code and shouldn't be changed. There are some values which can be changed via the config, e.g. the offset or position, but otherwise you'll need to override the Mini Cart's CSS in your own CSS using a higher CSS specificity. Here's an example if changing the height of the Mini Cart so that it grows as products are added:
+### I don't like the way the Mini Cart looks / How can I customize the Mini Cart more?
+The Mini Cart CSS is delivered as part of the code and shouldn't be changed. There are some values which can be changed via the config, e.g. the offset or position, but otherwise you'll need to override the Mini Cart's CSS in your own CSS using a higher CSS specificity. 
+
+Here's an example of changing the Mini Cart height so that it grows as products are added:
 
 	#myPage #PPMiniCart ul { height: auto; min-height: 130px; max-height: 500px; }
 
