@@ -570,14 +570,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 			// otherwise, setup the new element
 			} else {
 				// Click event for "x"
-				$.event.add(product.removeNode, 'click', function () {
+				$.event.add(product.removeInput, 'click', function () {
 					_removeProduct(product, offset);
 				});
 			
 				// Event for changing quantities
-				var currentValue = product.quantityNode.value;
+				var currentValue = product.quantityInput.value;
 				
-				$.event.add(product.quantityNode, 'keyup', function () {
+				$.event.add(product.quantityInput, 'keyup', function () {
 					var that = this;
 					
 					keyupTimer = setTimeout(function () {
@@ -626,7 +626,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 			
 			product.setQuantity(0);
-			product.quantityNode.style.display = 'none';
+			product.quantityInput.style.display = 'none';
 		
 			$.util.animate(product.liNode, 'opacity', { from: 1, to: 0 }, function () {
 				$.util.animate(product.liNode, 'height', { from: 18, to: 0 }, function () {
@@ -1083,9 +1083,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 			this.nameNode = document.createElement('a');
 			this.metaNode = document.createElement('span');
 			this.discountNode = document.createElement('span');
+			this.discountInput = document.createElement('input');
 			this.priceNode = document.createElement('span');
-			this.quantityNode = document.createElement('input');
-			this.removeNode = document.createElement('input');
+			this.quantityInput = document.createElement('input');
+			this.removeInput = document.createElement('input');
 			
 			// Don't add blank products
 			if (!this.product || (!this.product.item_name && !this.product.item_number)) { 
@@ -1117,6 +1118,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			// Discount
 			discount = this.getDiscount();
+			
+			this.discountInput.type = 'hidden';
+			this.discountInput.name = 'discount_amount_' + position;
+			this.discountInput.value = discount;
+			
 			this.metaNode.appendChild(this.discountNode);
 			
 			// Price
@@ -1125,24 +1131,27 @@ PAYPAL.apps = PAYPAL.apps || {};
 			
 			// Quantity
 			quantity = this.getQuantity();
-			this.quantityNode.name = 'quantity_' + position;
-			this.quantityNode.className = 'quantity';
-			this.quantityNode.setAttribute('autocomplete', 'off');
+			
+			this.quantityInput.name = 'quantity_' + position;
+			this.quantityInput.className = 'quantity';
+			this.quantityInput.setAttribute('autocomplete', 'off');
+			
 			this.setQuantity(quantity);
 			
 			// Remove button
-			this.removeNode.type = 'button';
-			this.removeNode.className = 'remove';
+			this.removeInput.type = 'button';
+			this.removeInput.className = 'remove';
 			
 			// Build out the DOM
-			this.liNode.appendChild(this.nameNode);			
-			this.liNode.appendChild(this.quantityNode);
-			this.liNode.appendChild(this.removeNode);
-			this.liNode.appendChild(this.priceNode);	
+			this.liNode.appendChild(this.nameNode);
+			this.liNode.appendChild(this.quantityInput);
+			this.liNode.appendChild(this.discountInput);
+			this.liNode.appendChild(this.removeInput);
+			this.liNode.appendChild(this.priceNode);
 			
 			// Add in hidden product data
 			for (key in this.product) {
-				if (key !== 'quantity') {
+				if (key !== 'quantity' && key.indexOf('discount_') === -1) {
 					hiddenInput = document.createElement('input');
 					hiddenInput.type = 'hidden';
 					hiddenInput.name = key + '_' + position;
@@ -1226,10 +1235,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 			value = parseInt(value, 10);
 			this.product.quantity = value;	
 			
-			if (this.quantityNode.value != value) {
-				this.quantityNode.value = value;
+			if (this.quantityInput.value != value) {
+				this.quantityInput.value = value;
 				
 				if ((discount = this.getDiscount())) {
+					this.discountInput.value = discount;
+					
 					this.discountNode.innerHTML  = '<br />';
 					this.discountNode.innerHTML += config.strings.discount || 'Discount: ';
 					this.discountNode.innerHTML += $.util.formatCurrency(discount, this.settings.currency_code);
