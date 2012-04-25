@@ -196,7 +196,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Adds the cart's CSS to the page in a <style> element.
 		 * The CSS lives in this file so that it can leverage properties from the config 
-		 * and doesn't require an additional down. To override the CSS see the FAQ.
+		 * and doesn't require an additional download. To override the CSS see the FAQ.
 		 */
 		var _addCSS = function () {
 			var name = config.name,
@@ -325,7 +325,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				form = forms[i];
 				
 				if (form.cmd && SUPPORTED_CMDS[form.cmd.value]) {
-					minicart.bindForm(form);	
+					minicart.bindForm(form);
 				}
 			}
 			
@@ -814,17 +814,17 @@ PAYPAL.apps = PAYPAL.apps || {};
 				success = false,
 				productNode, offset;
 			
+			data = _parseData(data);
+			offset = data.product.offset;
+			
 			if (typeof onAddToCart === 'function') {
-				if (onAddToCart.call(minicart, data) === false) {
+				if (onAddToCart.call(minicart, data.product) === false) {
 					return;
 				}
 			}
 			
-			data = _parseData(data);
-			offset = data.product.offset;
-			
 			// Check if the product has already been added; update if so
-			if ((productNode = (typeof offset !== 'undefined' && minicart.products[offset]))) {
+			if ((productNode = this.getProductAtOffset(offset))) {
 				productNode.product.quantity += parseInt(data.product.quantity || 1, 10);
 				productNode.setPrice(data.product.amount * productNode.product.quantity);
 				productNode.setQuantity(productNode.product.quantity);
@@ -846,6 +846,17 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 			
 			return success;
+		};
+		
+		
+		/**
+		 * Returns a product from the Mini Cart's interal storage
+		 *
+		 * @param offset {number} The offset of the product
+		 * @return {ProductNode}
+		 */
+		minicart.getProductAtOffset = function (offset) {
+			return (typeof offset !== 'undefined' && this.products[offset]);
 		};
 
 
