@@ -14,7 +14,7 @@ Interested? Let’s get you setup
 
 Make sure to update the path to point to your downloaded copy of minicart.js!
 
-    <script src="/path/to/minicart.js" async="async"></script>
+    <script src="/path/to/minicart.js"></script>
     <script>
         PAYPAL.apps.MiniCart.render();
     </script>
