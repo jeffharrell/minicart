@@ -23,7 +23,7 @@ It’s as simple as that! Now the Mini Cart will appear when a user adds a produ
 
 
 
-
+Customization
 -------------
 
 You can customize the script to make it work for your site by passing a JavaScript object as an argument, setting any of the following optional properties:
