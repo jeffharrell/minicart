@@ -14,8 +14,8 @@ Interested? Let’s get you setup
 
 Make sure to update the path to point to your downloaded copy of minicart.js!
 
-    <script src="/path/to/minicart.js" type="text/javascript"></script>
-    <script type="text/javascript">
+    <script src="/path/to/minicart.js" async="async"></script>
+    <script>
         PAYPAL.apps.MiniCart.render();
     </script>
 
@@ -76,7 +76,7 @@ An object of customizable callbacks:
 
 The scope of all events is adjusted to the Mini Cart to allow access to the products, UI, and certain functions. See below for an example of a custom configuration:
 
-    <script type="text/javascript">
+    <script>
         PAYPAL.apps.MiniCart.render({
             displayEdge: "right",
             edgeDistance: "50px",
@@ -98,7 +98,7 @@ Localization
 
 Localization and adaption are supported in the Mini Cart using the configuration strings object. For example, if we wanted the cart to appear in French we would need to pass our configuration like this:
 
-    <script type="text/javascript"> 
+    <script> 
         PAYPAL.apps.MiniCart.render({
             strings: {
                 button: "Caisse",  
