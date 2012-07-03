@@ -9,8 +9,8 @@ Interested? Let’s get you setup
 -------------------------------
 
 1. Start with a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
-2. Download the [Mini Cart JavaScript](https://raw.github.com/jeffharrell/MiniCart/master/minicart.js)
-3. Next, include the following snippet of JavaScript code into your HTML file before the closing &lt;/body&gt; tag.
+2. Download the latest [minicart.js](https://raw.github.com/jeffharrell/MiniCart/master/minicart.js) – You can also browse the [tagged versions](https://github.com/jeffharrell/MiniCart/tags)
+3. Next, include the following snippet of JavaScript code into your HTML file before the closing &lt;/body&gt; tag
 
 Make sure to update the path to point to your downloaded copy of minicart.js!
 
