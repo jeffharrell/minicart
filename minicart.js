@@ -1682,8 +1682,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 
 
-	// json2.js - See http://www.JSON.org/js.html
-	
+	/**
+	 * json2.js
+	 * See http://www.JSON.org/js.html
+	 */
 	var JSON;
 	if (!JSON) {
 		JSON = {};
