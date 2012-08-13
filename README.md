@@ -34,6 +34,9 @@ The HTMLElement the Mini Cart should render as a child of. Default document.body
 `formTarget`  
 The HTML target property for the checkout form.
 
+`displayWidth`
+The width of the cart window. Minimum width is 265px. Default 265px.
+
 `displayEdge`  
 The edge of the page the cart should pin to. Set to left or right. Default right.
 
