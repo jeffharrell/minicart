@@ -1690,18 +1690,18 @@ PAYPAL.apps = PAYPAL.apps || {};
 	if (!JSON) {
 		JSON = {};
 	}
-	
+
 	(function () {
 		 'use strict';
-	
+
 		 function f(n) {
 			 return n < 10 ? '0' + n : n;
 		 }
-	
+
 		 if (typeof Date.prototype.toJSON !== 'function') {
-	
+
 			 Date.prototype.toJSON = function (key) {
-	
+
 				 return isFinite(this.valueOf())
 					 ? this.getUTCFullYear()	 + '-' +
 						 f(this.getUTCMonth() + 1) + '-' +
@@ -1711,14 +1711,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 						 f(this.getUTCSeconds())   + 'Z'
 					 : null;
 			 };
-	
+
 			 String.prototype.toJSON	  =
 				 Number.prototype.toJSON  =
 				 Boolean.prototype.toJSON = function (key) {
 					 return this.valueOf();
 				 };
 		 }
-	
+
 		 var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 			 escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 			 gap,
@@ -1733,8 +1733,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 '\\': '\\\\'
 			 },
 			 rep;
-	
-	
+
+
 		 function quote(string) {
 			 escapable.lastIndex = 0;
 			 return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
@@ -1744,8 +1744,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 					 : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
 			 }) + '"' : '"' + string + '"';
 		 }
-	
-	
+
+
 		 function str(key, holder) {
 			 var i,
 				 k,
@@ -1754,23 +1754,23 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 mind = gap,
 				 partial,
 				 value = holder[key];
-				 
+
 			 if (value && typeof value === 'object' &&
 					 typeof value.toJSON === 'function') {
 				 value = value.toJSON(key);
 			 }
-			 
+
 			 if (typeof rep === 'function') {
 				 value = rep.call(holder, key, value);
 			 }
-			 
+
 			 switch (typeof value) {
 			 case 'string':
 				 return quote(value);
-	
+
 			 case 'number':
 				 return isFinite(value) ? String(value) : 'null';
-	
+
 			 case 'boolean':
 			 case 'null':
 				 return String(value);
@@ -1851,7 +1851,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 if (typeof JSON.parse !== 'function') {
 			 JSON.parse = function (text, reviver) {
 				 var j;
-	
+
 				 function walk(holder, key) {
 					 var k, v, value = holder[key];
 					 if (value && typeof value === 'object') {
@@ -1868,7 +1868,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					 }
 					 return reviver.call(holder, key, value);
 				 }
-				 
+
 				 text = String(text);
 				 cx.lastIndex = 0;
 				 if (cx.test(text)) {
