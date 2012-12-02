@@ -29,7 +29,8 @@ module.exports = function (grunt) {
 	});
 
 
-	// Default task.
-	grunt.registerTask('default', 'lint min');
+	// Tasks
+	grunt.registerTask('default', 'lint');
+	grunt.registerTask('dist', 'lint min');
 
 };
