@@ -9,46 +9,50 @@
 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="product1">
 		<input type="hidden" name="cmd" value="_cart" />
 		<input type="hidden" name="add" value="1" />
-		<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" />
+		<input type="hidden" name="business" value="minicart@minicart.com" />
 		<input type="hidden" name="item_name" value="Product 1" />
 		<input type="hidden" name="amount" value="1.50" />
 		<input type="hidden" name="quantity" value="1" />
 		<input type="hidden" name="currency_code" value="JPY" />
-		<input type="hidden" name="return" value="https://minicart.paypal-labs.com/?success" />
-		<input type="hidden" name="cancel_return" value="https://minicart.paypal-labs.com/?cancel" />
+		<input type="hidden" name="return" value="http://www.minicart.com/build/test/?success" />
+		<input type="hidden" name="cancel_return" value="http://www.minicart.com/build/test/?cancel" />
+		<input type="submit" value="add" />
 	</form>
 
 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="product2">
 		<input type="hidden" name="cmd" value="_cart" />
 		<input type="hidden" name="add" value="1" />
-		<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" />
+		<input type="hidden" name="business" value="minicart@minicart.com" />
 		<input type="hidden" name="item_name" value="Product 2" />
 		<input type="hidden" name="item_number" value="12345" />
 		<input type="hidden" name="discount_amount" value="1.00" />
 		<input type="hidden" name="amount" value="3.00" />
 		<input type="hidden" name="currency_code" value="JPY" />
-		<input type="hidden" name="quantity" value="2" />		
+		<input type="hidden" name="quantity" value="2" />
 		<input type="hidden" name="on0" value="Color" />
 		<input type="hidden" name="os0" value="Green" />
-		<input type="hidden" name="return" value="https://minicart.paypal-labs.com/?success" />
-		<input type="hidden" name="cancel_return" value="https://minicart.paypal-labs.com/?cancel" />
+		<input type="hidden" name="return" value="http://www.minicart.com/build/test/?success" />
+		<input type="hidden" name="cancel_return" value="http://www.minicart.com/build/test/?cancel" />
+		<input type="submit" value="add" />
 	</form>
 
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="view"> 
-		<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" /> 
-		<input type="hidden" name="cmd" value="_cart" /> 
-		<input type="hidden" name="display" value="1" /> 
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="view">
+		<input type="hidden" name="business" value="minicart@minicart.com" />
+		<input type="hidden" name="cmd" value="_cart" />
+		<input type="hidden" name="display" value="1" />
+		<input type="submit" value="show" />
 	</form>
-			
-	
+
+
 	<h1 id="qunit-header">Mini Cart &mdash; Test Suite</h1>
 	<h2 id="qunit-banner"></h2>
 	<div id="qunit-testrunner-toolbar"></div>
 	<h2 id="qunit-userAgent"></h2>
 	<ol id="qunit-tests"></ol>
 	<div id="qunit-fixture"></div>
-	
-	<script src="../minicart.js"></script>
+
+
+	<script src="../src/minicart.js"></script>
 	<script type="text/javascript" src="qunit/qunit.js"></script>
 	<script type="text/javascript" src="tests.js"></script>
 </body>
