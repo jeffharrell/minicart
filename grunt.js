@@ -20,9 +20,15 @@ module.exports = function (grunt) {
 		jshint: {
 			options: jshintOptions
 		},
+		concat: {
+			dist: {
+				src: [ 'src/minicart.js', 'lib/json2.js' ],
+				dest: 'dist/minicart.js'
+			}
+		},
 		min: {
 			dist: {
-				src: [ '<banner:meta.banner>', 'lib/json2.js', 'src/minicart.js' ],
+				src: [ '<banner:meta.banner>', 'src/minicart.js', 'lib/json2.js' ],
 				dest: 'dist/minicart.min.js'
 			}
 		}
@@ -31,6 +37,6 @@ module.exports = function (grunt) {
 
 	// Tasks
 	grunt.registerTask('default', 'lint');
-	grunt.registerTask('dist', 'lint min');
+	grunt.registerTask('dist', 'lint concat min');
 
 };
