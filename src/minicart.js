@@ -525,13 +525,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Resets the card and renders the products
 		 */
-		var _redrawCartItems = function () {
+		var _redrawCartItems = function (silent) {
 			minicart.products = [];
 			minicart.UI.itemList.innerHTML = '';
 			minicart.UI.subtotalAmount.innerHTML = '';
 
 			_parseStorage();
-			minicart.updateSubtotal();
+			minicart.updateSubtotal(silent);
 		};
 
 
@@ -757,7 +757,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			// Process any stored data and render it
 			// TODO: _parseStorage shouldn't be so tightly coupled here and one
 			// should be able to redraw without re-parsing the storage
-			_redrawCartItems();
+			_redrawCartItems(true);
 
 			// Trigger the cart to peek on first load if any products were loaded
 			if (!isRendered) {
@@ -893,7 +893,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 		/**
 		 * Updates the UI with the current subtotal and currency code
 		 */
-		minicart.updateSubtotal = function () {
+		minicart.updateSubtotal = function (silent) {
 			var ui = minicart.UI,
 				cartEl = ui.cart.elements,
 				subtotalEl = ui.subtotalAmount,
@@ -920,25 +920,27 @@ PAYPAL.apps = PAYPAL.apps || {};
 			subtotalEl.innerHTML = $.util.formatCurrency(subtotal, currency_code);
 
 			// Yellow fade on update
-			(function doFade() {
-				hex = level.toString(16);
-				level++;
+			if (!silent) {
+				(function doFade() {
+					hex = level.toString(16);
+					level++;
 
-				subtotalEl.style.backgroundColor = '#ff' + hex;
+					subtotalEl.style.backgroundColor = '#ff' + hex;
 
-				if (level >= 15) {
-					subtotalEl.style.backgroundColor = 'transparent';
+					if (level >= 15) {
+						subtotalEl.style.backgroundColor = 'transparent';
 
-					// hide the cart if there's no total
-					if (subtotal === '0.00') {
-						minicart.reset();
+						// hide the cart if there's no total
+						if (subtotal === '0.00') {
+							minicart.reset();
+						}
+
+						return;
 					}
 
-					return;
-				}
-
-				setTimeout(doFade, 30);
-			})();
+					setTimeout(doFade, 30);
+				})();
+			}
 		};
 
 
