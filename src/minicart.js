@@ -929,7 +929,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 					// hide the cart if there's no total
 					if (subtotal === '0.00') {
-						minicart.hide(null, true);
+						minicart.reset();
 					}
 
 					return;
