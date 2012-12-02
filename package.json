@@ -6,6 +6,8 @@
 		"name": "Jeff Harrell",
 		"url": "https://github.com/jeffharrell/"
 	},
+	"url": "http://www.minicartjs.com/",
+	"license": "eBay Open Source License Agreement <https://github.com/jeffharrell/MiniCart/blob/master/LICENSE>",
 	"dependencies": {},
 	"devDependencies": {
 		"grunt": "*",
