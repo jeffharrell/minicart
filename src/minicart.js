@@ -718,10 +718,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * @param userConfig {object} User settings which override the default configuration
 		 */
 		minicart.render = function (userConfig) {
-			var events = config.events,
-				onRender = events.onRender,
-				afterRender = events.afterRender,
-				hash, cmd;
+			var events, onRender, afterRender, hash, cmd;
+
+			// Overwrite default configuration with user settings
+			_parseUserConfig(userConfig);
+
+			events = config.events;
+			onRender = events.onRender;
+			afterRender = events.afterRender;
 
 			if (typeof onRender === 'function') {
 				if (onRender.call(minicart) === false) {
@@ -730,9 +734,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 			}
 
 			if (!isRendered) {
-				// Overwrite default configuration with user settings
-				_parseUserConfig(userConfig);
-
 				// Render the cart UI
 				_addCSS();
 				_buildDOM();
