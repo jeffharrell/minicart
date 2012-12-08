@@ -48,6 +48,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 		cookiePath: '/',
 
 		/**
+		 * The number of days to keep the cart data
+		 */
+		cartDuration: 30,
+
+		/**
 		 * Strings used for display text
 		 */
 		strings: {
@@ -674,7 +679,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			minicart.products[offset].product.item_number = '';
 
 			minicart.updateSubtotal();
-			$.storage.save(minicart.products);
+			$.storage.save(minicart.products, config.cartDuration);
 		};
 
 
@@ -843,7 +848,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			minicart.updateSubtotal();
 			minicart.show(null);
 
-			$.storage.save(minicart.products);
+			$.storage.save(minicart.products, config.cartDuration);
 
 			if (typeof afterAddToCart === 'function') {
 				afterAddToCart.call(minicart, data);
@@ -1319,13 +1324,29 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 * @return {object}
 				 */
 				load: function () {
-					var data = localStorage.getItem(name);
+					var data = localStorage.getItem(name),
+						todayDate, expiresDate;
 
 					if (data) {
 						data = JSON.parse(decodeURIComponent(data));
 					}
 
-					return data;
+					if (data && data.expires) {
+						todayDate = new Date();
+						expiresDate = new Date(data.expires);
+
+						if (todayDate > expiresDate) {
+							$.storage.remove();
+							return;
+						}
+					}
+
+					// A little bit of backwards compatibility for the moment
+					if (data && data.value) {
+						return data.value;
+					} else {
+						return data;
+					}
 				},
 
 
@@ -1333,10 +1354,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 * Saves the data
 				 *
 				 * @param items {object} The list of items to save
+				 * @param duration {Number} The number of days to keep the data
 				 */
-				save: function (items) {
-					var data = [],
-						item, len, i;
+				save: function (items, duration) {
+					var date = new Date(),
+						data = [],
+						wrappedData, item, len, i;
 
 					if (items) {
 						for (i = 0, len = items.length; i < len; i++) {
@@ -1347,8 +1370,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 							});
 						}
 
-						data = encodeURIComponent(JSON.stringify(data));
-						localStorage.setItem(name, data);
+						date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
+						wrappedData = {
+							value: data,
+							expires: date.toGMTString()
+						};
+
+						localStorage.setItem(name, encodeURIComponent(JSON.stringify(wrappedData)));
 					}
 				},
 
@@ -1399,6 +1427,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				 * Saves the data
 				 *
 				 * @param items {object} The list of items to save
+				 * @param duration {Number} The number of days to keep the data
 				 */
 				save: function (items, duration) {
 					var date = new Date(),
@@ -1414,9 +1443,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 							});
 						}
 
-						duration = duration || 30;
 						date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-
 						document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
 					}
 				},
