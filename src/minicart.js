@@ -1141,11 +1141,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 			// Discount
 			discount = this.getDiscount();
 
-			this.discountInput.type = 'hidden';
-			this.discountInput.name = 'discount_amount_' + position;
-			this.discountInput.value = discount;
+			if (discount) {
+				this.discountInput.type = 'hidden';
+				this.discountInput.name = 'discount_amount_' + position;
+				this.discountInput.value = discount;
 
-			this.metaNode.appendChild(this.discountNode);
+				this.metaNode.appendChild(this.discountNode);
+			}
 
 			// Price
 			price = this.getPrice();
@@ -1167,7 +1169,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 			// Build out the DOM
 			this.liNode.appendChild(this.nameNode);
 			this.liNode.appendChild(this.quantityInput);
-			this.liNode.appendChild(this.discountInput);
+
+			if (discount) {
+				this.liNode.appendChild(this.discountInput);
+			}
+
 			this.liNode.appendChild(this.removeInput);
 			this.liNode.appendChild(this.priceNode);
 
