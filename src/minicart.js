@@ -809,7 +809,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 			return true;
 		};
 
-
 		/**
 		 * Adds a product to the cart
 		 *
@@ -1140,7 +1139,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 			// Discount
 			discount = this.getDiscount();
-
+			
 			if (discount) {
 				this.discountInput.type = 'hidden';
 				this.discountInput.name = 'discount_amount_' + position;
@@ -1268,7 +1267,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 				if ((discount = this.getDiscount())) {
 					this.discountInput.value = discount;
-
+					/**
+					 * Append the discount node if it doesn't already exist
+					 *
+					 * @author Ethan Schroeder <ethan.schroeder@gmail.com>
+					 */
+					if(!this.discountNode.innerHTML) {
+						this.metaNode.appendChild(this.discountNode);
+					}
 					this.discountNode.innerHTML  = '<br />';
 					this.discountNode.innerHTML += config.strings.discount || 'Discount: ';
 					this.discountNode.innerHTML += $.util.formatCurrency(discount, this.settings.currency_code);
