@@ -1,0 +1,294 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Minicart by jeffharrell</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Minicart</h1>
+        <p>Improve your PayPal integration with an overlay that appears once a user adds a product</p>
+
+        <p class="view"><a href="https://github.com/jeffharrell/MiniCart">View the Project on GitHub <small>jeffharrell/MiniCart</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/jeffharrell/MiniCart/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/jeffharrell/MiniCart/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/jeffharrell/MiniCart">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>The Mini Cart</h1>
+
+<p>The Mini Cart is a great way to improve your PayPal integration by creating an overlay which appears as a user adds products to their cart. It’s a simple change that creates a wonderful new experience for your website!</p>
+
+<ol>
+<li><a href="#interested-let%E2%80%99s-get-you-setup">Setup</a></li>
+<li><a href="#customization">Customization</a></li>
+<li><a href="#event-callback-examples">Event callback examples</a></li>
+<li><a href="#localization">Localization</a></li>
+<li><a href="#javascript-api">JavaScript API</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a href="#questions-or-comments">Questions or comments</a></li>
+</ol><h2>Interested? Let’s get you setup</h2>
+
+<ol>
+<li>Start with a PayPal <a href="https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside">Add to Cart Button</a>
+</li>
+<li>Download the latest <a href="https://raw.github.com/jeffharrell/MiniCart/master/dist/minicart.min.js">minicart.js</a> – You can also browse the <a href="https://github.com/jeffharrell/MiniCart/tags">tagged versions</a>
+</li>
+<li>Next, include the following snippet of JavaScript code into your HTML file before the closing &lt;/body&gt; tag</li>
+</ol><p>Make sure to update the path to point to your downloaded copy of minicart.js!</p>
+
+<pre><code>&lt;script src="/path/to/minicart.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    PAYPAL.apps.MiniCart.render();
+&lt;/script&gt;
+</code></pre>
+
+<p>It’s as simple as that! Now the Mini Cart will appear when a user adds a product to, views, or has an item in their cart.</p>
+
+<h2>Customization</h2>
+
+<p>You can customize the script to make it work for your site by passing a JavaScript object as an argument, setting any of the following optional properties:</p>
+
+<p><code>parent</code><br>
+The HTMLElement the Mini Cart should render as a child of. Default document.body.</p>
+
+<p><code>formTarget</code><br>
+The HTML target property for the checkout form.</p>
+
+<p><code>displayEdge</code><br>
+The edge of the page the cart should pin to. Set to left or right. Default right.</p>
+
+<p><code>edgeDistance</code><br>
+Distance from the edge the cart should appear. Default 50px.</p>
+
+<p><code>cookiePath</code><br>
+The base path of your website to set the cookie to (useful for shared website hosting)</p>
+
+<p><code>peekEnabled</code><br>
+Boolean to determine if the cart should "peek" when it's hidden with items. Default true.</p>
+
+<p><code>paypalURL</code><br>
+The PayPal URL to use if you are accessing sandbox or another version of the PayPal website. Defaults to <a href="https://www.paypal.com/cgi-bin/webscr">https://www.paypal.com/cgi-bin/webscr</a>.</p>
+
+<p><code>strings</code><br>
+An object of localizable text strings used:  </p>
+
+<ul>
+<li>
+<code>button</code> - The checkout button text</li>
+<li>
+<code>subtotal</code> - The subtotal text<br>
+</li>
+<li>
+<code>discount</code> - The discount text<br>
+</li>
+<li>
+<code>shipping</code> - The shipping text<br>
+</li>
+</ul><p><code>events</code><br>
+An object of customizable callbacks (see <a href="#event-callback-examples">Event callback examples</a>):  </p>
+
+<ul>
+<li>
+<code>onRender</code> - Event before the cart is rendered<br>
+</li>
+<li>
+<code>afterRender</code> - Event after the cart is rendered<br>
+</li>
+<li>
+<code>onHide</code> - Event before the cart is hidden<br>
+</li>
+<li>
+<code>afterHide</code> - Event after the cart is hidden<br>
+</li>
+<li>
+<code>onShow</code> - Event before the cart is shown<br>
+</li>
+<li>
+<code>afterShow</code> - Event after the cart is shown<br>
+</li>
+<li>
+<code>onAddToCart</code> - Event before a product is added to the cart<br>
+</li>
+<li>
+<code>afterAddToCart</code> - Event after a product is added to the cart<br>
+</li>
+<li>
+<code>onRemoveFromCart</code> - Event before a product is removed from the cart<br>
+</li>
+<li>
+<code>afterRemoveFromCart</code> - Event after a product is removed from the cart</li>
+<li>
+<code>onCheckout</code> - Event before the checkout action takes place<br>
+</li>
+<li>
+<code>onReset</code> - Event before the cart is emptied (typically when a transaction is completed)<br>
+</li>
+<li>
+<code>afterReset</code> - Event after the cart is emptied (typically when a transaction is completed)<br>
+</li>
+</ul><p>The scope of all events is adjusted to the Mini Cart to allow access to the products, UI, and certain functions. See below for an example of a custom configuration:</p>
+
+<pre><code>&lt;script&gt;
+    PAYPAL.apps.MiniCart.render({
+        displayEdge: "right",
+        edgeDistance: "50px",
+        events: {
+            afterAddToCart: function () {
+                var msg = "There's now " + this.products.length + " unique product(s).";
+                msg += " That's a total of " + this.calculateSubtotal() + "!";
+
+                alert(msg);
+            }
+        }
+    });
+&lt;/script&gt; 
+</code></pre>
+
+<h2>Event callback examples</h2>
+
+<p>Examples of how you can use the event callbacks:</p>
+
+<ul>
+<li><a href="http://www.minicartjs.com/examples/terms.html">Preventing checkout until terms are accepted</a></li>
+<li><a href="http://www.minicartjs.com/examples/minquantity.html">Requiring a minimum quantity to checkout</a></li>
+<li><a href="http://www.minicartjs.com/examples/fixedquantity.html">Only allowing a fixed quantity per item</a></li>
+<li><a href="http://www.minicartjs.com/examples/options.html">Supporting multiple options per item</a></li>
+</ul><h2>Localization</h2>
+
+<p>Localization and adaption are supported in the Mini Cart using the configuration strings object. For example, if we wanted the cart to appear in French we would need to pass our configuration like this:</p>
+
+<pre><code>&lt;script&gt; 
+    PAYPAL.apps.MiniCart.render({
+        strings: {
+            button: "Caisse",  
+            subtotal: "Total ",
+            shipping: "ne comprend pas les frais de port et d'impôt"   
+        }
+    });
+&lt;/script&gt;
+</code></pre>
+
+<p>The currency symbol will be automatically adjusted based on the currency_code setting of your button.</p>
+
+<h2>JavaScript API</h2>
+
+<p>The Mini Cart has a rich JavaScript API which allows you to control it using the following methods:</p>
+
+<p><code>PAYPAL.apps.MiniCart.render()</code><br>
+Renders the cart element to the page. This method is required to see the Mini Cart.</p>
+
+<p><code>PAYPAL.apps.MiniCart.bindForm(form)</code><br>
+Binds a form DOM element's submit event to the Mini Cart. This is useful for forms which may have been added to the page after the initial load. </p>
+
+<p><code>PAYPAL.apps.MiniCart.addToCart(data)</code><br>
+Allows you to manually add a product to your cart, e.g. directly using JavaScript and not through a PayPal form. The parameter <code>data</code> is a key / value pair object of parameters and their value. For example: </p>
+
+<pre><code>{"business":"user@example.com","item_name":"Product","amount":"5.00","currency_code":"USD"}
+</code></pre>
+
+<p><code>PAYPAL.apps.MiniCart.reset()</code><br>
+Resets the cart, emptying and hiding it.</p>
+
+<p><code>PAYPAL.apps.MiniCart.hide(null, fully)</code><br>
+Hides the cart. If the cart contains products then it will "peek" from the top of the window. Set the parameter <code>fully</code> to true to override this and have it fully hidden.</p>
+
+<p><code>PAYPAL.apps.MiniCart.show()</code><br>
+Shows the cart.</p>
+
+<p><code>PAYPAL.apps.MiniCart.toggle()</code><br>
+Toggles the visibility of the cart.</p>
+
+<h2>FAQ</h2>
+
+<h3>Is the Mini Cart free? How is it licensed?</h3>
+
+<p>Yes, it’s free and licensed using an <a href="https://github.com/jeffharrell/MiniCart/raw/master/LICENSE">eBay Open Source License Agreement</a>.</p>
+
+<h3>What browsers does the Mini Cart support?</h3>
+
+<p>The Mini Cart is functionally supported by Chrome, Safari, Firefox, Opera, and Internet Explorer 6+. Older versions of IE use cookies for their data store while all other browsers use localStorage.</p>
+
+<h3>I have special integration / translation needs. Are there advanced settings?</h3>
+
+<p>Yes, there’s a rich API which can be used to customize the Mini Cart. See the <a href="https://github.com/jeffharrell/MiniCart#readme">project page README</a> for more details.</p>
+
+<h3>I found a bug / I have an issue!</h3>
+
+<p>Please log the issue on the <a href="https://github.com/jeffharrell/MiniCart/issues">Mini Cart’s issue tracker</a>, including a link or sample code that reproduces it if possible.</p>
+
+<h3>I made a change and want to integrate it back into the Mini Cart!</h3>
+
+<p>Awesome! Thanks for helping out. Please fork the Mini Cart code on Github. Once you're done with the change you can submit a pull request back to me. If everything looks good and the change is beneficial all I will integrate it.</p>
+
+<h3>I installed the Mini Cart, but my website still redirects to PayPal when clicking on a button. Why?</h3>
+
+<p>There's two causes for this. The first is quite easy and it's that you have inserted the Mini Cart JavaScript in the document head or at the top of your page. It needs to be inserted before the closing body element so that it can "see" the PayPal forms.</p>
+
+<p>The other cause is that the Mini Cart doesn’t yet work with what PayPal’s call their “hosted” or “encrypted” buttons which is why this is most likely happening. To fix your buttons, you’ll need to log into paypal.com and do the following steps:</p>
+
+<ol>
+<li>Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit &amp; loss.</li>
+<li>Once you’ve created the button click Remove code protection before copying your button’s code.</li>
+</ol><h3>The Mini Cart isn’t emptying after a transaction is completed. Why?</h3>
+
+<p>The Mini Cart appends a fragment to your button’s return URL which sends a command to it when the user successfully returns from a transaction. If this is not working properly you should make sure that your are setting the value correctly and that it does not already contain a fragment.</p>
+
+<h3>Is non-JavaScript supported?</h3>
+
+<p>If your users do not have a JavaScript-capable browser, they will still be able to see your cart buttons and make purchases, but the user interface will gracefully degrade to the standard PayPal Cart.</p>
+
+<h3>My website uses frames / iframes for it’s products. How can I make the Mini Cart work?</h3>
+
+<p>Depending upon how your site is setup the Mini Cart isn’t always compatible with websites containing frames. To ensure that it works you need to have the product buttons on the same frame as the main window.</p>
+
+<h3>The Mini Cart isn’t appearing the same as on this page. Why?</h3>
+
+<p>This can occur if your page is being rendered in the browser’s <a href="http://en.wikipedia.org/wiki/Quirks_mode">Quirks mode</a>. Example issues include appearing in the bottom left of the browser, not scrolling properly, or having rendering issues. To check for this issue, validate and correct your HTML markup using the <a href="http://validator.w3.org/">W3C Markup Validator</a>.</p>
+
+<h3>The Mini Cart is appearing behind objects on my page!</h3>
+
+<p>This happens when you have the position and z-index CSS properties set on an element. If you need to use z-index then you will need to add the following code to your CSS styles:</p>
+
+<pre><code>#PPMiniCart { position: relative; z-index: 100; }
+</code></pre>
+
+<p>and set the value to correspond with your code.</p>
+
+<h3>I don't like the way the Mini Cart looks / How can I customize the Mini Cart more?</h3>
+
+<p>The Mini Cart CSS is delivered as part of the code and shouldn't be changed. There are some values which can be changed via the config, e.g. the offset or position, but otherwise you'll need to override the Mini Cart's CSS in your own CSS using a higher CSS specificity. </p>
+
+<p>Here's an example of changing the Mini Cart height so that it grows as products are added:</p>
+
+<pre><code>#myPage #PPMiniCart ul { height: auto; min-height: 130px; max-height: 500px; }
+</code></pre>
+
+<p>Note that using an additional id of #myPage in your CSS causes the rule to be more specific than the Mini Cart's and the bowser renders that instead.</p>
+
+<h2>Questions or comments</h2>
+
+<p>If you have questions or suggestions, please use the <a href="https://github.com/jeffharrell/MiniCart/issues">issue tracker</a> at Github.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/jeffharrell">jeffharrell</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
