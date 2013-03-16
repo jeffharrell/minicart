@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: '<json:package.json>',
 		meta: {
-			banner: "/*!\n * <%= pkg.name %>\n *\n * <%= pkg.description %>\n *\n * @version <%= pkg.version %> - <%= grunt.template.today('yyyy-mm-dd, h:MM:ss TT') %>\n * @author <%= pkg.author.name %> <<%= pkg.author.url %>>\n * @url <%= pkg.url %> \n * @license <<%= pkg.license %>>\n */"
+			banner: "/*!\n * <%= pkg.name %>\n *\n * <%= pkg.description %>\n *\n * @version <%= pkg.version %> - <%= grunt.template.today('yyyy-mm-dd') %>\n * @author <%= pkg.author.name %> <<%= pkg.author.url %>>\n * @url <%= pkg.url %> \n * @license <<%= pkg.license %>>\n */"
 		},
 		lint: {
 			all: [ 'src/*.js', 'test/*.js' ]
