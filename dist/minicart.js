@@ -56,11 +56,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 		 * Strings used for display text
 		 */
 		strings: {
-			button: '',
-			subtotal: '',
-			discount: '',
-			shipping: '',
-			processing: ''
+			button: 'Checkout',
+			subtotal: 'Subtotal: ',
+			discount: 'Discount: ',
+			shipping: 'does not include shipping &amp; tax',
+			processing: 'Processing...'
 		},
 
 		/**
@@ -283,11 +283,11 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 				UI.button = document.createElement('input');
 				UI.button.type = 'submit';
-				UI.button.value = config.strings.button || 'Checkout';
+				UI.button.value = config.strings.button;
 				UI.summary.appendChild(UI.button);
 
 				UI.subtotal = document.createElement('span');
-				UI.subtotal.innerHTML = config.strings.subtotal || 'Subtotal: ';
+				UI.subtotal.innerHTML = config.strings.subtotal;
 
 				UI.subtotalAmount = document.createElement('span');
 				UI.subtotalAmount.innerHTML = '0.00';
@@ -297,10 +297,10 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 				UI.shipping = document.createElement('span');
 				UI.shipping.className = 'shipping';
-				UI.shipping.innerHTML = config.strings.shipping || 'does not include shipping &amp; tax';
+				UI.shipping.innerHTML = config.strings.shipping;
 				UI.summary.appendChild(UI.shipping);
 
-				// Workaround: IE 6 and IE 7/8 in quirks mode do not support position:fixed in CSS
+				// Workaround: IE 6 and IE 7/8 in quirks mode do not support position: fixed in CSS
 				if (window.attachEvent && !window.opera) {
 					version = navigator.userAgent.match(/MSIE\s([^;]*)/);
 
@@ -369,6 +369,14 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 					if (target !== ui.button) {
 						minicart.toggle(e);
+					}
+				});
+
+				// Redraw the cart if the back/forward cache doesn't re-render
+				$.event.add(window, 'pageshow', function (e) {
+					if (e.persisted) {
+						_redrawCartItems(true);
+						minicart.hide();
 					}
 				});
 
@@ -529,12 +537,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 
 
 			/**
-			 * Resets the card and renders the products
+			 * Resets the cart and renders the products
 			 */
 			var _redrawCartItems = function (silent) {
 				minicart.products = [];
 				minicart.UI.itemList.innerHTML = '';
 				minicart.UI.subtotalAmount.innerHTML = '';
+				minicart.UI.button.value = config.strings.button;
 
 				_parseStorage();
 				minicart.updateSubtotal(silent);
@@ -699,7 +708,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					}
 				}
 
-				minicart.UI.button.value = config.strings.processing || 'Processing...';
+				minicart.UI.button.value = config.strings.processing;
 			};
 
 
@@ -1279,7 +1288,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 						}
 
 						this.discountNode.innerHTML  = '<br />';
-						this.discountNode.innerHTML += config.strings.discount || 'Discount: ';
+						this.discountNode.innerHTML += config.strings.discount;
 						this.discountNode.innerHTML += $.util.formatCurrency(discount, this.settings.currency_code);
 					}
 				}
