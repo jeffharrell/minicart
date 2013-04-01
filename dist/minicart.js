@@ -1,12 +1,8 @@
 /*!
  * MiniCart
  *
- * Improve your PayPal integration by creating an overlay which appears as a user adds products to their cart.
- *
- * @version 2.5.0 - 2012-12-02, 1:04:43 PM
  * @author Jeff Harrell <https://github.com/jeffharrell/>
- * @url http://www.minicartjs.com/
- * @license <eBay Open Source License Agreement <https://github.com/jeffharrell/MiniCart/blob/master/LICENSE>>
+ * @license MIT <https://github.com/jeffharrell/MiniCart/blob/master/LICENSE>
  */
 if (typeof PAYPAL === 'undefined' || !PAYPAL) {
 	var PAYPAL = {};
