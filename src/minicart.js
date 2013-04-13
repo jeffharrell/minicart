@@ -1146,12 +1146,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 				// Discount
 				discount = this.getDiscount();
 
-				if (discount) {
+				if (discount>=0) {
 					this.discountInput.type = 'hidden';
 					this.discountInput.name = 'discount_amount_' + position;
 					this.discountInput.value = discount;
 
-					this.metaNode.appendChild(this.discountNode);
+					this.metaNode.appendChild(this.discountInput);
 				}
 
 				// Price
@@ -1207,7 +1207,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					quantity;
 
 				// Discounts: Amount-based
-				if (this.product.discount_amount) {
+				if (this.product.discount_amount>=0) {
 					// Discount amount for the first item
 					discount = parseFloat(this.product.discount_amount);
 
@@ -1216,12 +1216,12 @@ PAYPAL.apps = PAYPAL.apps || {};
 						quantity = this.getQuantity();
 
 						if (quantity > 1) {
-							discount += Math.max(quantity - 1, discountNum) * parseFloat(this.product.discount_amount2);
+							discount += Math.min(quantity - 1, discountNum) * parseFloat(this.product.discount_amount2);
 						}
 					}
 
 				// Discounts: Percentage-based
-				} else if (this.product.discount_rate) {
+				} else if (this.product.discount_rate>=0) {
 					// Discount amount on the first item
 					discount = this.product.amount * parseFloat(this.product.discount_rate) / 100;
 
@@ -1230,7 +1230,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 						quantity = this.getQuantity();
 
 						if (quantity > 1) {
-							discount += Math.max(quantity - 1, discountNum) * this.product.amount * parseFloat(this.product.discount_amount2) / 100;
+							discount += Math.min(quantity - 1, discountNum) * this.product.amount * parseFloat(this.product.discount_amount2) / 100;
 						}
 					}
 				}
