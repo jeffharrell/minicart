@@ -312,6 +312,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 
 				parent = (typeof config.parent === 'string') ? document.getElementById(config.parent) : config.parent;
+				if (parent == null)
+					parent = document.body;
 				parent.appendChild(UI.wrapper);
 			};
 
