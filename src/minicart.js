@@ -55,7 +55,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			button: 'Checkout',
 			subtotal: 'Subtotal: ',
 			discount: 'Discount: ',
-			shipping: 'does not include shipping &amp; tax',
+			shipping: 'does not include shipping & tax',
 			processing: 'Processing...'
 		},
 
@@ -212,7 +212,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				css.push('#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ');
 				css.push('#' + name + ' li { position:relative; margin:-1px 0 0; padding:6px 5px 6px 0; border-top:1px solid #f2f2f2; } ');
 				css.push('#' + name + ' li a { display: block; width: 155px; color:#333; text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } ');
-				css.push('#' + name + ' li a span { color:#999; font-size:10px; } ');
+				css.push('#' + name + ' li a span { display:block; color:#999; font-size:10px; } ');
 				css.push('#' + name + ' li .quantity { position:absolute; top:.5em; right:78px; width:22px; padding:1px; border:1px solid #83a8cc; text-align:right; } ');
 				css.push('#' + name + ' li .price { position:absolute; top:.5em; right:4px; } ');
 				css.push('#' + name + ' li .remove { position:absolute; top:9px; right:60px; width:14px; height:14px; background:url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -134px -4px; border:0; cursor:pointer; } ');
@@ -283,17 +283,17 @@ PAYPAL.apps = PAYPAL.apps || {};
 				UI.summary.appendChild(UI.button);
 
 				UI.subtotal = document.createElement('span');
-				UI.subtotal.innerHTML = config.strings.subtotal;
+				$.util.setText(UI.subtotal, config.strings.subtotal);
 
 				UI.subtotalAmount = document.createElement('span');
-				UI.subtotalAmount.innerHTML = '0.00';
+				$.util.setText(UI.subtotalAmount, '0.00');
 
 				UI.subtotal.appendChild(UI.subtotalAmount);
 				UI.summary.appendChild(UI.subtotal);
 
 				UI.shipping = document.createElement('span');
 				UI.shipping.className = 'shipping';
-				UI.shipping.innerHTML = config.strings.shipping;
+				$.util.setText(UI.shipping, config.strings.shipping);
 				UI.summary.appendChild(UI.shipping);
 
 				// Workaround: IE 6 and IE 7/8 in quirks mode do not support position: fixed in CSS
@@ -537,8 +537,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 			 */
 			var _redrawCartItems = function (silent) {
 				minicart.products = [];
-				minicart.UI.itemList.innerHTML = '';
-				minicart.UI.subtotalAmount.innerHTML = '';
+				$.util.setText(minicart.UI.itemList, '');
+				$.util.setText(minicart.UI.subtotalAmount, '');
 				minicart.UI.button.value = config.strings.button;
 
 				_parseStorage();
@@ -928,7 +928,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				}
 
 				// Update the UI
-				subtotalEl.innerHTML = $.util.formatCurrency(subtotal, currency_code);
+				$.util.setText(subtotalEl, $.util.formatCurrency(subtotal, currency_code));
 
 				// Yellow fade on update
 				if (!silent) {
@@ -1063,8 +1063,8 @@ PAYPAL.apps = PAYPAL.apps || {};
 				minicart.products = [];
 
 				if (isShowing) {
-					ui.itemList.innerHTML = '';
-					ui.subtotalAmount.innerHTML = '';
+					$.util.setText(ui.itemList, '');
+					$.util.setText(ui.subtotalAmount, '');
 					minicart.hide(null, true);
 				}
 
@@ -1126,27 +1126,26 @@ PAYPAL.apps = PAYPAL.apps || {};
 					name = this.product.item_name;
 				}
 
-				this.nameNode.innerHTML = name;
-				this.nameNode.title = name;
+				$.util.setText(this.nameNode, name);
 				this.nameNode.href = this.product.href;
 				this.nameNode.appendChild(this.metaNode);
 
 				// Meta info
 				if (this.product.item_number) {
-					this.metaNode.innerHTML = '<br />#' + this.product.item_number;
+					$.util.setText(this.metaNode, this.product.item_number, null, '<br>');
 				}
 
 				// Options
 				options = this.getOptions();
 
 				for (key in options) {
-					this.metaNode.innerHTML += '<br />' + key + ': ' + options[key];
+					$.util.setText(this.metaNode, key + ': ' + options[key], this.metaNode.innerHTML, '<br>');
 				}
 
 				// Discount
 				discount = this.getDiscount();
 
-				if (discount>=0) {
+				if (discount >= 0) {
 					this.discountInput.type = 'hidden';
 					this.discountInput.name = 'discount_amount_' + position;
 					this.discountInput.value = discount;
@@ -1207,7 +1206,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					quantity;
 
 				// Discounts: Amount-based
-				if (this.product.discount_amount>=0) {
+				if (this.product.discount_amount >= 0) {
 					// Discount amount for the first item
 					discount = parseFloat(this.product.discount_amount);
 
@@ -1221,7 +1220,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 					}
 
 				// Discounts: Percentage-based
-				} else if (this.product.discount_rate>=0) {
+				} else if (this.product.discount_rate >= 0) {
 					// Discount amount on the first item
 					discount = this.product.amount * parseFloat(this.product.discount_rate) / 100;
 
@@ -1283,9 +1282,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 							this.metaNode.appendChild(this.discountNode);
 						}
 
-						this.discountNode.innerHTML  = '<br />';
-						this.discountNode.innerHTML += config.strings.discount;
-						this.discountNode.innerHTML += $.util.formatCurrency(discount, this.settings.currency_code);
+						$.util.setText(this.discountNode, this.discountNode.innerHTML + config.strings.discount + $.util.formatCurrency(discount, this.settings.currency_code));
 					}
 				}
 
@@ -1311,7 +1308,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 			setPrice: function (value) {
 				value = parseFloat(value, 10);
 
-				this.priceNode.innerHTML = $.util.formatCurrency(value.toFixed(2), this.settings.currency_code);
+				$.util.setText(this.priceNode, $.util.formatCurrency(value.toFixed(2), this.settings.currency_code));
 			},
 
 
@@ -1639,7 +1636,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				if (tag === 'select') {
 					return input.options[input.selectedIndex].value;
 				} else if (tag === 'textarea') {
-					return input.innerHTML;
+					return input.innerText;
 				} else {
 					if (input.type === 'radio') {
 						return (input.checked) ? input.value : null;
@@ -1649,6 +1646,23 @@ PAYPAL.apps = PAYPAL.apps || {};
 						return input.value;
 					}
 				}
+			},
+
+
+			/**
+			 * Convenient method to set the innerText of an element
+			 *
+			 * @param node {HTMLElement} The element
+			 * @param contetn {String} The content to escape
+			 * @param after {String} The content before
+			 * @param after {String} The content afterwards
+			 */
+			setText: function (node, content, before, after) {
+				var str = before || '';
+				str += content = content.replace('<', '&lt;').replace('>', '&gt;');
+				str += (after || '');
+
+				node.innerHTML = str;
 			},
 
 
