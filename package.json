@@ -1,0 +1,26 @@
+{
+	"name": "MiniCart",
+	"description": "Improve your PayPal integration by creating an overlay which appears as a user adds products to their cart.",
+	"version": "2.5.0",
+	"author": {
+		"name": "Jeff Harrell",
+		"url": "https://github.com/jeffharrell/"
+	},
+	"url": "http://www.minicartjs.com/",
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/jeffharrell/MiniCart/raw/master/LICENSE"
+		}
+	],
+	"dependencies": {},
+	"devDependencies": {
+		"grunt": "*",
+		"mocha": "*",
+		"should": "*",
+		"jsdom": "*"
+	},
+	"scripts": {
+		"test": "mocha"
+	}
+}
