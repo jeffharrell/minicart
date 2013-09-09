@@ -62,9 +62,10 @@ The PayPal URL to use if you are accessing sandbox or another version of the Pay
 An object of localizable text strings used:  
 
 * `button` - The checkout button text
+* `processing` - The checkout button text after the cart is submitted
 * `subtotal` - The subtotal text  
 * `discount` - The discount text  
-* `shipping` - The shipping text  
+* `shipping` - The shipping text    
 
 `events`  
 An object of customizable callbacks (see [Event callback examples](#event-callback-examples)):  
