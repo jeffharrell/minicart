@@ -375,22 +375,6 @@ PAYPAL.apps = PAYPAL.apps || {};
 						minicart.hide();
 					}
 				});
-
-				// Update other windows when HTML5 localStorage is updated
-				if (window.attachEvent && !window.opera) {
-					$.event.add(document, 'storage', function (e) {
-						// IE needs a delay in order to properly see the change
-						setTimeout(_redrawCartItems, 100);
-					});
-				} else {
-					$.event.add(window, 'storage', function (e) {
-						// Safari, Chrome, and Opera can filter on updated storage key
-						// Firefox can't so it uses a brute force approach
-						if ((e.key && e.key === config.name) || !e.key) {
-							_redrawCartItems();
-						}
-					});
-				}
 			};
 
 
