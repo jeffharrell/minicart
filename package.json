@@ -17,8 +17,6 @@
 	"devDependencies": {
 		"grunt": "*",
 		"mocha": "*",
-		"should": "*",
-		"jsdom": "*"
 	},
 	"scripts": {
 		"test": "mocha"
