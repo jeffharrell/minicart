@@ -42,6 +42,9 @@ Product.prototype.get = function get(name) {
 
 Product.prototype.set = function set(name, value) {
     var item = this._data[name] = value;
+
+
+
     this.fire('change', name, value);
 };
 

@@ -4,7 +4,7 @@ var assert = require('assert'),
     Product = require('../src/product');
 
 
-describe('Product Model', function() {
+describe('Product Model', function () {
 
     var item;
 
@@ -23,14 +23,14 @@ describe('Product Model', function() {
     });
 
 
-    it('get() returns valid data', function() {
+    it('get() returns valid data', function () {
         assert.equal(item.get('name'), 'Foo');
         assert.equal(item.get('desc'), 'This is an item, foo');
         assert.equal(item.get('amount'), 1.23);
     });
 
 
-    it('set() writes data', function() {
+    it('set() writes data', function () {
         item.set('name', 'Bar');
         item.set('desc', 'Where is the bar?');
         item.set('amount', 4.56);
@@ -52,7 +52,7 @@ describe('Product Model', function() {
     });
 
 
-    it('destroy() empties data', function() {
+    it('destroy() empties data', function () {
         item.destroy();
 
         assert.equal(item.get('name'), undefined);
