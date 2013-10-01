@@ -4,7 +4,7 @@ The Mini Cart
 The Mini Cart is a great way to improve your PayPal integration by creating an overlay which appears as a user adds products to their cart. It’s a simple change that creates a wonderful new experience for your website!
 
 
-1. [Setup](#interested-let%E2%80%99s-get-you-setup)
+1. [Setup](#interested-let's-get-you-setup)
 2. [Customization](#customization)
 3. [Event callback examples](#event-callback-examples)
 4. [Localization](#localization)
@@ -14,7 +14,7 @@ The Mini Cart is a great way to improve your PayPal integration by creating an o
 
 
 
-Interested? Let’s get you setup
+Interested? Let's get you setup
 -------------------------------
 
 1. Start with a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
