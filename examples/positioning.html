@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+	<style>
+		#foo { background: yellow; border: 1px solid black; overflow: hidden; position: absolute; top: 100px; left: 200px; width: 500px; height: 300px; }
+
+		/* Override the default Mini Cart styles */
+		#myPage #PPMiniCart form { position: relative; right: auto; width: auto; }
+	</style>
+</head>
+<body id="myPage">
+	<div id="foo"></div>
+
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<fieldset>
+			<input type="hidden" name="cmd" value="_cart" />
+			<input type="hidden" name="add" value="1" />
+			<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" />
+			<input type="hidden" name="item_name" value="Test Product" />
+			<input type="hidden" name="quantity" value="1" />
+			<input type="hidden" name="amount" value="1.00" />
+			<input type="hidden" name="currency_code" value="USD" />
+			<input type="hidden" name="return" value="http://localhost/minicartjs.com/?success" />
+			<input type="hidden" name="cancel_return" value="http://localhost/minicartjs.com/?cancel" />
+			<strong>Test Product</strong>
+			<input type="submit" name="submit" value="Add to cart" class="button" />
+		</fieldset>
+	</form>
+
+	<script src="../build/dist/minicart.min.js"></script>
+	<script>
+		PAYPAL.apps.MiniCart.render({
+			parent: 'foo'
+		});
+	</script>
+
+</body>
+</html>

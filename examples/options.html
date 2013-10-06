@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<fieldset>
+			<input type="hidden" name="cmd" value="_cart" />
+			<input type="hidden" name="add" value="1" />
+			<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" />
+			<input type="hidden" name="item_name" value="Test Product" />
+			<input type="hidden" name="quantity" value="1" />
+			<input type="hidden" name="amount" value="1.00" />
+			<input type="hidden" name="currency_code" value="USD" />
+			<input type="hidden" name="return" value="http://localhost/minicartjs.com/?success" />
+			<input type="hidden" name="cancel_return" value="http://localhost/minicartjs.com/?cancel" />
+			<strong>Test Product</strong>
+			<p>
+				<label>
+					Option 1:
+					<input type="text" name="os0" value="This is option one" />
+					<input type="hidden" name="on0" value="Option 1:" />
+				</label>
+			</p>
+			<p>
+				<label>
+					Option 2:
+					<input type="text" name="os1" value="This is option two" />
+					<input type="hidden" name="on1" value="Option 2:" />
+				</label>
+			</p>
+			<p>
+				<label>
+					Option 3:
+					<input type="text" name="os2" value="This is option three" />
+					<input type="hidden" name="on2" value="Option 3:" />
+				</label>
+			</p>
+
+			<input type="submit" name="submit" value="Add to cart" class="button" />
+		</fieldset>
+	</form>
+
+
+	<script src="../build/dist/minicart.min.js"></script>
+	<script>
+		PAYPAL.apps.MiniCart.render();
+	</script>
+
+</body>
+</html>
