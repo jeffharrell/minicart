@@ -13,7 +13,7 @@
     "mootools": false,
     "dojo": false,
 
-    "predef": [ 'describe', 'it', 'before', 'after', 'beforeEach', 'afterEach' ],
+    "predef": [ "describe", "it", "before", "after", "beforeEach", "afterEach" ],
 
     "debug": false,
     "devel": false,

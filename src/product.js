@@ -24,7 +24,7 @@ Product.prototype.fire = function on(name) {
     var cache = eventCache[name], i, len, fn;
 
     if (cache) {
-        for (i = 0 , len = cache.length; i < len; i++) {
+        for (i = 0, len = cache.length; i < len; i++) {
             fn = cache[i];
 
             if (typeof fn === 'function') {
