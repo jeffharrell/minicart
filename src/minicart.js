@@ -80,10 +80,13 @@ PAYPAL.apps = PAYPAL.apps || {};
 		assetURL: 'http://www.minicartjs.com/build/',
 
 		/**
-		 * Boolean to determine if the cart should be reset on success
+		 * Boolean to determine if the cart should be reset on payment completion
 		 */
 		resetCartOnSuccess: true,
-        
+
+        /**
+         * Life-cycle events
+         */
 		events: {
 			/**
 			 * Custom event fired before the cart is rendered
@@ -492,7 +495,7 @@ PAYPAL.apps = PAYPAL.apps || {};
 				product.amount = product.amount || 0;
 
 				// Add Mini Cart specific settings
-				if (settings['resetCartOnSuccess'] && settings['return'] && settings['return'].indexOf('#') === -1) {
+				if (config.resetCartOnSuccess && settings['return'] && settings['return'].indexOf('#') === -1) {
 					settings['return'] += '#' + config.name + '=reset';
 				}
 

@@ -38,25 +38,28 @@ Customization
 You can customize the script to make it work for your site by passing a JavaScript object as an argument, setting any of the following optional properties:
 
 `parent`  
-The HTMLElement the Mini Cart should render as a child of. Default document.body.
+The HTMLElement the Mini Cart should render as a child of. Default `document.body`.
 
 `formTarget`  
-The HTML target property for the checkout form.
+The HTML target property for the checkout form. Default `null`.
 
 `displayEdge`  
-The edge of the page the cart should pin to. Set to left or right. Default right.
+The edge of the page the cart should pin to. Set to left or right. Default `'right'`.
 
 `edgeDistance`  
-Distance from the edge the cart should appear. Default 50px.
+Distance from the edge the cart should appear. Default `'50px'`.
 
 `cookiePath`  
-The base path of your website to set the cookie to (useful for shared website hosting)
+The base path of your website to set the cookie to (useful for shared website hosting). Default `null`.
 
 `peekEnabled`  
-Boolean to determine if the cart should "peek" when it's hidden with items. Default true.
+Boolean to determine if the cart should "peek" when it's hidden with items. Default `true`.
 
 `paypalURL`  
-The PayPal URL to use if you are accessing sandbox or another version of the PayPal website. Defaults to https://www.paypal.com/cgi-bin/webscr.
+The PayPal URL to use if you are accessing sandbox or another version of the PayPal website. Default `'https://www.paypal.com/cgi-bin/webscr'`.
+
+`resetCartOnSuccess`
+Boolean to determine if the cart should be reset automatically on payment completion. Default `true`.
 
 `strings`  
 An object of localizable text strings used:  
