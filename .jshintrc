@@ -4,7 +4,7 @@
 
 
     "browser": true,
-    "node": false,
+    "node": true,
     "rhino": false,
     "couch": false,
     "wsh": false,
@@ -19,7 +19,6 @@
     "debug": false,
     "devel": false,
 
-    "es5": true,
     "strict": true,
     "globalstrict": false,
 
@@ -64,5 +63,6 @@
     "sub": false,
     "trailing": true,
     "white": true,
-    "indent": 4
+    "indent": 4,
+    "quotmark": "single"
 }
