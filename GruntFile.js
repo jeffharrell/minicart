@@ -25,16 +25,26 @@ module.exports = function (grunt) {
                     'dist/minicart.min.js': ['dist/minicart.js']
                 }
             }
+        },
+        mochaTest: {
+            test: {
+                options: {
+                    reporter: 'spec'
+                },
+                src: ['test/**/*.js']
+            }
         }
     });
 
     grunt.task.loadNpmTasks('grunt-contrib-concat');
     grunt.task.loadNpmTasks('grunt-contrib-jshint');
     grunt.task.loadNpmTasks('grunt-contrib-uglify');
+    grunt.task.loadNpmTasks('grunt-mocha-test');
 
 
     // Tasks
     grunt.registerTask('lint', ['jshint']);
-    grunt.registerTask('build', ['jshint', 'concat', 'uglify']);
+    grunt.registerTask('test', ['mochaTest']);
+    grunt.registerTask('build', ['mochaTest', 'jshint', 'concat', 'uglify']);
 
 };
