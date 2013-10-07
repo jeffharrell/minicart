@@ -1,7 +1,7 @@
 {
   "name": "minicart",
   "description": "Improve your PayPal integration by creating an overlay which appears as a user adds products to their cart.",
-  "version": "2.5.0",
+  "version": "3.0-alpha",
   "author": {
     "name": "Jeff Harrell",
     "url": "https://github.com/jeffharrell/"
