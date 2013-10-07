@@ -22,7 +22,7 @@ module.exports = function (grunt) {
             },
 			dist: {
 				files: {
-                    'dist/minicart.min.js': ['src/minicart.js', 'lib/json2.js']
+                    'dist/minicart.min.js': ['dist/minicart.js']
                 }
 			}
 		}
