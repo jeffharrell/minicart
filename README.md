@@ -58,7 +58,7 @@ Boolean to determine if the cart should "peek" when it's hidden with items. Defa
 `paypalURL`  
 The PayPal URL to use if you are accessing sandbox or another version of the PayPal website. Default `'https://www.paypal.com/cgi-bin/webscr'`.
 
-`resetCartOnSuccess`  
+`resetCartOnSuccess`
 Boolean to determine if the cart should be reset automatically on payment completion. Default `true`.
 
 `strings`  
