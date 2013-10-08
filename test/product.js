@@ -1,5 +1,6 @@
 'use strict';
 
+
 var assert = require('assert'),
     Product = require('../src/product');
 
