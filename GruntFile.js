@@ -3,18 +3,18 @@
 
 module.exports = function (grunt) {
 
-    // Project configuration
+    // Configuration
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         concat: {
             dist: {
-                src: ['src/minicart.js', 'lib/json2.js'],
+                src: ['src/config.js', 'src/product.js', 'src/cart.js', 'src/ui.js', 'lib/json2.js'],
                 dest: 'dist/minicart.js'
             }
         },
         jshint: {
             options: grunt.file.readJSON('.jshintrc'),
-            all: ['src/*.js', 'test/*.js']
+            all: ['src/**/*.js', 'test/**/*.js']
         },
         uglify: {
             options: {
@@ -36,15 +36,15 @@ module.exports = function (grunt) {
         }
     });
 
+    // Dependencies
     grunt.task.loadNpmTasks('grunt-contrib-concat');
     grunt.task.loadNpmTasks('grunt-contrib-jshint');
     grunt.task.loadNpmTasks('grunt-contrib-uglify');
     grunt.task.loadNpmTasks('grunt-mocha-test');
 
-
     // Tasks
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test', ['mochaTest']);
-    grunt.registerTask('build', ['mochaTest', 'jshint', 'concat', 'uglify']);
+    grunt.registerTask('build', ['jshint', 'mochaTest', 'concat', 'uglify']);
 
 };

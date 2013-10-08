@@ -47,14 +47,18 @@ Product.prototype.fire = function on(name) {
 };
 
 
-Product.prototype.get = function get(name) {
-    return this._data[name];
+Product.prototype.get = function get(key) {
+    return this._data[key];
 };
 
 
-Product.prototype.set = function set(name, value) {
-    var item = this._data[name] = value;
-    this.fire('change', name, value);
+Product.prototype.set = function set(key, value) {
+    var item = this._data[key] = value,
+        data = {};
+
+    data[key] = value;
+
+    this.fire('change', data);
 };
 
 

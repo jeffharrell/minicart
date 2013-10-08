@@ -43,9 +43,8 @@ describe('Product Model', function () {
 
 
     it('set() fires an event', function (done) {
-        item.on('change', function (name, value) {
-            assert.equal(name, 'name');
-            assert.equal(value, 'Baz');
+        item.on('change', function (data) {
+            assert.equal(data.name, 'Baz');
             done();
         });
 

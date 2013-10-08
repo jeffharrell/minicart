@@ -49,7 +49,7 @@ describe('Cart Model', function () {
 
         cart.on('add', function (idx, data) {
             assert.equal(len, idx);
-            assert.equal(data, product)
+            assert.equal(data, product);
             done();
         });
 

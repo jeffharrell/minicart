@@ -1,6 +1,9 @@
 'use strict';
 
 
+var Product = require('./product');
+
+
 function Cart(data) {
     var i, len;
 
@@ -55,7 +58,14 @@ Cart.prototype.fire = function on(name) {
 
 
 Cart.prototype.add = function add(data) {
-    var idx = (this._products.push(data) - 1);
+    var that = this,
+        product = new Product(data),
+        idx = (this._products.push(data) - 1);
+
+    product.on('change', function (key, value) {
+        that.fire('change', idx, key, value);
+    });
+
     this.fire('add', idx, data);
     return idx;
 };
