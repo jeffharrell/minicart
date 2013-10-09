@@ -7,35 +7,45 @@ var config = module.exports = {
 
     parent: document.body,
 
-    template: '<form method="post" action="https://www.paypal.com/cgi-bin/webscr">' +
+    action: 'https://www.paypal.com/cgi-bin/webscr',
+
+    target: '',
+
+    duration: 30,
+
+    cookiePath: '/',
+
+    bn: 'MiniCart_AddToCart_WPS_US',
+
+    resetOnSuccess: true,
+
+    template: '<form method="post" action="<%= config.action %>" target="<%= config.target %>">' +
         '<input type="hidden" name="cmd" value="_cart">' +
         '<input type="hidden" name="upload" value="1">' +
-        '<input type="hidden" name="bn" value="MiniCart_AddToCart_WPS_US">' +
+        '<input type="hidden" name="bn" value="<%= config.bn %>">' +
         '<ul>' +
-        '<li>' +
-        '<a href="http://minicartjs.com/">Product 2<span>12345<br><input type="hidden" name="discount_amount_1" value="0"></span></a>' +
-        '<input name="quantity_1" class="quantity" autocomplete="off">' +
-        '<input type="button" class="remove">' +
-        '<span class="price">$2.00</span>' +
-        '<input type="hidden" name="cmd_1" value="_cart">' +
-        '<input type="hidden" name="add_1" value="1">' +
-        '<input type="hidden" name="item_name_1" value="Product 2">' +
-        '<input type="hidden" name="item_number_1" value="12345">' +
-        '<input type="hidden" name="amount_1" value="2.00">' +
-        '<input type="hidden" name="submit_1" value="Add to cart">' +
-        '<input type="hidden" name="href_1" value="http://minicartjs.com/">' +
-        '<input type="hidden" name="offset_1" value="0">' +
+        '<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>' +
+        '<li class="minicart-item">' +
+        '<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].item_name %></a>' +
+        '<span class="minicart-number"><%= items[i].item_number %></span>' +
+        '<input class="minicart-quantity" name="quantity_<%= i %>" autocomplete="off">' +
+        '<input type="button">' +
+        '<span class="minicart-price"><%= items[i].amount.toFixed(2) %></span>' +
+        '<input type="hidden" name="item_name_<%= i %>" value="<%= items[i].item_name %>">' +
+        '<input type="hidden" name="item_number_<%= i %>" value="<%= items[i].item_number %>">' +
+        '<input type="hidden" name="amount_<%= i %>" value="<%= items[i].amount %>">' +
         '</li>' +
+        '<% } %>' +
         '</ul>' +
         '<p>' +
-        '<input type="submit" value="Checkout">' +
-        '<span>Subtotal: <span>$2.00</span></span>' +
-        '<span class="shipping">does not include shipping &amp; tax</span>' +
+        '<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>">' +
+        '<span class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %></span></span>' +
+        '<span class="minicart-shipping"><%= config.strings.shipping %></span>' +
         '</p>' +
-        '<input type="hidden" name="business" value="example@minicartjs.com">' +
-        '<input type="hidden" name="currency_code" value="USD">' +
-        '<input type="hidden" name="return" value="http://www.minicartjs.com/?success#PPMiniCart=reset">' +
-        '<input type="hidden" name="cancel_return" value="http://www.minicartjs.com/?cancel">' +
+        //'<input type="hidden" name="business" value="example@minicartjs.com">' +
+        //'<input type="hidden" name="currency_code" value="USD">' +
+        //'<input type="hidden" name="return" value="http://www.minicartjs.com/?success#PPMiniCart=reset">' +
+        //'<input type="hidden" name="cancel_return" value="http://www.minicartjs.com/?cancel">' +
         '</form>',
 
     styles: '',
@@ -56,4 +66,6 @@ module.exports.load = function load(userConfig) {
     for (var key in userConfig) {
         config[key] = userConfig[key];
     }
+
+    return config;
 };

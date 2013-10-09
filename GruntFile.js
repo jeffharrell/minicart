@@ -17,7 +17,7 @@ module.exports = function (grunt) {
 
 		concat: {
 			dist: {
-				src: ['dist/minicart.js', 'lib/json2.js'],
+				src: ['lib/json2.js', 'lib/ejs.js', 'dist/minicart.js'],
 				dest: 'dist/minicart.js'
 			}
 		},
@@ -57,7 +57,7 @@ module.exports = function (grunt) {
 
 	// Tasks
 	grunt.registerTask('lint', ['jshint']);
-	grunt.registerTask('test', ['browserify', 'mochaTest']);
+	grunt.registerTask('test', ['browserify', 'concat', 'mochaTest']);
 	grunt.registerTask('build', ['jshint', 'mochaTest', 'browserify', 'uglify']);
 
 };

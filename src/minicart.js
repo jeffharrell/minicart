@@ -1,82 +1,71 @@
 'use strict';
 
 
-var Product = require('./product'),
-    Cart = require('./cart'),
+var Cart = require('./cart'),
     config = require('./config'),
+    util = require('./util'),
     minicart = {},
-    isShowing = false,
-    cartModel;
+    cartModel, isShowing;
 
 
-function addItem(idx, data) {
+
+function redraw() {
+    minicart.el.innerHTML = util.template(config.template, minicart);
     minicart.show();
 }
-
-function changeItem(idx, data) {
-    minicart.show();
-}
-
-
-function removeItem(idx) {
-    minicart.show();
-}
-
 
 
 minicart.render = function render(userConfig) {
     var wrapper;
 
-    config.load(userConfig);
+    minicart.config = config.load(userConfig);
 
-    wrapper = document.createElement('div');
+    cartModel = minicart.cart = new Cart();
+    cartModel.on('add', redraw);
+    cartModel.on('change', redraw);
+    cartModel.on('remove', redraw);
+
+    wrapper = minicart.el = document.createElement('div');
     wrapper.id = config.name;
-    wrapper.innerHTML = config.template;
+
+    redraw();
 
     config.parent.appendChild(wrapper);
-
-//    cartModel = minicart.data = new Cart();
-//    cartModel.on('add', addItem);
-//    cartModel.on('change', changeItem);
-//    cartModel.on('remove', removeItem);
 };
 
-//
-//minicart.bind = function bind(form) {
-//
-//};
-//
-//
-//minicart.show = function show() {
-//    if (!isShowing) {
-//        config.parent.addClass('showing');
-//        isShowing = true;
-//    }
-//};
-//
-//
-//minicart.hide = function hide() {
-//    if (isShowing) {
-//        config.parent.removeClass('showing');
-//        isShowing = false;
-//    }
-//};
-//
-//
-//minicart.toggle = function toggle() {
-//    minicart[isShowing ? 'hide' : 'show']();
-//};
-//
-//
-//minicart.reset = function reset() {
-//    minicart.hide();
-//    cartModel.destroy();
-//};
+
+minicart.show = function show() {
+    if (!isShowing) {
+        config.parent.classList.add('showing');
+        isShowing = true;
+    }
+};
+
+
+minicart.hide = function hide() {
+    if (isShowing) {
+        config.parent.classList.remove('showing');
+        isShowing = false;
+    }
+};
+
+
+minicart.toggle = function toggle() {
+    minicart[isShowing ? 'hide' : 'show']();
+};
+
+
+minicart.reset = function reset() {
+    minicart.hide();
+    cartModel.destroy();
+
+    redraw();
+};
 
 
 
 
-// Export
+// Export for either the browser or node
 (function (win) {
     if (!win.paypal) {
         win.paypal = {};

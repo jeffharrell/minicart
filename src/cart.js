@@ -10,8 +10,10 @@ function Cart(data) {
     this._eventCache = {};
     this._products = [];
 
-    for (i = 0, len = data.length; i < len; i++) {
-        this.add(data[i]);
+    if (data) {
+        for (i = 0, len = data.length; i < len; i++) {
+            this.add(data[i]);
+        }
     }
 }
 
