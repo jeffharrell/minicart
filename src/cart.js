@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Product = require('./product');
+var Product = require('./product'),
+    util = require('./util');
 
 
 function Cart(data) {
@@ -83,7 +84,7 @@ Cart.prototype.getAll = function getAll() {
 };
 
 
-Cart.prototype.total = function total() {
+Cart.prototype.total = function total(options) {
     var products = this.getAll(),
         result = 0,
         i, len;
@@ -92,7 +93,11 @@ Cart.prototype.total = function total() {
         result += parseFloat(products[i].amount, 2);
     }
 
-    return result.toFixed(2);
+    if (options && options.unformatted) {
+        return result;
+    } else {
+        return util.currency(result, 'USD');
+    }
 };
 
 

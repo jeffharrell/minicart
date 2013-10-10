@@ -57,7 +57,7 @@ module.exports = function (grunt) {
 
 	// Tasks
 	grunt.registerTask('lint', ['jshint']);
-	grunt.registerTask('test', ['browserify', 'concat', 'mochaTest']);
-	grunt.registerTask('build', ['jshint', 'mochaTest', 'browserify', 'uglify']);
+	grunt.registerTask('test', ['lint', 'browserify', 'concat', 'mochaTest']);
+	grunt.registerTask('build', ['test', 'uglify']);
 
 };

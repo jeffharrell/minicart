@@ -5,7 +5,7 @@ var config = module.exports = {
 
     name: 'PPMiniCart',
 
-    parent: document.body,
+    parent: (typeof document !== 'undefined') ? document.body : null,
 
     action: 'https://www.paypal.com/cgi-bin/webscr',
 
@@ -16,8 +16,6 @@ var config = module.exports = {
     cookiePath: '/',
 
     bn: 'MiniCart_AddToCart_WPS_US',
-
-    resetOnSuccess: true,
 
     template: '<form method="post" action="<%= config.action %>" target="<%= config.target %>">' +
         '<input type="hidden" name="cmd" value="_cart">' +
@@ -37,18 +35,21 @@ var config = module.exports = {
         '</li>' +
         '<% } %>' +
         '</ul>' +
-        '<p>' +
+        '<div>' +
+        '<div class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %></span></div>' +
+        '<div class="minicart-shipping"><%= config.strings.shipping %></div>' +
         '<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>">' +
-        '<span class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %></span></span>' +
-        '<span class="minicart-shipping"><%= config.strings.shipping %></span>' +
-        '</p>' +
+        '</div>' +
         //'<input type="hidden" name="business" value="example@minicartjs.com">' +
         //'<input type="hidden" name="currency_code" value="USD">' +
         //'<input type="hidden" name="return" value="http://www.minicartjs.com/?success#PPMiniCart=reset">' +
         //'<input type="hidden" name="cancel_return" value="http://www.minicartjs.com/?cancel">' +
         '</form>',
 
-    styles: '',
+    styles: '' +
+        '#PPMiniCart form { position: absolute; top: 50%; left: 50%; width: 300px; max-height: 400px; margin-left: -150px; margin-top: -200px; padding: 10px; background: #fff url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -125px -60px; border: 1px solid #999; border-radius: 5px; box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2); font: 13px/normal arial, helvetica; color: #333; }' +
+        '#PPMiniCart ul { margin: 45px 0 0; border-bottom: 1px solid #ccc; }' +
+        '#PPMiniCart .minicart-submit { padding: 1px 4px; background: #ffa822 url(http://www.minicartjs.com/build/images/minicart_sprite.png) repeat-x left center; border: 1px solid #d5bd98; border-right-color: #935e0d; border-bottom-color: #935e0d; border-radius: 2px; }',
 
     strings: {
         button: 'Checkout',

@@ -16,7 +16,7 @@ function redraw() {
 
 
 minicart.render = function render(userConfig) {
-    var wrapper;
+    var wrapper, head, style;
 
     minicart.config = config.load(userConfig);
 
@@ -27,6 +27,20 @@ minicart.render = function render(userConfig) {
 
     wrapper = minicart.el = document.createElement('div');
     wrapper.id = config.name;
+
+    if (config.styles) {
+        style = document.createElement('style');
+        style.type = 'text/css';
+
+        if (style.styleSheet) {
+            style.styleSheet.cssText = config.styles;
+        } else {
+            style.appendChild(document.createTextNode(config.styles));
+        }
+
+        head = document.getElementsByTagName('head')[0];
+        head.appendChild(style);
+    }
 
     redraw();
 

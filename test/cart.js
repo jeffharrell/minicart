@@ -22,7 +22,7 @@ describe('Cart Model', function () {
 
     it('get() returns a valid product', function () {
         assert.deepEqual(cart.get(0), { name: 'Item 1', amount: 1.00 });
-        assert.deepEqual(cart.get(1), { name: 'Item 2', amount: 2.00 });
+        assert.deepEqual(cart.get(1), { name: 'Item 2', amount: 2.34 });
     });
 
 
@@ -58,9 +58,17 @@ describe('Cart Model', function () {
 
 
     it('total() returns the cart product total', function () {
-        assert.equal(cart.total(), 3.00);
-        cart.remove(0);
-        assert.equal(cart.total(), 2.00);
+        assert.equal(cart.total(), '$3.34');
+        cart.remove(1);
+        assert.equal(cart.total(), '$1.00');
+
+    });
+
+
+    it('total() returns the unformatted cart product total', function () {
+        assert.equal(cart.total({ unformatted: true }), 3.34);
+        cart.remove(1);
+        assert.equal(cart.total({ unformatted: true }), 1);
 
     });
 
