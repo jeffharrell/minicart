@@ -37,7 +37,6 @@ var config = module.exports = {
         '</ul>' +
         '<div>' +
         '<div class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %></span></div>' +
-        '<div class="minicart-shipping"><%= config.strings.shipping %></div>' +
         '<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>">' +
         '</div>' +
         //'<input type="hidden" name="business" value="example@minicartjs.com">' +
@@ -55,7 +54,6 @@ var config = module.exports = {
         button: 'Checkout',
         subtotal: 'Subtotal: ',
         discount: 'Discount: ',
-        shipping: 'Does not include shipping & tax',
         processing: 'Processing...'
     }
 
