@@ -65,6 +65,24 @@ minicart.render = function render(userConfig) {
 
     redraw();
 
+    document.addEventListener('click', function (e) {
+        if (isShowing) {
+            var target = e.target;
+
+            if (!(/input|button|select|option/i.test(target.tagName))) {
+                while (target.nodeType === 1) {
+                    if (target === config.parent) {
+                        return;
+                    }
+
+                    target = target.parentNode;
+                }
+
+                minicart.hide();
+            }
+        }
+    }, false);
+
     config.parent.appendChild(wrapper);
 };
 
