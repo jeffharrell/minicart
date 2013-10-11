@@ -11,8 +11,29 @@ var Cart = require('./cart'),
 
 function redraw() {
     minicart.el.innerHTML = util.template(config.template, minicart);
-    minicart.show();
 }
+
+
+function addItem(idx, data) {
+    redraw();
+    minicart.show();
+    console.log('add item');
+}
+
+
+function changeItem(idx, data) {
+    redraw();
+    minicart.show();
+    console.log('change item');
+}
+
+
+function removeItem(idx) {
+    redraw();
+    minicart.show();
+    console.log('remove item');
+}
+
 
 
 minicart.render = function render(userConfig) {
@@ -21,9 +42,9 @@ minicart.render = function render(userConfig) {
     minicart.config = config.load(userConfig);
 
     cartModel = minicart.cart = new Cart();
-    cartModel.on('add', redraw);
-    cartModel.on('change', redraw);
-    cartModel.on('remove', redraw);
+    cartModel.on('add', addItem);
+    cartModel.on('change', changeItem);
+    cartModel.on('remove', removeItem);
 
     wrapper = minicart.el = document.createElement('div');
     wrapper.id = config.name;
@@ -50,7 +71,7 @@ minicart.render = function render(userConfig) {
 
 minicart.show = function show() {
     if (!isShowing) {
-        config.parent.classList.add('showing');
+        document.body.classList.add('minicart-showing');
         isShowing = true;
     }
 };
@@ -58,7 +79,7 @@ minicart.show = function show() {
 
 minicart.hide = function hide() {
     if (isShowing) {
-        config.parent.classList.remove('showing');
+        document.body.classList.remove('minicart-showing');
         isShowing = false;
     }
 };

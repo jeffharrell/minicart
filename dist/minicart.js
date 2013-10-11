@@ -1132,12 +1132,11 @@ var config = module.exports = {
 
     cookiePath: '/',
 
-    bn: 'MiniCart_AddToCart_WPS_US',
-
-    template: '<form method="post" action="<%= config.action %>" target="<%= config.target %>">' +
+    template: '' +
+        '<form method="post" action="<%= config.action %>" target="<%= config.target %>">' +
         '<input type="hidden" name="cmd" value="_cart" />' +
         '<input type="hidden" name="upload" value="1" />' +
-        '<input type="hidden" name="bn" value="<%= config.bn %>" />' +
+        '<input type="hidden" name="bn" value="MiniCart_AddToCart_WPS_US" />' +
         '<ul>' +
         '<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>' +
         '<li class="minicart-item">' +
@@ -1163,6 +1162,8 @@ var config = module.exports = {
         '</form>',
 
     styles: '' +
+        '.minicart-showing #PPMiniCart { display: block; }' +
+        '#PPMiniCart { display: none; }' +
         '#PPMiniCart form { position: absolute; top: 50%; left: 50%; width: 300px; max-height: 400px; margin-left: -150px; margin-top: -200px; padding: 10px; background: #fff url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -125px -60px; border: 1px solid #999; border-radius: 5px; box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2); font: 13px/normal arial, helvetica; color: #333; }' +
         '#PPMiniCart ul { margin: 45px 0 13px; padding: 0; list-style-type: none; border-bottom: 1px solid #ccc; }' +
         '#PPMiniCart .minicart-item { position: relative; height: 30px; }' +
@@ -1171,7 +1172,7 @@ var config = module.exports = {
         '#PPMiniCart .minicart-remove { position: absolute; top: 5px; left: 230px; width: 14px; height: 14px; background: url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -134px -4px; border: 0; cursor: pointer; }' +
         '#PPMiniCart .minicart-price { position: absolute; left: 0; width: 300px; text-align: right; }' +
         '#PPMiniCart .minicart-subtotal { float: left; font-weight: bold; }' +
-        '#PPMiniCart .minicart-submit { float: right; padding: 1px 4px; background: #ffa822 url(http://www.minicartjs.com/build/images/minicart_sprite.png) repeat-x left center; border: 1px solid #d5bd98; border-right-color: #935e0d; border-bottom-color: #935e0d; border-radius: 2px; }',
+        '#PPMiniCart .minicart-submit { float: right; padding: 1px 4px; background: #ffa822 url(http://www.minicartjs.com/build/images/minicart_sprite.png) repeat-x left center; border: 1px solid #d5bd98; border-right-color: #935e0d; border-bottom-color: #935e0d; border-radius: 2px; cursor: pointer; }',
 
     strings: {
         button: 'Checkout',
@@ -1205,8 +1206,29 @@ var Cart = require('./cart'),
 
 function redraw() {
     minicart.el.innerHTML = util.template(config.template, minicart);
-    minicart.show();
 }
+
+
+function addItem(idx, data) {
+    redraw();
+    minicart.show();
+    console.log('add item');
+}
+
+
+function changeItem(idx, data) {
+    redraw();
+    minicart.show();
+    console.log('change item');
+}
+
+
+function removeItem(idx) {
+    redraw();
+    minicart.show();
+    console.log('remove item');
+}
+
 
 
 minicart.render = function render(userConfig) {
@@ -1215,9 +1237,9 @@ minicart.render = function render(userConfig) {
     minicart.config = config.load(userConfig);
 
     cartModel = minicart.cart = new Cart();
-    cartModel.on('add', redraw);
-    cartModel.on('change', redraw);
-    cartModel.on('remove', redraw);
+    cartModel.on('add', addItem);
+    cartModel.on('change', changeItem);
+    cartModel.on('remove', removeItem);
 
     wrapper = minicart.el = document.createElement('div');
     wrapper.id = config.name;
@@ -1244,7 +1266,7 @@ minicart.render = function render(userConfig) {
 
 minicart.show = function show() {
     if (!isShowing) {
-        config.parent.classList.add('showing');
+        document.body.classList.add('minicart-showing');
         isShowing = true;
     }
 };
@@ -1252,7 +1274,7 @@ minicart.show = function show() {
 
 minicart.hide = function hide() {
     if (isShowing) {
-        config.parent.classList.remove('showing');
+        document.body.classList.remove('minicart-showing');
         isShowing = false;
     }
 };
@@ -1744,5 +1766,5 @@ var config = require('./config'),
 
 
 module.exports = util;
-},{"./config":2}]},{},[1,2,3,4,5])
+},{"./config":2}]},{},[1,3,2,4,5])
 ;
