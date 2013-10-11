@@ -55,9 +55,6 @@ function addEvents() {
 
         if (target.className === 'minicart-quantity') {
             var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
-
-            console.log(target.getAttribute('data-minicart-idx'), target, product);
-
             product.set('quantity', target.value);
         }
     }, false);
@@ -71,21 +68,18 @@ function redraw() {
 function addItem(idx, data) {
     redraw();
     minicart.show();
-    console.log('add item');
 }
 
 
 function changeItem(idx, data) {
     redraw();
     minicart.show();
-    console.log('change item');
 }
 
 
 function removeItem(idx) {
     redraw();
     minicart.show();
-    console.log('remove item');
 }
 
 

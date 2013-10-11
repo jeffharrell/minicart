@@ -90,7 +90,7 @@ Cart.prototype.total = function total(options) {
         i, len;
 
     for (i = 0, len = products.length; i < len; i++) {
-        result += parseFloat(products[i].get('amount'));
+        result += products[i].total({ unformatted: true });
     }
 
     if (options && options.unformatted) {
