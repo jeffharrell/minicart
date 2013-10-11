@@ -9,6 +9,60 @@ var Cart = require('./cart'),
 
 
 
+function addStyles() {
+    var head, style;
+
+    if (config.styles) {
+        style = document.createElement('style');
+        style.type = 'text/css';
+
+        if (style.styleSheet) {
+            style.styleSheet.cssText = config.styles;
+        } else {
+            style.appendChild(document.createTextNode(config.styles));
+        }
+
+        head = document.getElementsByTagName('head')[0];
+        head.appendChild(style);
+    }
+}
+
+
+function addEvents() {
+    document.addEventListener('click', function (e) {
+        var target = e.target;
+
+        if (target.className === 'minicart-remove') {
+            minicart.cart.remove(target.getAttribute('data-minicart-idx'));
+        } else if (isShowing) {
+            if (!(/input|button|select|option/i.test(target.tagName))) {
+                while (target.nodeType === 1) {
+                    if (target === config.parent) {
+                        return;
+                    }
+
+                    target = target.parentNode;
+                }
+
+                minicart.hide();
+            }
+        }
+    }, false);
+
+
+    document.addEventListener('change', function (e) {
+        var target = e.target;
+
+        if (target.className === 'minicart-quantity') {
+            var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
+
+            console.log(target.getAttribute('data-minicart-idx'), target, product);
+
+            product.set('quantity', target.value);
+        }
+    }, false);
+}
+
 function redraw() {
     minicart.el.innerHTML = util.template(config.template, minicart);
 }
@@ -37,7 +91,7 @@ function removeItem(idx) {
 
 
 minicart.render = function render(userConfig) {
-    var wrapper, head, style;
+    var wrapper;
 
     minicart.config = config.load(userConfig);
 
@@ -49,39 +103,9 @@ minicart.render = function render(userConfig) {
     wrapper = minicart.el = document.createElement('div');
     wrapper.id = config.name;
 
-    if (config.styles) {
-        style = document.createElement('style');
-        style.type = 'text/css';
-
-        if (style.styleSheet) {
-            style.styleSheet.cssText = config.styles;
-        } else {
-            style.appendChild(document.createTextNode(config.styles));
-        }
-
-        head = document.getElementsByTagName('head')[0];
-        head.appendChild(style);
-    }
-
+    addStyles();
+    addEvents();
     redraw();
-
-    document.addEventListener('click', function (e) {
-        if (isShowing) {
-            var target = e.target;
-
-            if (!(/input|button|select|option/i.test(target.tagName))) {
-                while (target.nodeType === 1) {
-                    if (target === config.parent) {
-                        return;
-                    }
-
-                    target = target.parentNode;
-                }
-
-                minicart.hide();
-            }
-        }
-    }, false);
 
     config.parent.appendChild(wrapper);
 };

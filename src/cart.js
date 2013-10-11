@@ -63,7 +63,7 @@ Cart.prototype.fire = function on(name) {
 Cart.prototype.add = function add(data) {
     var that = this,
         product = new Product(data),
-        idx = (this._products.push(data) - 1);
+        idx = (this._products.push(product) - 1);
 
     product.on('change', function (key, value) {
         that.fire('change', idx, key, value);
@@ -90,7 +90,7 @@ Cart.prototype.total = function total(options) {
         i, len;
 
     for (i = 0, len = products.length; i < len; i++) {
-        result += parseFloat(products[i].amount, 2);
+        result += parseFloat(products[i].get('amount'));
     }
 
     if (options && options.unformatted) {

@@ -1056,7 +1056,7 @@ Cart.prototype.fire = function on(name) {
 Cart.prototype.add = function add(data) {
     var that = this,
         product = new Product(data),
-        idx = (this._products.push(data) - 1);
+        idx = (this._products.push(product) - 1);
 
     product.on('change', function (key, value) {
         that.fire('change', idx, key, value);
@@ -1083,7 +1083,7 @@ Cart.prototype.total = function total(options) {
         i, len;
 
     for (i = 0, len = products.length; i < len; i++) {
-        result += parseFloat(products[i].amount, 2);
+        result += parseFloat(products[i].get('amount'));
     }
 
     if (options && options.unformatted) {
@@ -1140,14 +1140,14 @@ var config = module.exports = {
         '<ul>' +
         '<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>' +
         '<li class="minicart-item">' +
-        '<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].item_name %></a>' +
-        '<span class="minicart-number"><%= items[i].item_number %></span>' +
-        '<input class="minicart-quantity" name="quantity_<%= i %>" autocomplete="off" />' +
-        '<input class="minicart-remove" type="button" />' +
-        '<span class="minicart-price"><%= items[i].amount.toFixed(2) %></span>' +
-        '<input type="hidden" name="item_name_<%= i %>" value="<%= items[i].item_name %>" />' +
-        '<input type="hidden" name="item_number_<%= i %>" value="<%= items[i].item_number %>" />' +
-        '<input type="hidden" name="amount_<%= i %>" value="<%= items[i].amount %>" />' +
+        '<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>' +
+        '<span class="minicart-number"><%= items[i].get("item_number") %></span>' +
+        '<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= i %>" value="<%= items[i].qty() %>" autocomplete="off" />' +
+        '<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />' +
+        '<span class="minicart-price"><%= items[i].total() %></span>' +
+        '<input type="hidden" name="item_name_<%= i %>" value="<%= items[i].get("item_name") %>" />' +
+        '<input type="hidden" name="item_number_<%= i %>" value="<%= items[i].get("item_number") %>" />' +
+        '<input type="hidden" name="amount_<%= i %>" value="<%= items[i].get("amount") %>" />' +
         '</li>' +
         '<% } %>' +
         '</ul>' +
@@ -1167,10 +1167,10 @@ var config = module.exports = {
         '#PPMiniCart form { position: absolute; top: 50%; left: 50%; width: 300px; max-height: 400px; margin-left: -150px; margin-top: -200px; padding: 10px; background: #fff url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -125px -60px; border: 1px solid #999; border-radius: 5px; box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2); font: 13px/normal arial, helvetica; color: #333; }' +
         '#PPMiniCart ul { margin: 45px 0 13px; padding: 0; list-style-type: none; border-bottom: 1px solid #ccc; }' +
         '#PPMiniCart .minicart-item { position: relative; height: 30px; }' +
-        '#PPMiniCart .minicart-item a { text-decoration: none; }' +
+        '#PPMiniCart .minicart-item a { position: absolute; top: 0; left: 0; width: 185px; text-decoration: none; }' +
         '#PPMiniCart .minicart-quantity { position: absolute; left: 190px; width: 30px; }' +
         '#PPMiniCart .minicart-remove { position: absolute; top: 5px; left: 230px; width: 14px; height: 14px; background: url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -134px -4px; border: 0; cursor: pointer; }' +
-        '#PPMiniCart .minicart-price { position: absolute; left: 0; width: 300px; text-align: right; }' +
+        '#PPMiniCart .minicart-price { display: block; text-align: right; }' +
         '#PPMiniCart .minicart-subtotal { float: left; font-weight: bold; }' +
         '#PPMiniCart .minicart-submit { float: right; padding: 1px 4px; background: #ffa822 url(http://www.minicartjs.com/build/images/minicart_sprite.png) repeat-x left center; border: 1px solid #d5bd98; border-right-color: #935e0d; border-bottom-color: #935e0d; border-radius: 2px; cursor: pointer; }',
 
@@ -1204,6 +1204,60 @@ var Cart = require('./cart'),
 
 
 
+function addStyles() {
+    var head, style;
+
+    if (config.styles) {
+        style = document.createElement('style');
+        style.type = 'text/css';
+
+        if (style.styleSheet) {
+            style.styleSheet.cssText = config.styles;
+        } else {
+            style.appendChild(document.createTextNode(config.styles));
+        }
+
+        head = document.getElementsByTagName('head')[0];
+        head.appendChild(style);
+    }
+}
+
+
+function addEvents() {
+    document.addEventListener('click', function (e) {
+        var target = e.target;
+
+        if (target.className === 'minicart-remove') {
+            minicart.cart.remove(target.getAttribute('data-minicart-idx'));
+        } else if (isShowing) {
+            if (!(/input|button|select|option/i.test(target.tagName))) {
+                while (target.nodeType === 1) {
+                    if (target === config.parent) {
+                        return;
+                    }
+
+                    target = target.parentNode;
+                }
+
+                minicart.hide();
+            }
+        }
+    }, false);
+
+
+    document.addEventListener('change', function (e) {
+        var target = e.target;
+
+        if (target.className === 'minicart-quantity') {
+            var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
+
+            console.log(target.getAttribute('data-minicart-idx'), target, product);
+
+            product.set('quantity', target.value);
+        }
+    }, false);
+}
+
 function redraw() {
     minicart.el.innerHTML = util.template(config.template, minicart);
 }
@@ -1232,7 +1286,7 @@ function removeItem(idx) {
 
 
 minicart.render = function render(userConfig) {
-    var wrapper, head, style;
+    var wrapper;
 
     minicart.config = config.load(userConfig);
 
@@ -1244,20 +1298,8 @@ minicart.render = function render(userConfig) {
     wrapper = minicart.el = document.createElement('div');
     wrapper.id = config.name;
 
-    if (config.styles) {
-        style = document.createElement('style');
-        style.type = 'text/css';
-
-        if (style.styleSheet) {
-            style.styleSheet.cssText = config.styles;
-        } else {
-            style.appendChild(document.createTextNode(config.styles));
-        }
-
-        head = document.getElementsByTagName('head')[0];
-        head.appendChild(style);
-    }
-
+    addStyles();
+    addEvents();
     redraw();
 
     config.parent.appendChild(wrapper);
@@ -1309,6 +1351,9 @@ minicart.reset = function reset() {
 
 },{"./cart":1,"./config":2,"./util":5}],4:[function(require,module,exports){
 'use strict';
+
+
+var util = require('./util');
 
 
 function Product(data) {
@@ -1363,11 +1408,10 @@ Product.prototype.get = function get(key) {
 
 
 Product.prototype.set = function set(key, value) {
-    var item = this._data[key] = value,
-        data = {};
-
+    var data = {};
     data[key] = value;
 
+    this._data[key] = value;
     this.fire('change', data);
 };
 
@@ -1378,10 +1422,27 @@ Product.prototype.destroy = function destroy() {
 };
 
 
+Product.prototype.qty = function qty() {
+    return parseInt(this.get('quantity'), 10) || 1;
+};
+
+
+Product.prototype.total = function total(options) {
+    var qty = this.qty(),
+        amount = parseFloat(this.get('amount')),
+        result = qty * amount;
+
+    if (options && options.unformatted) {
+        return result;
+    } else {
+        return util.currency(result, 'USD');
+    }
+};
+
 
 
 module.exports = Product;
-},{}],5:[function(require,module,exports){
+},{"./util":5}],5:[function(require,module,exports){
 /*global EJS:true */
 
 'use strict';
@@ -1766,5 +1827,5 @@ var config = require('./config'),
 
 
 module.exports = util;
-},{"./config":2}]},{},[1,3,2,4,5])
+},{"./config":2}]},{},[1,2,3,4,5])
 ;

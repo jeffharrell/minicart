@@ -1,6 +1,9 @@
 'use strict';
 
 
+var util = require('./util');
+
+
 function Product(data) {
     this._data = data;
     this._eventCache = {};
@@ -53,11 +56,10 @@ Product.prototype.get = function get(key) {
 
 
 Product.prototype.set = function set(key, value) {
-    var item = this._data[key] = value,
-        data = {};
-
+    var data = {};
     data[key] = value;
 
+    this._data[key] = value;
     this.fire('change', data);
 };
 
@@ -67,6 +69,23 @@ Product.prototype.destroy = function destroy() {
     this.fire('destroy', this);
 };
 
+
+Product.prototype.qty = function qty() {
+    return parseInt(this.get('quantity'), 10) || 1;
+};
+
+
+Product.prototype.total = function total(options) {
+    var qty = this.qty(),
+        amount = parseFloat(this.get('amount')),
+        result = qty * amount;
+
+    if (options && options.unformatted) {
+        return result;
+    } else {
+        return util.currency(result, 'USD');
+    }
+};
 
 
 

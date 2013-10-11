@@ -35,10 +35,12 @@ describe('Product Model', function () {
         item.set('name', 'Bar');
         item.set('desc', 'Where is the bar?');
         item.set('amount', 4.56);
+        item.set('something', 'random');
 
         assert.equal(item.get('name'), 'Bar');
         assert.equal(item.get('desc'), 'Where is the bar?');
         assert.equal(item.get('amount'), 4.56);
+        assert.equal(item.get('something'), 'random');
     });
 
 
@@ -49,6 +51,34 @@ describe('Product Model', function () {
         });
 
         item.set('name', 'Baz');
+    });
+
+
+    it('qty() returns the quantity', function () {
+        item.set('quantity', 1234);
+        assert.equal(item.qty(), 1234);
+    });
+
+
+    it('qty() returns 1 for null quantities', function () {
+        assert.equal(item.qty(item), 1);
+    });
+
+
+    it('total() returns the cart product total', function () {
+        assert.equal(item.total(), '$1.23');
+
+        item.set('quantity', 2);
+        assert.equal(item.total(), '$2.46');
+
+    });
+
+
+    it('total() returns the unformatted cart product total', function () {
+        assert.equal(item.total({ unformatted: true }), 1.23);
+
+        item.set('quantity', 2);
+        assert.equal(item.total({ unformatted: true }), 2.46);
     });
 
 

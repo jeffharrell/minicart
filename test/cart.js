@@ -21,8 +21,10 @@ describe('Cart Model', function () {
 
 
     it('get() returns a valid product', function () {
-        assert.deepEqual(cart.get(0), { name: 'Item 1', amount: 1.00 });
-        assert.deepEqual(cart.get(1), { name: 'Item 2', amount: 2.34 });
+        assert.equal(cart.get(0).get('name'), 'Item 1');
+        assert.equal(cart.get(0).get('amount'), 1.00);
+        assert.equal(cart.get(1).get('name'), 'Item 2');
+        assert.equal(cart.get(1).get('amount'),  2.34);
     });
 
 
@@ -30,8 +32,10 @@ describe('Cart Model', function () {
         var products = cart.getAll();
 
         assert.equal(products.length, 2);
-        assert.deepEqual(products[0], cartData[0]);
-        assert.deepEqual(products[1], cartData[1]);
+        assert.equal(products[0].get('name'), cartData[0].name);
+        assert.equal(products[0].get('amount'), cartData[0].amount);
+        assert.equal(products[1].get('name'), cartData[1].name);
+        assert.equal(products[1].get('amount'), cartData[1].amount);
     });
 
 
@@ -39,7 +43,8 @@ describe('Cart Model', function () {
         var product = { name: 'Item 3', amount: 3.00 },
             idx = cart.add(product);
 
-        assert.deepEqual(cart.get(idx), product);
+        assert.equal(cart.get(idx).get('name'), product.name);
+        assert.equal(cart.get(idx).get('amount'), product.amount);
     });
 
 
