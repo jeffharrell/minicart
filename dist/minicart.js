@@ -995,7 +995,7 @@ EJS.Helpers.prototype = {
 
 
 var Product = require('./product'),
-    util = require('./util');
+    currency = require('./util/currency');
 
 
 function Cart(data) {
@@ -1089,7 +1089,7 @@ Cart.prototype.total = function total(options) {
     if (options && options.unformatted) {
         return result;
     } else {
-        return util.currency(result, 'USD');
+        return currency(result, 'USD');
     }
 };
 
@@ -1114,7 +1114,7 @@ Cart.prototype.destroy = function destroy() {
 
 
 module.exports = Cart;
-},{"./product":4,"./util":5}],2:[function(require,module,exports){
+},{"./product":4,"./util/currency":5}],2:[function(require,module,exports){
 'use strict';
 
 
@@ -1198,7 +1198,7 @@ module.exports.load = function load(userConfig) {
 
 var Cart = require('./cart'),
     config = require('./config'),
-    util = require('./util'),
+    template = require('./util/template'),
     minicart = {},
     cartModel, isShowing;
 
@@ -1256,7 +1256,7 @@ function addEvents() {
 }
 
 function redraw() {
-    minicart.el.innerHTML = util.template(config.template, minicart);
+    minicart.el.innerHTML = template(config.template, minicart);
 }
 
 
@@ -1343,11 +1343,11 @@ minicart.reset = function reset() {
 
 
 
-},{"./cart":1,"./config":2,"./util":5}],4:[function(require,module,exports){
+},{"./cart":1,"./config":2,"./util/template":9}],4:[function(require,module,exports){
 'use strict';
 
 
-var util = require('./util');
+var currency = require('./util/currency');
 
 
 function Product(data) {
@@ -1429,32 +1429,98 @@ Product.prototype.total = function total(options) {
     if (options && options.unformatted) {
         return result;
     } else {
-        return util.currency(result, 'USD');
+        return currency(result, 'USD');
     }
 };
 
 
 
 module.exports = Product;
-},{"./util":5}],5:[function(require,module,exports){
-/*global EJS:true */
-
+},{"./util/currency":5}],5:[function(require,module,exports){
 'use strict';
 
 
-var config = require('./config'),
-    util = {};
+var currencies = {
+    AED: { before: '\u062c' },
+    ANG: { before: '\u0192' },
+    ARS: { before: '$' },
+    AUD: { before: '$' },
+    AWG: { before: '\u0192' },
+    BBD: { before: '$' },
+    BGN: { before: '\u043b\u0432' },
+    BMD: { before: '$' },
+    BND: { before: '$' },
+    BRL: { before: 'R$' },
+    BSD: { before: '$' },
+    CAD: { before: '$' },
+    CHF: { before: '' },
+    CLP: { before: '$' },
+    CNY: { before: '\u00A5' },
+    COP: { before: '$' },
+    CRC: { before: '\u20A1' },
+    CZK: { before: 'Kc' },
+    DKK: { before: 'kr' },
+    DOP: { before: '$' },
+    EEK: { before: 'kr' },
+    EUR: { before: '\u20AC' },
+    GBP: { before: '\u00A3' },
+    GTQ: { before: 'Q' },
+    HKD: { before: '$' },
+    HRK: { before: 'kn' },
+    HUF: { before: 'Ft' },
+    IDR: { before: 'Rp' },
+    ILS: { before: '\u20AA' },
+    INR: { before: 'Rs.' },
+    ISK: { before: 'kr' },
+    JMD: { before: 'J$' },
+    JPY: { before: '\u00A5' },
+    KRW: { before: '\u20A9' },
+    KYD: { before: '$' },
+    LTL: { before: 'Lt' },
+    LVL: { before: 'Ls' },
+    MXN: { before: '$' },
+    MYR: { before: 'RM' },
+    NOK: { before: 'kr' },
+    NZD: { before: '$' },
+    PEN: { before: 'S/' },
+    PHP: { before: 'Php' },
+    PLN: { before: 'z' },
+    QAR: { before: '\ufdfc' },
+    RON: { before: 'lei' },
+    RUB: { before: '\u0440\u0443\u0431' },
+    SAR: { before: '\ufdfc' },
+    SEK: { before: 'kr' },
+    SGD: { before: '$' },
+    THB: { before: '\u0E3F' },
+    TRY: { before: 'TL' },
+    TTD: { before: 'TT$' },
+    TWD: { before: 'NT$' },
+    UAH: { before: '\u20b4' },
+    USD: { before: '$' },
+    UYU: { before: '$U' },
+    VEF: { before: 'Bs' },
+    VND: { before: '\u20ab' },
+    XCD: { before: '$' },
+    ZAR: { before: 'R' }
+};
+
+
+module.exports = function currency(amount, code) {
+    var value = currencies[code] || {},
+        before = value.before || '',
+        after = value.after || '',
+        length = value.length || 2;
+
+    return before + amount.toFixed(length) + after;
+};
+},{}],6:[function(require,module,exports){
+'use strict';
 
 
 (function (window, document) {
 
 
-    util.template = function template(str, data) {
-        return new EJS({text: str}).render(data);
-    };
-
-
-    util.event = (function () {
+    module.exports = (function () {
         /**
          * Events are added here for easy reference
          */
@@ -1466,7 +1532,7 @@ var config = require('./config'),
                 add: function () {},
                 remove: function () {}
             };
-        // Non-IE events
+            // Non-IE events
         } else if (document.addEventListener) {
             return {
                 /**
@@ -1512,7 +1578,7 @@ var config = require('./config'),
                 }
             };
 
-        // IE events
+            // IE events
         } else if (document.attachEvent) {
             return {
                 /**
@@ -1570,235 +1636,14 @@ var config = require('./config'),
     })();
 
 
-    util.storage = (function () {
-        var name = config.name;
-
-        // NOOP for Node
-        if (!window) {
-            return {
-                load: function () {},
-                save: function () {},
-                remove: function () {}
-            };
-        // Use HTML5 client side storage
-        } else if (window.localStorage) {
-            return {
-
-                /**
-                 * Loads the saved data
-                 *
-                 * @return {object}
-                 */
-                load: function () {
-                    var data = localStorage.getItem(name),
-                        todayDate, expiresDate;
-
-                    if (data) {
-                        data = JSON.parse(decodeURIComponent(data));
-                    }
-
-                    if (data && data.expires) {
-                        todayDate = new Date();
-                        expiresDate = new Date(data.expires);
-
-                        if (todayDate > expiresDate) {
-                            util.storage.remove();
-                            return;
-                        }
-                    }
-
-                    // A little bit of backwards compatibility for the moment
-                    if (data && data.value) {
-                        return data.value;
-                    } else {
-                        return data;
-                    }
-                },
+})(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
+},{}],7:[function(require,module,exports){
+'use strict';
 
 
-                /**
-                 * Saves the data
-                 *
-                 * @param items {object} The list of items to save
-                 * @param duration {Number} The number of days to keep the data
-                 */
-                save: function (items, duration) {
-                    var date = new Date(),
-                        data = [],
-                        wrappedData, item, len, i;
+module.exports = {
 
-                    if (items) {
-                        for (i = 0, len = items.length; i < len; i++) {
-                            item = items[i];
-                            data.push({
-                                product: item.product,
-                                settings: item.settings
-                            });
-                        }
-
-                        date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-                        wrappedData = {
-                            value: data,
-                            expires: date.toGMTString()
-                        };
-
-                        localStorage.setItem(name, encodeURIComponent(JSON.stringify(wrappedData)));
-                    }
-                },
-
-
-                /**
-                 * Removes the saved data
-                 */
-                remove: function () {
-                    localStorage.removeItem(name);
-                }
-            };
-
-            // Otherwise use cookie based storage
-        } else {
-            return {
-
-                /**
-                 * Loads the saved data
-                 *
-                 * @return {object}
-                 */
-                load: function () {
-                    var key = name + '=',
-                        data, cookies, cookie, value, i;
-
-                    try {
-                        cookies = document.cookie.split(';');
-
-                        for (i = 0; i < cookies.length; i++) {
-                            cookie = cookies[i];
-
-                            while (cookie.charAt(0) === ' ') {
-                                cookie = cookie.substring(1, cookie.length);
-                            }
-
-                            if (cookie.indexOf(key) === 0) {
-                                value = cookie.substring(key.length, cookie.length);
-                                data = JSON.parse(decodeURIComponent(value));
-                            }
-                        }
-                    } catch (e) {}
-
-                    return data;
-                },
-
-
-                /**
-                 * Saves the data
-                 *
-                 * @param items {object} The list of items to save
-                 * @param duration {Number} The number of days to keep the data
-                 */
-                save: function (items, duration) {
-                    var date = new Date(),
-                        data = [],
-                        item, len, i;
-
-                    if (items) {
-                        for (i = 0, len = items.length; i < len; i++) {
-                            item = items[i];
-                            data.push({
-                                product: item.product,
-                                settings: item.settings
-                            });
-                        }
-
-                        date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-                        document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
-                    }
-                },
-
-
-                /**
-                 * Removes the saved data
-                 */
-                remove: function () {
-                    this.save(null, -1);
-                }
-            };
-        }
-    })();
-
-
-    util.currency = function (amount, code) {
-        var currencies = {
-                AED: { before: '\u062c' },
-                ANG: { before: '\u0192' },
-                ARS: { before: '$' },
-                AUD: { before: '$' },
-                AWG: { before: '\u0192' },
-                BBD: { before: '$' },
-                BGN: { before: '\u043b\u0432' },
-                BMD: { before: '$' },
-                BND: { before: '$' },
-                BRL: { before: 'R$' },
-                BSD: { before: '$' },
-                CAD: { before: '$' },
-                CHF: { before: '' },
-                CLP: { before: '$' },
-                CNY: { before: '\u00A5' },
-                COP: { before: '$' },
-                CRC: { before: '\u20A1' },
-                CZK: { before: 'Kc' },
-                DKK: { before: 'kr' },
-                DOP: { before: '$' },
-                EEK: { before: 'kr' },
-                EUR: { before: '\u20AC' },
-                GBP: { before: '\u00A3' },
-                GTQ: { before: 'Q' },
-                HKD: { before: '$' },
-                HRK: { before: 'kn' },
-                HUF: { before: 'Ft' },
-                IDR: { before: 'Rp' },
-                ILS: { before: '\u20AA' },
-                INR: { before: 'Rs.' },
-                ISK: { before: 'kr' },
-                JMD: { before: 'J$' },
-                JPY: { before: '\u00A5' },
-                KRW: { before: '\u20A9' },
-                KYD: { before: '$' },
-                LTL: { before: 'Lt' },
-                LVL: { before: 'Ls' },
-                MXN: { before: '$' },
-                MYR: { before: 'RM' },
-                NOK: { before: 'kr' },
-                NZD: { before: '$' },
-                PEN: { before: 'S/' },
-                PHP: { before: 'Php' },
-                PLN: { before: 'z' },
-                QAR: { before: '\ufdfc' },
-                RON: { before: 'lei' },
-                RUB: { before: '\u0440\u0443\u0431' },
-                SAR: { before: '\ufdfc' },
-                SEK: { before: 'kr' },
-                SGD: { before: '$' },
-                THB: { before: '\u0E3F' },
-                TRY: { before: 'TL' },
-                TTD: { before: 'TT$' },
-                TWD: { before: 'NT$' },
-                UAH: { before: '\u20b4' },
-                USD: { before: '$' },
-                UYU: { before: '$U' },
-                VEF: { before: 'Bs' },
-                VND: { before: '\u20ab' },
-                XCD: { before: '$' },
-                ZAR: { before: 'R' }
-            },
-            currency = currencies[code] || {},
-            before = currency.before || '',
-            after = currency.after || '';
-
-        return before + amount.toFixed(2) + after;
-    };
-
-
-    util.getInputValue = function getInputValue(input) {
+    getInputValue: function getInputValue(input) {
         var tag = input.tagName.toLowerCase();
 
         if (tag === 'select') {
@@ -1814,12 +1659,182 @@ var config = require('./config'),
                 return input.value;
             }
         }
-    };
+    }
+
+};
+},{}],8:[function(require,module,exports){
+'use strict';
+
+
+var config = require('../config');
+
+
+var storage = module.exports = (function (window, document) {
+
+    var name = config.name;
+
+    // NOOP for Node
+    if (!window) {
+        return {
+            load: function () {},
+            save: function () {},
+            remove: function () {}
+        };
+        // Use HTML5 client side storage
+    } else if (window.localStorage) {
+        return {
+
+            /**
+             * Loads the saved data
+             *
+             * @return {object}
+             */
+            load: function () {
+                var data = localStorage.getItem(name),
+                    todayDate, expiresDate;
+
+                if (data) {
+                    data = JSON.parse(decodeURIComponent(data));
+                }
+
+                if (data && data.expires) {
+                    todayDate = new Date();
+                    expiresDate = new Date(data.expires);
+
+                    if (todayDate > expiresDate) {
+                        storage.remove();
+                        return;
+                    }
+                }
+
+                // A little bit of backwards compatibility for the moment
+                if (data && data.value) {
+                    return data.value;
+                } else {
+                    return data;
+                }
+            },
+
+
+            /**
+             * Saves the data
+             *
+             * @param items {object} The list of items to save
+             * @param duration {Number} The number of days to keep the data
+             */
+            save: function (items, duration) {
+                var date = new Date(),
+                    data = [],
+                    wrappedData, item, len, i;
+
+                if (items) {
+                    for (i = 0, len = items.length; i < len; i++) {
+                        item = items[i];
+                        data.push({
+                            product: item.product,
+                            settings: item.settings
+                        });
+                    }
+
+                    date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
+                    wrappedData = {
+                        value: data,
+                        expires: date.toGMTString()
+                    };
+
+                    localStorage.setItem(name, encodeURIComponent(JSON.stringify(wrappedData)));
+                }
+            },
+
+
+            /**
+             * Removes the saved data
+             */
+            remove: function () {
+                localStorage.removeItem(name);
+            }
+        };
+
+        // Otherwise use cookie based storage
+    } else {
+        return {
+
+            /**
+             * Loads the saved data
+             *
+             * @return {object}
+             */
+            load: function () {
+                var key = name + '=',
+                    data, cookies, cookie, value, i;
+
+                try {
+                    cookies = document.cookie.split(';');
+
+                    for (i = 0; i < cookies.length; i++) {
+                        cookie = cookies[i];
+
+                        while (cookie.charAt(0) === ' ') {
+                            cookie = cookie.substring(1, cookie.length);
+                        }
+
+                        if (cookie.indexOf(key) === 0) {
+                            value = cookie.substring(key.length, cookie.length);
+                            data = JSON.parse(decodeURIComponent(value));
+                        }
+                    }
+                } catch (e) {}
+
+                return data;
+            },
+
+
+            /**
+             * Saves the data
+             *
+             * @param items {object} The list of items to save
+             * @param duration {Number} The number of days to keep the data
+             */
+            save: function (items, duration) {
+                var date = new Date(),
+                    data = [],
+                    item, len, i;
+
+                if (items) {
+                    for (i = 0, len = items.length; i < len; i++) {
+                        item = items[i];
+                        data.push({
+                            product: item.product,
+                            settings: item.settings
+                        });
+                    }
+
+                    date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
+                    document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
+                }
+            },
+
+
+            /**
+             * Removes the saved data
+             */
+            remove: function () {
+                this.save(null, -1);
+            }
+        };
+    }
 
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
 
+},{"../config":2}],9:[function(require,module,exports){
+/*global EJS:true */
 
-module.exports = util;
-},{"./config":2}]},{},[1,2,3,4,5])
+'use strict';
+
+
+module.exports = function template(str, data) {
+    return new EJS({text: str}).render(data);
+};
+},{}]},{},[1,2,3,4,5,6,7,8,9])
 ;

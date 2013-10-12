@@ -67,10 +67,10 @@ var currencies = {
 
 
 module.exports = function currency(amount, code) {
-    var result = currencies[code] || {},
-        before = result.before || '',
-        after = result.after || '',
-        length = result.length || 2
+    var value = currencies[code] || {},
+        before = value.before || '',
+        after = value.after || '',
+        length = value.length || 2;
 
     return before + amount.toFixed(length) + after;
 };

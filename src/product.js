@@ -1,7 +1,7 @@
 'use strict';
 
 
-var util = require('./util');
+var currency = require('./util/currency');
 
 
 function Product(data) {
@@ -83,7 +83,7 @@ Product.prototype.total = function total(options) {
     if (options && options.unformatted) {
         return result;
     } else {
-        return util.currency(result, 'USD');
+        return currency(result, 'USD');
     }
 };
 

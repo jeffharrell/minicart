@@ -2,7 +2,7 @@
 
 
 var Product = require('./product'),
-    util = require('./util');
+    currency = require('./util/currency');
 
 
 function Cart(data) {
@@ -96,7 +96,7 @@ Cart.prototype.total = function total(options) {
     if (options && options.unformatted) {
         return result;
     } else {
-        return util.currency(result, 'USD');
+        return currency(result, 'USD');
     }
 };
 

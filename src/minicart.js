@@ -3,7 +3,7 @@
 
 var Cart = require('./cart'),
     config = require('./config'),
-    util = require('./util'),
+    template = require('./util/template'),
     minicart = {},
     cartModel, isShowing;
 
@@ -61,7 +61,7 @@ function addEvents() {
 }
 
 function redraw() {
-    minicart.el.innerHTML = util.template(config.template, minicart);
+    minicart.el.innerHTML = template(config.template, minicart);
 }
 
 
