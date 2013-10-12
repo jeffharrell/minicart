@@ -8,7 +8,8 @@ var Cart = require('./cart'),
     forms = require('./util/forms'),
     constants = require('./constants'),
     minicart = {},
-    cartModel, isShowing;
+    cartModel,
+    isShowing;
 
 
 function addStyles() {
@@ -83,6 +84,7 @@ function addEvents() {
     }
 }
 
+
 function redrawCart() {
     minicart.el.innerHTML = template(config.template, minicart);
 }
@@ -102,7 +104,12 @@ function changeItem(idx, data) {
 
 function removeItem(idx) {
     redrawCart();
-    minicart.show();
+
+    if (minicart.cart.getAll().length === 0) {
+        minicart.hide();
+    } else {
+        minicart.show();
+    }
 }
 
 

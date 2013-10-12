@@ -1114,7 +1114,7 @@ Cart.prototype.destroy = function destroy() {
 
 
 module.exports = Cart;
-},{"./product":4,"./util/currency":5}],2:[function(require,module,exports){
+},{"./product":5,"./util/currency":6}],2:[function(require,module,exports){
 'use strict';
 
 
@@ -1196,17 +1196,26 @@ module.exports.load = function load(userConfig) {
 'use strict';
 
 
+module.exports = {
+
+    CMDS: { _cart: true, _xclick: true, _donations: true },
+
+    SETTINGS: /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/
+
+};
+},{}],4:[function(require,module,exports){
+'use strict';
+
+
 var Cart = require('./cart'),
     config = require('./config'),
     template = require('./util/template'),
     events = require('./util/events'),
     forms = require('./util/forms'),
+    constants = require('./constants'),
     minicart = {},
-    cartModel, isShowing;
-
-
-
-var SUPPORTED_CMDS = { _cart: true, _xclick: true };
+    cartModel,
+    isShowing;
 
 
 function addStyles() {
@@ -1275,11 +1284,12 @@ function addEvents() {
     for (i = 0; i < forms.length; i++) {
         form = forms[i];
 
-        if (form.cmd && SUPPORTED_CMDS[form.cmd.value]) {
+        if (form.cmd && constants.CMDS[form.cmd.value]) {
             minicart.bind(form);
         }
     }
 }
+
 
 function redrawCart() {
     minicart.el.innerHTML = template(config.template, minicart);
@@ -1300,7 +1310,12 @@ function changeItem(idx, data) {
 
 function removeItem(idx) {
     redrawCart();
-    minicart.show();
+
+    if (minicart.cart.getAll().length === 0) {
+        minicart.hide();
+    } else {
+        minicart.show();
+    }
 }
 
 
@@ -1388,7 +1403,7 @@ minicart.reset = function reset() {
 
 
 
-},{"./cart":1,"./config":2,"./util/events":6,"./util/forms":7,"./util/template":9}],4:[function(require,module,exports){
+},{"./cart":1,"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":10}],5:[function(require,module,exports){
 'use strict';
 
 
@@ -1481,7 +1496,7 @@ Product.prototype.total = function total(options) {
 
 
 module.exports = Product;
-},{"./util/currency":5}],5:[function(require,module,exports){
+},{"./util/currency":6}],6:[function(require,module,exports){
 'use strict';
 
 
@@ -1558,7 +1573,7 @@ module.exports = function currency(amount, code) {
 
     return before + amount.toFixed(length) + after;
 };
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 
@@ -1678,7 +1693,7 @@ module.exports = (function (window, document) {
     }
 
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 
@@ -1720,7 +1735,7 @@ var forms = module.exports = {
     }
 
 };
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 
@@ -1885,7 +1900,7 @@ var storage = module.exports = (function (window, document) {
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
 
-},{"../config":2}],9:[function(require,module,exports){
+},{"../config":2}],10:[function(require,module,exports){
 /*global EJS:true */
 
 'use strict';
@@ -1894,5 +1909,5 @@ var storage = module.exports = (function (window, document) {
 module.exports = function template(str, data) {
     return new EJS({text: str}).render(data);
 };
-},{}]},{},[1,2,3,4,5,6,7,8,9])
+},{}]},{},[1,3,2,4,5,6,7,8,9,10])
 ;
