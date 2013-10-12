@@ -6,12 +6,9 @@ var Cart = require('./cart'),
     template = require('./util/template'),
     events = require('./util/events'),
     forms = require('./util/forms'),
+    constants = require('./constants'),
     minicart = {},
     cartModel, isShowing;
-
-
-
-var SUPPORTED_CMDS = { _cart: true, _xclick: true };
 
 
 function addStyles() {
@@ -80,7 +77,7 @@ function addEvents() {
     for (i = 0; i < forms.length; i++) {
         form = forms[i];
 
-        if (form.cmd && SUPPORTED_CMDS[form.cmd.value]) {
+        if (form.cmd && constants.CMDS[form.cmd.value]) {
             minicart.bind(form);
         }
     }
