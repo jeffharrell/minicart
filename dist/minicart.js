@@ -1199,9 +1199,14 @@ module.exports.load = function load(userConfig) {
 var Cart = require('./cart'),
     config = require('./config'),
     template = require('./util/template'),
+    events = require('./util/events'),
+    forms = require('./util/forms'),
     minicart = {},
     cartModel, isShowing;
 
+
+
+var SUPPORTED_CMDS = { _cart: true, _xclick: true };
 
 
 function addStyles() {
@@ -1224,7 +1229,9 @@ function addStyles() {
 
 
 function addEvents() {
-    document.addEventListener('click', function (e) {
+    var forms, form, i, len;
+
+    events.add(document, 'click', function (e) {
         var target = e.target;
 
         if (target.className === 'minicart-remove') {
@@ -1242,38 +1249,57 @@ function addEvents() {
                 minicart.hide();
             }
         }
-    }, false);
+    });
 
 
-    document.addEventListener('change', function (e) {
+    events.add(document, 'change', function (e) {
         var target = e.target;
 
         if (target.className === 'minicart-quantity') {
             var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
             product.set('quantity', target.value);
         }
-    }, false);
+    });
+
+
+    events.add(window, 'pageshow', function (e) {
+        if (e.persisted) {
+            redrawCart();
+            minicart.hide();
+        }
+    });
+
+
+    forms = document.getElementsByTagName('form');
+
+    for (i = 0; i < forms.length; i++) {
+        form = forms[i];
+
+        if (form.cmd && SUPPORTED_CMDS[form.cmd.value]) {
+            minicart.bind(form);
+        }
+    }
 }
 
-function redraw() {
+function redrawCart() {
     minicart.el.innerHTML = template(config.template, minicart);
 }
 
 
 function addItem(idx, data) {
-    redraw();
+    redrawCart();
     minicart.show();
 }
 
 
 function changeItem(idx, data) {
-    redraw();
+    redrawCart();
     minicart.show();
 }
 
 
 function removeItem(idx) {
-    redraw();
+    redrawCart();
     minicart.show();
 }
 
@@ -1294,9 +1320,28 @@ minicart.render = function render(userConfig) {
 
     addStyles();
     addEvents();
-    redraw();
+    redrawCart();
 
     config.parent.appendChild(wrapper);
+};
+
+
+minicart.bind = function bind(form) {
+    if (form.add) {
+        events.add(form, 'submit', function (e) {
+            e.preventDefault(e);
+            minicart.cart.add(forms.parse(form));
+        });
+    } else if (form.display) {
+        events.add(form, 'submit', function (e) {
+            e.preventDefault();
+            minicart.show();
+        });
+    } else {
+        return false;
+    }
+
+    return true;
 };
 
 
@@ -1325,7 +1370,7 @@ minicart.reset = function reset() {
     minicart.hide();
     cartModel.destroy();
 
-    redraw();
+    redrawCart();
 };
 
 
@@ -1343,7 +1388,7 @@ minicart.reset = function reset() {
 
 
 
-},{"./cart":1,"./config":2,"./util/template":9}],4:[function(require,module,exports){
+},{"./cart":1,"./config":2,"./util/events":6,"./util/forms":7,"./util/template":9}],4:[function(require,module,exports){
 'use strict';
 
 
@@ -1637,7 +1682,24 @@ module.exports = (function (window, document) {
 'use strict';
 
 
-module.exports = {
+var forms = module.exports = {
+
+    parse: function parse(form) {
+        var raw = form.elements,
+            data = {},
+            pair, value, i, len;
+
+        for (i = 0, len = raw.length; i < len; i++) {
+            pair = raw[i];
+
+            if ((value = forms.getInputValue(pair))) {
+                data[pair.name] = value;
+            }
+        }
+
+        return data;
+    },
+
 
     getInputValue: function getInputValue(input) {
         var tag = input.tagName.toLowerCase();
@@ -1832,5 +1894,5 @@ var storage = module.exports = (function (window, document) {
 module.exports = function template(str, data) {
     return new EJS({text: str}).render(data);
 };
-},{}]},{},[1,2,3,4,6,5,7,8,9])
+},{}]},{},[1,2,3,4,5,6,7,8,9])
 ;

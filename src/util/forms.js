@@ -1,7 +1,24 @@
 'use strict';
 
 
-module.exports = {
+var forms = module.exports = {
+
+    parse: function parse(form) {
+        var raw = form.elements,
+            data = {},
+            pair, value, i, len;
+
+        for (i = 0, len = raw.length; i < len; i++) {
+            pair = raw[i];
+
+            if ((value = forms.getInputValue(pair))) {
+                data[pair.name] = value;
+            }
+        }
+
+        return data;
+    },
+
 
     getInputValue: function getInputValue(input) {
         var tag = input.tagName.toLowerCase();
