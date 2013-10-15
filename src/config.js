@@ -38,11 +38,10 @@ var config = module.exports = {
         '<div class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %></span></div>' +
         '<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />' +
         '</div>' +
-        //'<input type="hidden" name="business" value="example@minicartjs.com" />' +
-        //'<input type="hidden" name="currency_code" value="USD" />' +
-        //'<input type="hidden" name="return" value="http://www.minicartjs.com/?success#PPMiniCart=reset" />' +
-        //'<input type="hidden" name="cancel_return" value="http://www.minicartjs.com/?cancel" />' +
-        '</form>',
+		'<% var settings = cart.settings(); for (var key in settings) { %>' +
+        '<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />' +
+		'<% } %>' +
+		'</form>',
 
     styles: '' +
         '.minicart-showing #PPMiniCart { display: block; }' +

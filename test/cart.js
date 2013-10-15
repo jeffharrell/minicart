@@ -9,9 +9,9 @@ describe('Cart Model', function () {
 
     var cart;
 
-
     beforeEach(function () {
-        cart = new Cart(cartData.slice(0));
+		var myCartData = JSON.parse(JSON.stringify(cartData));
+        cart = new Cart(myCartData);
     });
 
 
@@ -21,9 +21,9 @@ describe('Cart Model', function () {
 
 
     it('get() returns a valid product', function () {
-        assert.equal(cart.get(0).get('name'), 'Item 1');
+        assert.equal(cart.get(0).get('item_name'), 'Item 1');
         assert.equal(cart.get(0).get('amount'), 1.00);
-        assert.equal(cart.get(1).get('name'), 'Item 2');
+        assert.equal(cart.get(1).get('item_name'), 'Item 2');
         assert.equal(cart.get(1).get('amount'),  2.34);
     });
 
@@ -32,24 +32,36 @@ describe('Cart Model', function () {
         var products = cart.getAll();
 
         assert.equal(products.length, 2);
-        assert.equal(products[0].get('name'), cartData[0].name);
+        assert.equal(products[0].get('item_name'), cartData[0].item_name);
         assert.equal(products[0].get('amount'), cartData[0].amount);
-        assert.equal(products[1].get('name'), cartData[1].name);
+        assert.equal(products[1].get('item_name'), cartData[1].item_name);
         assert.equal(products[1].get('amount'), cartData[1].amount);
     });
 
 
     it('add() adds a product', function () {
-        var product = { name: 'Item 3', amount: 3.00 },
+        var product = { item_name: 'Item 3', amount: 3.00 },
             idx = cart.add(product);
 
-        assert.equal(cart.get(idx).get('name'), product.name);
+        assert.equal(cart.get(idx).get('item_name'), product.item_name);
         assert.equal(cart.get(idx).get('amount'), product.amount);
     });
 
+	it('add() for the same product only increments the quantity', function () {
+		var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },
+			idx = cart.add(product);
+
+		assert.equal(cart.getAll().length, 3);
+		assert.equal(cart.get(idx).get('quantity'), 1);
+		cart.add(product);
+		assert.equal(cart.getAll().length, 3);
+		assert.equal(cart.get(idx).get('quantity'), 2);
+
+	});
+
 
     it('add() fires an event', function (done) {
-        var product = { name: 'Item 3', amount: 3.00 },
+        var product = { item_name: 'Item 3', amount: 3.00 },
             len = cart.getAll().length;
 
         cart.on('add', function (idx, data) {
@@ -60,6 +72,17 @@ describe('Cart Model', function () {
 
         cart.add(product);
     });
+
+
+	it('settings() returns the value for a named setting', function () {
+		assert.equal(cart.settings('currency_code'), 'USD');
+		assert.equal(cart.settings('custom'), 'foo');
+	});
+
+
+	it('settings() returns all when no args are passed', function () {
+		assert.deepEqual(cart.settings(), { currency_code: 'USD', custom: 'foo' });
+	});
 
 
     it('total() returns the cart product total', function () {

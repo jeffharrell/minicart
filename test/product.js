@@ -82,6 +82,43 @@ describe('Product Model', function () {
     });
 
 
+	it('isEqual() correctly identifies similar products', function () {
+		var item1 = new Product({
+			item_name: 'Foo',
+			item_number: 'This is an item, foo',
+			amount: 1.23,
+			os0: true,
+			os1: true
+		});
+
+		var item2 = new Product({
+			item_name: 'Foo',
+			item_number: 'This is an item, foo',
+			amount: 1.23,
+			os0: true,
+			os1: true
+		});
+
+		var item3 = new Product({
+			item_name: 'Foo',
+			item_number: 'This is an item, foo',
+			amount: 1.23,
+			os0: true,
+			os1: false
+		});
+
+		var item4 = new Product({
+			item_name: 'Bar',
+			item_number: 'This is not the same as item1',
+			amount: 4.56
+		});
+
+		assert(item1.isEqual(item2));
+		assert(!item1.isEqual(item3));
+		assert(!item1.isEqual(item4));
+	});
+
+
     it('destroy() empties data', function () {
         item.destroy();
 

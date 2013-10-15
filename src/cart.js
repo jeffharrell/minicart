@@ -2,16 +2,18 @@
 
 
 var Product = require('./product'),
+    constants = require('./constants'),
     currency = require('./util/currency');
 
 
 function Cart(data) {
     var i, len;
 
-    this._eventCache = {};
     this._products = [];
+	this._settings = {};
+	this._eventCache = {};
 
-    if (data) {
+	if (data) {
         for (i = 0, len = data.length; i < len; i++) {
             this.add(data[i]);
         }
@@ -62,14 +64,40 @@ Cart.prototype.fire = function on(name) {
 
 Cart.prototype.add = function add(data) {
     var that = this,
-        product = new Product(data),
-        idx = (this._products.push(product) - 1);
+		items = this.getAll(),
+        product, idx, key, len, i;
 
-    product.on('change', function (key, value) {
-        that.fire('change', idx, key, value);
-    });
 
-    this.fire('add', idx, data);
+	// Prune cart settings data from the product
+	for (key in data) {
+		if (constants.SETTINGS.test(key)) {
+			this._settings[key] = data[key];
+			delete data[key];
+		}
+	}
+
+	// Look to see if the same product has already been added
+	for (i = 0, len = items.length; i < len; i++) {
+		if (items[i].isEqual(data)) {
+			product = items[i];
+			product.set('quantity', product.get('quantity') + (data.quantity || 1));
+			idx = i;
+			break;
+		}
+	}
+
+	// If not, then add it
+	if (!product) {
+		product = new Product(data);
+		idx = (this._products.push(product) - 1);
+
+		product.on('change', function (key, value) {
+			that.fire('change', idx, key, value);
+		});
+
+		this.fire('add', idx, data);
+	}
+
     return idx;
 };
 
@@ -81,6 +109,11 @@ Cart.prototype.get = function get(idx) {
 
 Cart.prototype.getAll = function getAll() {
     return this._products;
+};
+
+
+Cart.prototype.settings = function settings(name) {
+	return (name) ? this._settings[name] : this._settings;
 };
 
 

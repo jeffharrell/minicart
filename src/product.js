@@ -5,6 +5,9 @@ var currency = require('./util/currency');
 
 
 function Product(data) {
+	data.quantity = data.quantity || 1;
+	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
+
     this._data = data;
     this._eventCache = {};
 }
@@ -80,6 +83,24 @@ Product.prototype.total = function total(options) {
         amount = parseFloat(this.get('amount')),
         result = qty * amount;
 
+	//    // Add option amounts to the total amount
+	//    option_index = (product.option_index) ? product.option_index : 0;
+	//
+	//    while (product['os' + option_index]) {
+	//        i = 0;
+	//
+	//        while (typeof product['option_select' + i] !== 'undefined') {
+	//            if (product['option_select' + i] === product['os' + option_index]) {
+	//                product.amount = product.amount + parseFloat(product['option_amount' + i]);
+	//                break;
+	//            }
+	//
+	//            i++;
+	//        }
+	//
+	//        option_index++;
+	//    }
+
     if (options && options.unformatted) {
         return result;
     } else {
@@ -87,6 +108,35 @@ Product.prototype.total = function total(options) {
     }
 };
 
+
+Product.prototype.isEqual = function isEqual(data) {
+	var match = false;
+
+	if (data instanceof Product) {
+		data = data._data;
+	}
+
+	if (this.get('item_name') === data.item_name) {
+		if (this.get('item_number') === data.item_number) {
+			if (this.get('amount') === data.amount) {
+				var i = 0;
+
+				match = true;
+
+				while (typeof data['os' + i] !== 'undefined') {
+					if (this.get('os' + i) !== data['os' + i]) {
+						match = false;
+						break;
+					}
+
+					i++;
+				}
+			}
+		}
+	}
+
+	return match;
+};
 
 
 module.exports = Product;

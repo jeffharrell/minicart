@@ -995,16 +995,18 @@ EJS.Helpers.prototype = {
 
 
 var Product = require('./product'),
+    constants = require('./constants'),
     currency = require('./util/currency');
 
 
 function Cart(data) {
     var i, len;
 
-    this._eventCache = {};
     this._products = [];
+	this._settings = {};
+	this._eventCache = {};
 
-    if (data) {
+	if (data) {
         for (i = 0, len = data.length; i < len; i++) {
             this.add(data[i]);
         }
@@ -1055,14 +1057,40 @@ Cart.prototype.fire = function on(name) {
 
 Cart.prototype.add = function add(data) {
     var that = this,
-        product = new Product(data),
-        idx = (this._products.push(product) - 1);
+		items = this.getAll(),
+        product, idx, key, len, i;
 
-    product.on('change', function (key, value) {
-        that.fire('change', idx, key, value);
-    });
 
-    this.fire('add', idx, data);
+	// Prune cart settings data from the product
+	for (key in data) {
+		if (constants.SETTINGS.test(key)) {
+			this._settings[key] = data[key];
+			delete data[key];
+		}
+	}
+
+	// Look to see if the same product has already been added
+	for (i = 0, len = items.length; i < len; i++) {
+		if (items[i].isEqual(data)) {
+			product = items[i];
+			product.set('quantity', product.get('quantity') + (data.quantity || 1));
+			idx = i;
+			break;
+		}
+	}
+
+	// If not, then add it
+	if (!product) {
+		product = new Product(data);
+		idx = (this._products.push(product) - 1);
+
+		product.on('change', function (key, value) {
+			that.fire('change', idx, key, value);
+		});
+
+		this.fire('add', idx, data);
+	}
+
     return idx;
 };
 
@@ -1074,6 +1102,11 @@ Cart.prototype.get = function get(idx) {
 
 Cart.prototype.getAll = function getAll() {
     return this._products;
+};
+
+
+Cart.prototype.settings = function settings(name) {
+	return (name) ? this._settings[name] : this._settings;
 };
 
 
@@ -1114,7 +1147,8 @@ Cart.prototype.destroy = function destroy() {
 
 
 module.exports = Cart;
-},{"./product":5,"./util/currency":6}],2:[function(require,module,exports){
+
+},{"./constants":3,"./product":5,"./util/currency":6}],2:[function(require,module,exports){
 'use strict';
 
 
@@ -1155,11 +1189,10 @@ var config = module.exports = {
         '<div class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %></span></div>' +
         '<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />' +
         '</div>' +
-        //'<input type="hidden" name="business" value="example@minicartjs.com" />' +
-        //'<input type="hidden" name="currency_code" value="USD" />' +
-        //'<input type="hidden" name="return" value="http://www.minicartjs.com/?success#PPMiniCart=reset" />' +
-        //'<input type="hidden" name="cancel_return" value="http://www.minicartjs.com/?cancel" />' +
-        '</form>',
+		'<% var settings = cart.settings(); for (var key in settings) { %>' +
+        '<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />' +
+		'<% } %>' +
+		'</form>',
 
     styles: '' +
         '.minicart-showing #PPMiniCart { display: block; }' +
@@ -1192,6 +1225,7 @@ module.exports.load = function load(userConfig) {
 
     return config;
 };
+
 },{}],3:[function(require,module,exports){
 'use strict';
 
@@ -1411,6 +1445,9 @@ var currency = require('./util/currency');
 
 
 function Product(data) {
+	data.quantity = data.quantity || 1;
+	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
+
     this._data = data;
     this._eventCache = {};
 }
@@ -1486,6 +1523,24 @@ Product.prototype.total = function total(options) {
         amount = parseFloat(this.get('amount')),
         result = qty * amount;
 
+	//    // Add option amounts to the total amount
+	//    option_index = (product.option_index) ? product.option_index : 0;
+	//
+	//    while (product['os' + option_index]) {
+	//        i = 0;
+	//
+	//        while (typeof product['option_select' + i] !== 'undefined') {
+	//            if (product['option_select' + i] === product['os' + option_index]) {
+	//                product.amount = product.amount + parseFloat(product['option_amount' + i]);
+	//                break;
+	//            }
+	//
+	//            i++;
+	//        }
+	//
+	//        option_index++;
+	//    }
+
     if (options && options.unformatted) {
         return result;
     } else {
@@ -1494,8 +1549,38 @@ Product.prototype.total = function total(options) {
 };
 
 
+Product.prototype.isEqual = function isEqual(data) {
+	var match = false;
+
+	if (data instanceof Product) {
+		data = data._data;
+	}
+
+	if (this.get('item_name') === data.item_name) {
+		if (this.get('item_number') === data.item_number) {
+			if (this.get('amount') === data.amount) {
+				var i = 0;
+
+				match = true;
+
+				while (typeof data['os' + i] !== 'undefined') {
+					if (this.get('os' + i) !== data['os' + i]) {
+						match = false;
+						break;
+					}
+
+					i++;
+				}
+			}
+		}
+	}
+
+	return match;
+};
+
 
 module.exports = Product;
+
 },{"./util/currency":6}],6:[function(require,module,exports){
 'use strict';
 
@@ -1909,5 +1994,5 @@ var storage = module.exports = (function (window, document) {
 module.exports = function template(str, data) {
     return new EJS({text: str}).render(data);
 };
-},{}]},{},[1,3,2,4,5,6,7,8,9,10])
+},{}]},{},[1,2,3,4,5,6,7,8,9,10])
 ;
