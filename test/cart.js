@@ -46,6 +46,7 @@ describe('Cart Model', function () {
         assert.equal(cart.get(idx).get('item_name'), product.item_name);
         assert.equal(cart.get(idx).get('amount'), product.amount);
     });
+	
 
 	it('add() for the same product only increments the quantity', function () {
 		var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },

@@ -1186,7 +1186,7 @@ var config = module.exports = {
         '<% } %>' +
         '</ul>' +
         '<div>' +
-        '<div class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %></span></div>' +
+        '<div class="minicart-subtotal"><%= config.strings.subtotal %> <span class="minicart-subtotal-amount"><%= cart.total() %> <%= cart.settings("currency_code") %></span></div>' +
         '<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />' +
         '</div>' +
 		'<% var settings = cart.settings(); for (var key in settings) { %>' +
