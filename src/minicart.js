@@ -1,11 +1,10 @@
 'use strict';
 
-// TOOD:
-// 1. storage
-// 2. deep merge for config
-// 3. themes
-// 4. key up timer on quantity change
-// 5. product options and totals
+// TODO:
+// - storage
+// - themes
+// - key up timer on quantity change
+// - product options and totals
 
 
 var Cart = require('./cart'),

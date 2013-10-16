@@ -58,19 +58,31 @@ var config = module.exports = {
 
     strings: {
         button: 'Checkout',
-        subtotal: 'Subtotal: ',
-        discount: 'Discount: ',
+        subtotal: 'Subtotal:',
+        discount: 'Discount:',
         processing: 'Processing...'
     }
 
 };
 
 
-module.exports.load = function load(userConfig) {
-    // TODO: This should recursively merge the config values
-    for (var key in userConfig) {
-        config[key] = userConfig[key];
-    }
+function merge(dest, source) {
+	var value;
 
-    return config;
+	for (var key in source) {
+		value = source[key];
+
+		if (value && value.constructor === Object) {
+			merge(dest[key], value);
+		} else {
+			dest[key] = value;
+		}
+	}
+
+	return dest;
+}
+
+
+module.exports.load = function load(userConfig) {
+    return merge(config, userConfig);
 };
