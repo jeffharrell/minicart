@@ -2,9 +2,8 @@
 
 // TODO:
 // - storage
-// - themes
-// - key up timer on quantity change
 // - product options and totals
+// - support currencies
 
 
 var Cart = require('./cart'),
@@ -38,7 +37,8 @@ function addStyles() {
 
 
 function addEvents() {
-    var forms, form, i, len;
+    var forms, form, i, len, keyupTimer;
+
 
     events.add(document, 'click', function (e) {
         var target = e.target;
@@ -61,12 +61,14 @@ function addEvents() {
     });
 
 
-    events.add(document, 'change', function (e) {
+    events.add(document, 'keyup', function (e) {
         var target = e.target;
 
         if (target.className === 'minicart-quantity') {
-            var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
-            product.set('quantity', target.value);
+			keyupTimer = setTimeout(function () {
+				var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
+				product.set('quantity', target.value);
+			}, 250);
         }
     });
 

@@ -4,8 +4,25 @@
 var currency = require('./util/currency');
 
 
+var setters = {
+	quantity: function (value) {
+		value = parseInt(value, 10);
+
+		if (isNaN(value) || !value) {
+			value = 1;
+		}
+
+		return value;
+	},
+	amount: function (value) {
+		return parseFloat(value);
+	}
+};
+
+
 function Product(data) {
-	data.quantity = data.quantity || 1;
+	data.quantity = parseInt(data.quantity, 10) || 1;
+	data.amount = parseFloat(data.amount);
 	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
 
     this._data = data;
@@ -59,11 +76,10 @@ Product.prototype.get = function get(key) {
 
 
 Product.prototype.set = function set(key, value) {
-    var data = {};
-    data[key] = value;
+	var setter = setters[key];
 
-    this._data[key] = value;
-    this.fire('change', data);
+	this._data[key] = setter ? setter(value) : value;
+    this.fire('change', key);
 };
 
 
@@ -73,14 +89,9 @@ Product.prototype.destroy = function destroy() {
 };
 
 
-Product.prototype.qty = function qty() {
-    return parseInt(this.get('quantity'), 10) || 1;
-};
-
-
 Product.prototype.total = function total(options) {
-    var qty = this.qty(),
-        amount = parseFloat(this.get('amount')),
+    var qty = this.get('quantity'),
+        amount = this.get('amount'),
         result = qty * amount;
 
 	//    // Add option amounts to the total amount
@@ -118,7 +129,7 @@ Product.prototype.isEqual = function isEqual(data) {
 
 	if (this.get('item_name') === data.item_name) {
 		if (this.get('item_number') === data.item_number) {
-			if (this.get('amount') === data.amount) {
+			if (this.get('amount') === parseFloat(data.amount)) {
 				var i = 0;
 
 				match = true;

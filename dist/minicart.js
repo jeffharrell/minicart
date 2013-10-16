@@ -1166,7 +1166,7 @@ var config = module.exports = {
 
     cookiePath: '/',
 
-    template: '<form method="post" action="<%= config.action %>" target="<%= config.target %>">	<ul>		<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>			<li class="minicart-item">				<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>				<span class="minicart-number"><%= items[i].get("item_number") %></span>				<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= i %>" value="<%= items[i].qty() %>" autocomplete="off" />				<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />				<span class="minicart-price"><%= items[i].total() %></span>				<input type="hidden" name="item_name_<%= i %>" value="<%= items[i].get("item_name") %>" />				<input type="hidden" name="item_number_<%= i %>" value="<%= items[i].get("item_number") %>" />				<input type="hidden" name="amount_<%= i %>" value="<%= items[i].get("amount") %>" />			</li>		<% } %>	</ul>	<div>		<div class="minicart-subtotal">			<%= config.strings.subtotal %>			<span class="minicart-subtotal-amount"><%= cart.total() %> <%= cart.settings("currency_code") %></span>		</div>		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />	</div>	<input type="hidden" name="cmd" value="_cart" />	<input type="hidden" name="upload" value="1" />	<input type="hidden" name="bn" value="MiniCart_AddToCart_WPS_US" />	<% var settings = cart.settings(); for (var key in settings) { %>		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />	<% } %></form>',
+    template: '<form method="post" action="<%= config.action %>" target="<%= config.target %>">	<ul>		<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>			<li class="minicart-item">				<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>				<span class="minicart-number"><%= items[i].get("item_number") %></span>				<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= i %>" value="<%= items[i].get("quantity") %>" autocomplete="off" />				<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />				<span class="minicart-price"><%= items[i].total() %></span>				<input type="hidden" name="item_name_<%= i %>" value="<%= items[i].get("item_name") %>" />				<input type="hidden" name="item_number_<%= i %>" value="<%= items[i].get("item_number") %>" />				<input type="hidden" name="amount_<%= i %>" value="<%= items[i].get("amount") %>" />			</li>		<% } %>	</ul>	<div>		<div class="minicart-subtotal">			<%= config.strings.subtotal %>			<span class="minicart-subtotal-amount"><%= cart.total() %> <%= cart.settings("currency_code") %></span>		</div>		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />	</div>	<input type="hidden" name="cmd" value="_cart" />	<input type="hidden" name="upload" value="1" />	<input type="hidden" name="bn" value="MiniCart_AddToCart_WPS_US" />	<% var settings = cart.settings(); for (var key in settings) { %>		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />	<% } %></form>',
 
     styles: '.minicart-showing #PPMiniCart {	display: block;}#PPMiniCart {	display: none;}#PPMiniCart form {	position: absolute;	top: 50%;	left: 50%;	width: 300px;	max-height: 400px;	margin-left: -150px;	margin-top: -200px;	padding: 10px;	background: #fff url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -125px -60px;	border: 1px solid #999;	border-radius: 5px;	box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);	font: 13px/normal arial, helvetica;	color: #333;}#PPMiniCart ul {	margin: 45px 0 13px;	padding: 0;	list-style-type: none;	border-bottom: 1px solid #ccc;}#PPMiniCart .minicart-item {	position: relative;	height: 30px;	padding: 6px;	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 6px;	left: 0;	width: 185px;	text-decoration: none;}#PPMiniCart .minicart-quantity {	position: absolute;	left: 190px;	width: 30px;}#PPMiniCart .minicart-remove {	position: absolute;	top: 10px;	left: 230px;	width: 14px;	height: 14px;	background: url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -134px -4px;	border: 0;	cursor: pointer;}#PPMiniCart .minicart-price {	display: block;	text-align: right;}#PPMiniCart .minicart-subtotal {	float: left;	font-weight: bold;}#PPMiniCart .minicart-submit {	float: right;	padding: 1px 4px;	background: #ffa822 url(http://www.minicartjs.com/build/images/minicart_sprite.png) repeat-x left center;	border: 1px solid #d5bd98;	border-right-color: #935e0d;	border-bottom-color: #935e0d;	border-radius: 2px;	cursor: pointer;}',
 
@@ -1217,9 +1217,8 @@ module.exports = {
 
 // TODO:
 // - storage
-// - themes
-// - key up timer on quantity change
 // - product options and totals
+// - support currencies
 
 
 var Cart = require('./cart'),
@@ -1253,7 +1252,8 @@ function addStyles() {
 
 
 function addEvents() {
-    var forms, form, i, len;
+    var forms, form, i, len, keyupTimer;
+
 
     events.add(document, 'click', function (e) {
         var target = e.target;
@@ -1276,12 +1276,14 @@ function addEvents() {
     });
 
 
-    events.add(document, 'change', function (e) {
+    events.add(document, 'keyup', function (e) {
         var target = e.target;
 
         if (target.className === 'minicart-quantity') {
-            var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
-            product.set('quantity', target.value);
+			keyupTimer = setTimeout(function () {
+				var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
+				product.set('quantity', target.value);
+			}, 250);
         }
     });
 
@@ -1425,8 +1427,25 @@ minicart.reset = function reset() {
 var currency = require('./util/currency');
 
 
+var setters = {
+	quantity: function (value) {
+		value = parseInt(value, 10);
+
+		if (isNaN(value) || !value) {
+			value = 1;
+		}
+
+		return value;
+	},
+	amount: function (value) {
+		return parseFloat(value);
+	}
+};
+
+
 function Product(data) {
-	data.quantity = data.quantity || 1;
+	data.quantity = parseInt(data.quantity, 10) || 1;
+	data.amount = parseFloat(data.amount);
 	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
 
     this._data = data;
@@ -1480,11 +1499,10 @@ Product.prototype.get = function get(key) {
 
 
 Product.prototype.set = function set(key, value) {
-    var data = {};
-    data[key] = value;
+	var setter = setters[key];
 
-    this._data[key] = value;
-    this.fire('change', data);
+	this._data[key] = setter ? setter(value) : value;
+    this.fire('change', key);
 };
 
 
@@ -1494,14 +1512,9 @@ Product.prototype.destroy = function destroy() {
 };
 
 
-Product.prototype.qty = function qty() {
-    return parseInt(this.get('quantity'), 10) || 1;
-};
-
-
 Product.prototype.total = function total(options) {
-    var qty = this.qty(),
-        amount = parseFloat(this.get('amount')),
+    var qty = this.get('quantity'),
+        amount = this.get('amount'),
         result = qty * amount;
 
 	//    // Add option amounts to the total amount
@@ -1539,7 +1552,7 @@ Product.prototype.isEqual = function isEqual(data) {
 
 	if (this.get('item_name') === data.item_name) {
 		if (this.get('item_number') === data.item_number) {
-			if (this.get('amount') === data.amount) {
+			if (this.get('amount') === parseFloat(data.amount)) {
 				var i = 0;
 
 				match = true;
@@ -1975,5 +1988,5 @@ var storage = module.exports = (function (window, document) {
 module.exports = function template(str, data) {
     return new EJS({text: str}).render(data);
 };
-},{}]},{},[1,2,3,4,5,6,7,8,9,10])
+},{}]},{},[1,3,4,2,5,6,7,8,9,10])
 ;

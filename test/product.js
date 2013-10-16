@@ -45,8 +45,8 @@ describe('Product Model', function () {
 
 
     it('set() fires an event', function (done) {
-        item.on('change', function (data) {
-            assert.equal(data.name, 'Baz');
+        item.on('change', function (key) {
+            assert.equal(key, 'name');
             done();
         });
 
@@ -54,14 +54,14 @@ describe('Product Model', function () {
     });
 
 
-    it('qty() returns the quantity', function () {
+    it('get() returns the correct quantity', function () {
         item.set('quantity', 1234);
-        assert.equal(item.qty(), 1234);
+        assert.equal(item.get('quantity'), 1234);
     });
 
 
-    it('qty() returns 1 for null quantities', function () {
-        assert.equal(item.qty(item), 1);
+    it('get() returns 1 for null quantities', function () {
+        assert.equal(item.get('quantity'), 1);
     });
 
 
