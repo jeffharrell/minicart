@@ -1,0 +1,29 @@
+<form method="post" action="<%= config.action %>" target="<%= config.target %>">
+	<ul>
+		<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>
+			<li class="minicart-item">
+				<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>
+				<span class="minicart-number"><%= items[i].get("item_number") %></span>
+				<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= i %>" value="<%= items[i].qty() %>" autocomplete="off" />
+				<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />
+				<span class="minicart-price"><%= items[i].total() %></span>
+				<input type="hidden" name="item_name_<%= i %>" value="<%= items[i].get("item_name") %>" />
+				<input type="hidden" name="item_number_<%= i %>" value="<%= items[i].get("item_number") %>" />
+				<input type="hidden" name="amount_<%= i %>" value="<%= items[i].get("amount") %>" />
+			</li>
+		<% } %>
+	</ul>
+	<div>
+		<div class="minicart-subtotal">
+			<%= config.strings.subtotal %>
+			<span class="minicart-subtotal-amount"><%= cart.total() %> <%= cart.settings("currency_code") %></span>
+		</div>
+		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />
+	</div>
+	<input type="hidden" name="cmd" value="_cart" />
+	<input type="hidden" name="upload" value="1" />
+	<input type="hidden" name="bn" value="MiniCart_AddToCart_WPS_US" />
+	<% var settings = cart.settings(); for (var key in settings) { %>
+		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />
+	<% } %>
+</form>

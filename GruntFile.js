@@ -45,6 +45,30 @@ module.exports = function (grunt) {
 				},
 				src: ['test/**/*.js']
 			}
+		},
+
+		replace: {
+			classic: {
+				src: ['dist/minicart.js'],
+				overwrite: true,
+				options: {
+					processTemplates: false
+				},
+				replacements: [
+					{
+						from: '$TEMPLATE$',
+						to: function (word) {
+							return grunt.file.read('src/themes/classic/index.html').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
+						}
+					},
+					{
+						from: '$STYLES$',
+						to: function (word) {
+							return grunt.file.read('src/themes/classic/styles.css').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
+						}
+					}
+				]
+			}
 		}
 	});
 
@@ -54,10 +78,11 @@ module.exports = function (grunt) {
 	grunt.task.loadNpmTasks('grunt-contrib-uglify');
 	grunt.task.loadNpmTasks('grunt-mocha-test');
 	grunt.task.loadNpmTasks('grunt-browserify');
+	grunt.task.loadNpmTasks('grunt-text-replace');
 
 	// Tasks
 	grunt.registerTask('lint', ['jshint']);
-	grunt.registerTask('test', ['lint', 'browserify', 'concat', 'mochaTest']);
+	grunt.registerTask('test', ['lint', 'browserify', 'replace', 'concat', 'mochaTest']);
 	grunt.registerTask('build', ['test', 'uglify']);
 
 };
