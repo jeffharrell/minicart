@@ -3,7 +3,11 @@
 		<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>
 			<li class="minicart-item">
 				<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>
-				<span class="minicart-attributes"><%= items[i].get("item_number") %></span>
+				<ul class="minicart-attributes">
+					<% if (items[i].get("item_number")) { %>
+						<li><%= items[i].get("item_number") %></li>
+					<% } %>
+				</ul>
 				<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= i %>" value="<%= items[i].get("quantity") %>" autocomplete="off" />
 				<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />
 				<span class="minicart-price"><%= items[i].total() %></span>
