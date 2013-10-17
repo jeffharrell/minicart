@@ -20,7 +20,7 @@
     "url": "https://github.com/jeffharrell/minicart"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "mocha test/*"
   },
   "licenses": [
     {
