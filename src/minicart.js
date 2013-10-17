@@ -45,18 +45,16 @@ function addEvents() {
 
         if (target.className === 'minicart-remove') {
             minicart.cart.remove(target.getAttribute('data-minicart-idx'));
-        } else if (isShowing) {
-            if (!(/input|button|select|option/i.test(target.tagName))) {
-                while (target.nodeType === 1) {
-                    if (target === config.parent) {
-                        return;
-                    }
+        } else if (isShowing && !(/input|button|select|option/i.test(target.tagName))) {
+			while (target.nodeType === 1) {
+				if (target === minicart.el) {
+					return;
+				}
 
-                    target = target.parentNode;
-                }
+				target = target.parentNode;
+			}
 
-                minicart.hide();
-            }
+			minicart.hide();
         }
     });
 
@@ -201,6 +199,3 @@ minicart.reset = function reset() {
 
     win.paypal.minicart = minicart;
 })(window || module.exports);
-
-
-

@@ -45,6 +45,13 @@
 	text-decoration: none;
 }
 
+#PPMiniCart .minicart-attributes {
+	position: absolute;
+	top: 20px;
+	left: 0;
+	color: #999;
+}
+
 #PPMiniCart .minicart-quantity {
 	position: absolute;
 	left: 190px;
