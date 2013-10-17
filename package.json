@@ -19,6 +19,9 @@
     "type": "git",
     "url": "https://github.com/jeffharrell/minicart"
   },
+  "scripts": {
+    "test": "grunt test"
+  },
   "licenses": [
     {
       "type": "MIT",

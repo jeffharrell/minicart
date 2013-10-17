@@ -2,6 +2,8 @@
 
 The Mini Cart is a great way to improve your PayPal integration by creating an overlay which appears as a user adds products to their cart. It’s a simple change that creates a wonderful new experience for your website!
 
+[![Build Status](https://travis-ci.org/jeffharrell/minicart.png?branch=master,3.0-alpha)](https://travis-ci.org/jeffharrell/minicart)
+
 
 1. [Setup](#interested-lets-get-you-setup)
 2. [Customization](#customization)
