@@ -2,7 +2,6 @@
 
 // TODO:
 // - storage
-// - discounts
 // - support currencies
 
 

@@ -98,6 +98,24 @@ describe('Product Model', function () {
 	});
 
 
+	it('discount() calculates flat rate discounts', function () {
+		item.set('discount_amount', 1.00);
+		item.set('discount_amount2', 0.50);
+		item.set('quantity', 3);
+
+		assert.equal(item.total(), '$1.69');
+	});
+
+
+	it('discount() calculates percentage discounts', function () {
+		item.set('discount_rate', 25);
+		item.set('discount_rate2', 50);
+		item.set('quantity', 3);
+
+		assert.equal(item.total(), '$2.15');
+	});
+
+
     it('total() returns the product total', function () {
         assert.equal(item.total(), '$1.23');
 
@@ -117,6 +135,13 @@ describe('Product Model', function () {
 
 		item.set('quantity', 2);
 		assert.equal(item.total(), '$248.46');
+	});
+
+
+	it('total() takes into account discounts', function () {
+		item.set('discount_amount', 0.23);
+
+		assert.equal(item.total(), '$1.00');
 	});
 
 

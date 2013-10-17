@@ -1536,18 +1536,51 @@ Product.prototype.options = function options() {
 };
 
 
-Product.prototype.total = function total(config) {
-	var qty = this.get('quantity'),
-		amount = this.get('amount'),
+Product.prototype.discount = function discount() {
+	var flat = setters.amount(this.get('discount_amount')),
+		rate = setters.amount(this.get('discount_rate')),
+		num = parseInt(this.get('discount_num'), 10) || 0,
+		limit = Math.max(num, this.get('quantity') - 1),
+		result = 0,
+		amount;
+
+	if (flat) {
+		result += flat;
+		result += setters.amount(this.get('discount_amount2') || flat) * limit;
+	} else if (rate) {
+		amount = this.amount({ unformatted: true });
+
+		result += rate * amount / 100;
+		result += setters.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+	}
+
+	return result;
+};
+
+
+Product.prototype.amount = function amount(config) {
+	var result = this.get('amount'),
 		options = this.options(),
-		result, i, len;
+		len, i;
 
 	// TODO: cache the result until the product is changed
 	for (i = 0, len = options.length; i < len; i++) {
-		amount += options[i].amount;
+		result += options[i].amount;
 	}
 
-	result = qty * amount;
+	if (config && config.unformatted) {
+		return result;
+	} else {
+		return currency(result, 'USD');
+	}
+};
+
+Product.prototype.total = function total(config) {
+	var result;
+
+	// TODO: cache the result until the product is changed
+	result  = this.get('quantity') * this.amount({ unformatted: true});
+	result -= this.discount();
 
 	if (config && config.unformatted) {
 		return result;
