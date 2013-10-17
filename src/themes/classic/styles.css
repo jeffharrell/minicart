@@ -54,6 +54,18 @@
 	border: 0;
 }
 
+#PPMiniCart .minicart-attributes li {
+	display: inline;
+}
+
+#PPMiniCart .minicart-attributes li:after {
+	content: ",";
+}
+
+#PPMiniCart .minicart-attributes li:last-child:after {
+	content: "";
+}
+
 #PPMiniCart .minicart-quantity {
 	position: absolute;
 	left: 190px;

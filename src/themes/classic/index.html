@@ -7,6 +7,9 @@
 					<% if (items[i].get("item_number")) { %>
 						<li><%= items[i].get("item_number") %></li>
 					<% } %>
+					<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>
+						<li><%= options[j].key %>: <%= options[j].value %></li>
+					<% } %>
 				</ul>
 				<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= i %>" value="<%= items[i].get("quantity") %>" autocomplete="off" />
 				<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />

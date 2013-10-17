@@ -117,7 +117,7 @@ Cart.prototype.settings = function settings(name) {
 };
 
 
-Cart.prototype.total = function total(options) {
+Cart.prototype.total = function total(config) {
     var products = this.getAll(),
         result = 0,
         i, len;
@@ -126,7 +126,7 @@ Cart.prototype.total = function total(options) {
         result += products[i].total({ unformatted: true });
     }
 
-    if (options && options.unformatted) {
+    if (config && config.unformatted) {
         return result;
     } else {
         return currency(result, 'USD');

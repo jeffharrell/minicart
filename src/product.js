@@ -15,14 +15,14 @@ var setters = {
 		return value;
 	},
 	amount: function (value) {
-		return parseFloat(value);
+		return parseFloat(value) || 0;
 	}
 };
 
 
 function Product(data) {
-	data.quantity = parseInt(data.quantity, 10) || 1;
-	data.amount = parseFloat(data.amount);
+	data.quantity = setters.quantity(data.quantity);
+	data.amount = setters.amount(data.amount);
 	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
 
     this._data = data;
@@ -89,30 +89,55 @@ Product.prototype.destroy = function destroy() {
 };
 
 
-Product.prototype.total = function total(options) {
+Product.prototype.options = function options() {
+	var result = [],
+		i = 0,
+		j,
+		key,
+		value,
+		amount;
+
+	while ((key = this.get('on' + i))) {
+		value = this.get('os' + i);
+		amount = 0;
+		j = 0;
+
+		while (typeof this.get('option_select' + j) !== 'undefined') {
+			if (this.get('option_select' + j) === value) {
+				amount = setters.amount(this.get('option_amount' + j));
+				break;
+			}
+
+			j++;
+		}
+
+		result.push({
+			key: key,
+			value: value,
+			amount: amount
+		});
+
+		i++;
+	}
+
+	return result;
+};
+
+
+Product.prototype.total = function total(config) {
     var qty = this.get('quantity'),
         amount = this.get('amount'),
-        result = qty * amount;
+		options = this.options(),
+		result, i, len;
 
-	//    // Add option amounts to the total amount
-	//    option_index = (product.option_index) ? product.option_index : 0;
-	//
-	//    while (product['os' + option_index]) {
-	//        i = 0;
-	//
-	//        while (typeof product['option_select' + i] !== 'undefined') {
-	//            if (product['option_select' + i] === product['os' + option_index]) {
-	//                product.amount = product.amount + parseFloat(product['option_amount' + i]);
-	//                break;
-	//            }
-	//
-	//            i++;
-	//        }
-	//
-	//        option_index++;
-	//    }
+	// TODO: cache the result until the product is changed
+	for (i = 0, len = options.length; i < len; i++) {
+		amount += options[i].amount;
+	}
 
-    if (options && options.unformatted) {
+	result = qty * amount;
+
+    if (config && config.unformatted) {
         return result;
     } else {
         return currency(result, 'USD');

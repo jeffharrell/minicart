@@ -2,7 +2,7 @@
 
 // TODO:
 // - storage
-// - product options and totals
+// - product options and totals test cases
 // - support currencies
 
 
@@ -81,7 +81,7 @@ function addEvents() {
 
     forms = document.getElementsByTagName('form');
 
-    for (i = 0; i < forms.length; i++) {
+    for (i = 0, len = forms.length; i < len; i++) {
         form = forms[i];
 
         if (form.cmd && constants.CMDS[form.cmd.value]) {
