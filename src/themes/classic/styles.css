@@ -49,7 +49,9 @@
 	position: absolute;
 	top: 20px;
 	left: 0;
+	margin: 0;
 	color: #999;
+	border: 0;
 }
 
 #PPMiniCart .minicart-quantity {
