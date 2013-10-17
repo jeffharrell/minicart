@@ -46,7 +46,7 @@ describe('Cart Model', function () {
         assert.equal(cart.get(idx).get('item_name'), product.item_name);
         assert.equal(cart.get(idx).get('amount'), product.amount);
     });
-	
+
 
 	it('add() for the same product only increments the quantity', function () {
 		var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },
@@ -87,17 +87,17 @@ describe('Cart Model', function () {
 
 
     it('total() returns the cart product total', function () {
-        assert.equal(cart.total(), '$3.34');
+        assert.equal(cart.total({ format: true }), '$3.34 USD');
         cart.remove(1);
-        assert.equal(cart.total(), '$1.00');
+        assert.equal(cart.total({ format: true }), '$1.00 USD');
 
     });
 
 
     it('total() returns the unformatted cart product total', function () {
-        assert.equal(cart.total({ unformatted: true }), 3.34);
+        assert.equal(cart.total(), 3.34);
         cart.remove(1);
-        assert.equal(cart.total({ unformatted: true }), 1);
+        assert.equal(cart.total(), 1);
 
     });
 

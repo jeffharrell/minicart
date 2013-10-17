@@ -2,8 +2,7 @@
 
 // TODO:
 // - storage
-// - support currencies
-
+// - UI tests
 
 var Cart = require('./cart'),
     config = require('./config'),

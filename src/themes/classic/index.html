@@ -23,7 +23,7 @@
 	<div>
 		<div class="minicart-subtotal">
 			<%= config.strings.subtotal %>
-			<span class="minicart-subtotal-amount"><%= cart.total() %> <%= cart.settings("currency_code") %></span>
+			<span class="minicart-subtotal-amount"><%= cart.total({ format: true }) %></span>
 		</div>
 		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />
 	</div>

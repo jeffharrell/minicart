@@ -130,13 +130,13 @@ Product.prototype.discount = function discount() {
 		result += flat;
 		result += setters.amount(this.get('discount_amount2') || flat) * limit;
 	} else if (rate) {
-		amount = this.amount({ unformatted: true });
+		amount = this.amount();
 
 		result += rate * amount / 100;
 		result += setters.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
 	}
 
-	return result;
+	return result.toFixed(2);
 };
 
 
@@ -150,10 +150,10 @@ Product.prototype.amount = function amount(config) {
 		result += options[i].amount;
 	}
 
-	if (config && config.unformatted) {
-		return result;
+	if (config && config.currency_code) {
+		return currency(result, config.currency_code);
 	} else {
-		return currency(result, 'USD');
+		return result;
 	}
 };
 
@@ -161,13 +161,13 @@ Product.prototype.total = function total(config) {
 	var result;
 
 	// TODO: cache the result until the product is changed
-	result  = this.get('quantity') * this.amount({ unformatted: true});
+	result  = this.get('quantity') * this.amount();
 	result -= this.discount();
 
-	if (config && config.unformatted) {
-		return result;
+	if (config && config.currency_code) {
+		return currency(result, config.currency_code);
 	} else {
-		return currency(result, 'USD');
+		return result;
 	}
 };
 

@@ -72,5 +72,5 @@ module.exports = function currency(amount, code) {
         after = value.after || '',
         length = value.length || 2;
 
-    return before + amount.toFixed(length) + after;
+    return before + amount.toFixed(length) + after + ' ' + code;
 };

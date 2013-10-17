@@ -123,13 +123,14 @@ Cart.prototype.total = function total(config) {
         i, len;
 
     for (i = 0, len = products.length; i < len; i++) {
-        result += products[i].total({ unformatted: true });
+        result += products[i].total();
     }
 
-    if (config && config.unformatted) {
-        return result;
+	// TODO: support formatted as a formatting string
+    if (config && config.format) {
+		return currency(result, this.settings('currency_code') || 'USD');
     } else {
-        return currency(result, 'USD');
+        return result;
     }
 };
 

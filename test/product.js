@@ -89,7 +89,7 @@ describe('Product Model', function () {
 		item.set('on1', 'size');
 		item.set('os1', 'large');
 		item.set('option_select0', 'blue');
-		item.set('option_amount0', '123.00');
+		item.set('option_amount0', 123.00);
 
 		options = item.options();
 
@@ -103,7 +103,7 @@ describe('Product Model', function () {
 		item.set('discount_amount2', 0.50);
 		item.set('quantity', 3);
 
-		assert.equal(item.total(), '$1.69');
+		assert.equal(item.total(), 1.69);
 	});
 
 
@@ -112,15 +112,15 @@ describe('Product Model', function () {
 		item.set('discount_rate2', 50);
 		item.set('quantity', 3);
 
-		assert.equal(item.total(), '$2.15');
+		assert.equal(item.total(), 2.15);
 	});
 
 
     it('total() returns the product total', function () {
-        assert.equal(item.total(), '$1.23');
+        assert.equal(item.total(), 1.23);
 
         item.set('quantity', 2);
-        assert.equal(item.total(), '$2.46');
+        assert.equal(item.total(), 2.46);
 
     });
 
@@ -129,27 +129,37 @@ describe('Product Model', function () {
 		item.set('on0', 'color');
 		item.set('os0', 'blue');
 		item.set('option_select0', 'blue');
-		item.set('option_amount0', '123.00');
+		item.set('option_amount0', 123.00);
 
-		assert.equal(item.total(), '$124.23');
+		assert.equal(item.total(), 124.23);
 
 		item.set('quantity', 2);
-		assert.equal(item.total(), '$248.46');
+		assert.equal(item.total(), 248.46);
 	});
 
 
 	it('total() takes into account discounts', function () {
 		item.set('discount_amount', 0.23);
 
-		assert.equal(item.total(), '$1.00');
+		assert.equal(item.total(), 1.00);
 	});
 
 
-    it('total() returns the unformatted product total', function () {
-        assert.equal(item.total({ unformatted: true }), 1.23);
+    it('total() returns the formatted product total', function () {
+		var item1 = new Product({
+			name: 'Foo',
+			desc: 'This is an item, foo',
+			amount: 1.23
+		});
 
-        item.set('quantity', 2);
-        assert.equal(item.total({ unformatted: true }), 2.46);
+		var item2 = new Product({
+			name: 'Bar',
+			desc: 'This is another item',
+			amount: 4.56
+		});
+
+        assert.equal(item1.total({ currency_code: 'USD' }), '$1.23 USD');
+        assert.equal(item2.total({ currency_code: 'JPY' }), '\u00A54.56 JPY');
     });
 
 
