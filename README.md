@@ -1,5 +1,4 @@
-The Mini Cart
-=============
+# The Mini Cart
 
 The Mini Cart is a great way to improve your PayPal integration by creating an overlay which appears as a user adds products to their cart. It’s a simple change that creates a wonderful new experience for your website!
 
@@ -14,8 +13,7 @@ The Mini Cart is a great way to improve your PayPal integration by creating an o
 
 
 
-Interested? Let's get you setup
--------------------------------
+## Interested? Let's get you setup
 
 1. Start with a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
 2. Download the latest [minicart.js](https://raw.github.com/jeffharrell/MiniCart/master/dist/minicart.min.js) – You can also browse the [tagged versions](https://github.com/jeffharrell/MiniCart/tags)
@@ -25,106 +23,51 @@ Make sure to update the path to point to your downloaded copy of minicart.js!
 
     <script src="/path/to/minicart.js"></script>
     <script>
-        PAYPAL.apps.MiniCart.render();
+        paypal.minicart.render();
     </script>
 
 It’s as simple as that! Now the Mini Cart will appear when a user adds a product to, views, or has an item in their cart.
 
 
 
-Customization
--------------
+## Customization
 
 You can customize the script to make it work for your site by passing a JavaScript object as an argument, setting any of the following optional properties:
 
 `parent`  
 The HTMLElement the Mini Cart should render as a child of. Default `document.body`.
 
-`formTarget`  
+`target`  
 The HTML target property for the checkout form. Default `null`.
-
-`displayEdge`  
-The edge of the page the cart should pin to. Set to left or right. Default `'right'`.
-
-`edgeDistance`  
-Distance from the edge the cart should appear. Default `'50px'`.
 
 `cookiePath`  
 The base path of your website to set the cookie to (useful for shared website hosting). Default `null`.
 
-`peekEnabled`  
-Boolean to determine if the cart should "peek" when it's hidden with items. Default `true`.
-
-`paypalURL`  
+`action`  
 The PayPal URL to use if you are accessing sandbox or another version of the PayPal website. Default `'https://www.paypal.com/cgi-bin/webscr'`.
 
-`resetCartOnSuccess`
-Boolean to determine if the cart should be reset automatically on payment completion. Default `true`.
+`template`
+HTML string to override the rendered UI.
+
+`styles`
+CSS string to override the rendered styles.
 
 `strings`  
-An object of localizable text strings used:  
+An object of localizable text strings used:   
 
 * `button` - The checkout button text
 * `processing` - The checkout button text after the cart is submitted
 * `subtotal` - The subtotal text  
-* `discount` - The discount text  
-* `shipping` - The shipping text    
-
-`events`  
-An object of customizable callbacks (see [Event callback examples](#event-callback-examples)):  
-
-* `onRender` - Event before the cart is rendered  
-* `afterRender` - Event after the cart is rendered  
-* `onHide` - Event before the cart is hidden  
-* `afterHide` - Event after the cart is hidden  
-* `onShow` - Event before the cart is shown  
-* `afterShow` - Event after the cart is shown  
-* `onAddToCart` - Event before a product is added to the cart  
-* `afterAddToCart` - Event after a product is added to the cart  
-* `onRemoveFromCart` - Event before a product is removed from the cart  
-* `afterRemoveFromCart` - Event after a product is removed from the cart
-* `onCheckout` - Event before the checkout action takes place  
-* `onReset` - Event before the cart is emptied (typically when a transaction is completed)  
-* `afterReset` - Event after the cart is emptied (typically when a transaction is completed)  
-
-The scope of all events is adjusted to the Mini Cart to allow access to the products, UI, and certain functions. See below for an example of a custom configuration:
-
-    <script>
-        PAYPAL.apps.MiniCart.render({
-            displayEdge: "right",
-            edgeDistance: "50px",
-			events: {
-				afterAddToCart: function () {
-					var msg = "There's now " + this.products.length + " unique product(s).";
-					msg += " That's a total of " + this.calculateSubtotal() + "!";
-					
-					alert(msg);
-				}
-			}
-        });
-    </script> 
+* `discount` - The discount text    
 
 
 
-Event callback examples
------------------------
-
-Examples of how you can use the event callbacks:
-
-* [Preventing checkout until terms are accepted](http://www.minicartjs.com/examples/terms.html)
-* [Requiring a minimum quantity to checkout](http://www.minicartjs.com/examples/minquantity.html)
-* [Only allowing a fixed quantity per item](http://www.minicartjs.com/examples/fixedquantity.html)
-* [Supporting multiple options per item](http://www.minicartjs.com/examples/options.html)
-
-
-
-Localization
-------------
+## Localization
 
 Localization and adaption are supported in the Mini Cart using the configuration strings object. For example, if we wanted the cart to appear in French we would need to pass our configuration like this:
 
     <script> 
-        PAYPAL.apps.MiniCart.render({
+        paypal.minicart.render({
             strings: {
                 button: "Caisse",  
                 subtotal: "Total ",
@@ -137,44 +80,42 @@ The currency symbol will be automatically adjusted based on the currency_code se
 
 
 
-JavaScript API
---------------
+## JavaScript API
 
 The Mini Cart has a rich JavaScript API which allows you to control it using the following methods:
 
-`PAYPAL.apps.MiniCart.render()`  
+`paypal.minicart.render()`  
 Renders the cart element to the page. This method is required to see the Mini Cart.
 
-`PAYPAL.apps.MiniCart.bindForm(form)`  
+`paypal.minicart.show()`  
+Shows the cart.
+
+`paypal.minicart.hide()`  
+Hides the cart.
+
+`paypal.minicart.toggle()`  
+Toggles the visibility of the cart.
+
+`paypal.minicart.bind(form)`  
 Binds a form DOM element's submit event to the Mini Cart. This is useful for forms which may have been added to the page after the initial load. 
 
-`PAYPAL.apps.MiniCart.addToCart(data)`  
+`paypal.minicart.cart.add(data)`  
 Allows you to manually add a product to your cart, e.g. directly using JavaScript and not through a PayPal form. The parameter `data` is a key / value pair object of parameters and their value. For example: 
 
     {"business":"user@example.com","item_name":"Product","amount":"5.00","currency_code":"USD"}
 
-`PAYPAL.apps.MiniCart.reset()`  
+`paypal.minicart.reset()`  
 Resets the cart, emptying and hiding it.
 
-`PAYPAL.apps.MiniCart.hide(null, fully)`  
-Hides the cart. If the cart contains products then it will "peek" from the top of the window. Set the parameter `fully` to true to override this and have it fully hidden.
-
-`PAYPAL.apps.MiniCart.show()`  
-Shows the cart.
-
-`PAYPAL.apps.MiniCart.toggle()`  
-Toggles the visibility of the cart.
 
 
-
-FAQ
----
+## FAQ
 
 ### Is the Mini Cart free? How is it licensed?
 Yes, it’s free and licensed under the [MIT License](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE).
 
 ### What browsers does the Mini Cart support?
-The Mini Cart is functionally supported by Chrome, Safari, Firefox, Opera, and Internet Explorer 6+. Older versions of IE use cookies for their data store while all other browsers use localStorage.
+The Mini Cart is functionally supported by Chrome, Safari, Firefox, Opera, and Internet Explorer 8+. Older versions of IE use cookies for their data store while all other browsers use localStorage.
 
 ### I have special integration / translation needs. Are there advanced settings?
 Yes, there’s a rich API which can be used to customize the Mini Cart. See the [project page README](https://github.com/jeffharrell/MiniCart#readme) for more details.
@@ -223,8 +164,7 @@ Note that using an additional id of #myPage in your CSS causes the rule to be mo
 
 
 
-Questions or comments
----------------------
+## Questions or comments
 
 If you have questions or suggestions, please use the [issue tracker](https://github.com/jeffharrell/MiniCart/issues) at Github.
 
