@@ -1217,7 +1217,7 @@ module.exports = {
 
 // TODO:
 // - storage
-// - product options and totals test cases
+// - discounts
 // - support currencies
 
 
@@ -2008,5 +2008,5 @@ var storage = module.exports = (function (window, document) {
 module.exports = function template(str, data) {
     return new EJS({text: str}).render(data);
 };
-},{}]},{},[1,2,4,3,5,6,7,8,9,10])
+},{}]},{},[1,2,3,4,5,6,7,8,9,10])
 ;

@@ -65,7 +65,40 @@ describe('Product Model', function () {
     });
 
 
-    it('total() returns the cart product total', function () {
+	it('options() returns an array of options', function () {
+		var options;
+
+		item.set('on0', 'color');
+		item.set('os0', 'blue');
+		item.set('on1', 'size');
+		item.set('os1', 'large');
+
+		options = item.options();
+
+		assert.equal(options.length, 2);
+		assert.deepEqual(options[0], { key: 'color', value: 'blue', amount: 0});
+		assert.deepEqual(options[1], { key: 'size', value: 'large', amount: 0});
+	});
+
+
+	it('options() values have an amount', function () {
+		var options;
+
+		item.set('on0', 'color');
+		item.set('os0', 'blue');
+		item.set('on1', 'size');
+		item.set('os1', 'large');
+		item.set('option_select0', 'blue');
+		item.set('option_amount0', '123.00');
+
+		options = item.options();
+
+		assert.deepEqual(options[0].amount, 123.00);
+		assert.equal(options[1].amount, 0);
+	});
+
+
+    it('total() returns the product total', function () {
         assert.equal(item.total(), '$1.23');
 
         item.set('quantity', 2);
@@ -74,7 +107,20 @@ describe('Product Model', function () {
     });
 
 
-    it('total() returns the unformatted cart product total', function () {
+	it('total() takes into account option amounts', function () {
+		item.set('on0', 'color');
+		item.set('os0', 'blue');
+		item.set('option_select0', 'blue');
+		item.set('option_amount0', '123.00');
+
+		assert.equal(item.total(), '$124.23');
+
+		item.set('quantity', 2);
+		assert.equal(item.total(), '$248.46');
+	});
+
+
+    it('total() returns the unformatted product total', function () {
         assert.equal(item.total({ unformatted: true }), 1.23);
 
         item.set('quantity', 2);

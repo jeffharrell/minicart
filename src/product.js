@@ -83,12 +83,6 @@ Product.prototype.set = function set(key, value) {
 };
 
 
-Product.prototype.destroy = function destroy() {
-    this._data = [];
-    this.fire('destroy', this);
-};
-
-
 Product.prototype.options = function options() {
 	var result = [],
 		i = 0,
@@ -125,8 +119,8 @@ Product.prototype.options = function options() {
 
 
 Product.prototype.total = function total(config) {
-    var qty = this.get('quantity'),
-        amount = this.get('amount'),
+	var qty = this.get('quantity'),
+		amount = this.get('amount'),
 		options = this.options(),
 		result, i, len;
 
@@ -137,11 +131,11 @@ Product.prototype.total = function total(config) {
 
 	result = qty * amount;
 
-    if (config && config.unformatted) {
-        return result;
-    } else {
-        return currency(result, 'USD');
-    }
+	if (config && config.unformatted) {
+		return result;
+	} else {
+		return currency(result, 'USD');
+	}
 };
 
 
@@ -173,6 +167,14 @@ Product.prototype.isEqual = function isEqual(data) {
 
 	return match;
 };
+
+
+Product.prototype.destroy = function destroy() {
+    this._data = [];
+    this.fire('destroy', this);
+};
+
+
 
 
 module.exports = Product;

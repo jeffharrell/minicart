@@ -2,7 +2,7 @@
 
 // TODO:
 // - storage
-// - product options and totals test cases
+// - discounts
 // - support currencies
 
 
