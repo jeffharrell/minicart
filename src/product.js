@@ -28,6 +28,9 @@ function Product(data) {
 	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
 
     this._data = data;
+	this._options = null;
+	this._amount = null;
+	this._total = null;
 
 	Pubsub.call(this);
 }
@@ -45,42 +48,48 @@ Product.prototype.set = function set(key, value) {
 	var setter = parser[key];
 
 	this._data[key] = setter ? setter(value) : value;
+	this._options = null;
+	this._amount = null;
+	this._total = null;
+
     this.fire('change', key);
 };
 
 
 Product.prototype.options = function options() {
-	var result = [],
-		i = 0,
-		j,
-		key,
-		value,
-		amount;
+	var result, key, value, amount, i, j;
 
-	while ((key = this.get('on' + i))) {
-		value = this.get('os' + i);
-		amount = 0;
-		j = 0;
+	if (!this._options) {
+		result = [];
+		i = 0;
 
-		while (typeof this.get('option_select' + j) !== 'undefined') {
-			if (this.get('option_select' + j) === value) {
-				amount = parser.amount(this.get('option_amount' + j));
-				break;
+		while ((key = this.get('on' + i))) {
+			value = this.get('os' + i);
+			amount = 0;
+			j = 0;
+
+			while (typeof this.get('option_select' + j) !== 'undefined') {
+				if (this.get('option_select' + j) === value) {
+					amount = parser.amount(this.get('option_amount' + j));
+					break;
+				}
+
+				j++;
 			}
 
-			j++;
+			result.push({
+				key: key,
+				value: value,
+				amount: amount
+			});
+
+			i++;
 		}
 
-		result.push({
-			key: key,
-			value: value,
-			amount: amount
-		});
-
-		i++;
+		this._options = result;
 	}
 
-	return result;
+	return this._options;
 };
 
 
@@ -107,33 +116,40 @@ Product.prototype.discount = function discount() {
 
 
 Product.prototype.amount = function amount(config) {
-	var result = this.get('amount'),
-		options = this.options(),
-		len, i;
+	var result, options, len, i;
 
-	// TODO: cache the result until the product is changed
-	for (i = 0, len = options.length; i < len; i++) {
-		result += options[i].amount;
+	if (!this._amount) {
+		result = this.get('amount');
+		options = this.options();
+
+		for (i = 0, len = options.length; i < len; i++) {
+			result += options[i].amount;
+		}
+
+		this._amount = result;
 	}
 
 	if (config && config.currency_code) {
-		return currency(result, config.currency_code);
+		return currency(this._amount, config.currency_code);
 	} else {
-		return result;
+		return this._amount;
 	}
 };
 
 Product.prototype.total = function total(config) {
 	var result;
 
-	// TODO: cache the result until the product is changed
-	result  = this.get('quantity') * this.amount();
-	result -= this.discount();
+	if (!this._total) {
+		result  = this.get('quantity') * this.amount();
+		result -= this.discount();
+
+		this._total = result;
+	}
 
 	if (config && config.currency_code) {
-		return currency(result, config.currency_code);
+		return currency(this._total, config.currency_code);
 	} else {
-		return result;
+		return this._total;
 	}
 };
 
