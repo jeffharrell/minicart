@@ -3,7 +3,9 @@
 
 var Product = require('./product'),
     constants = require('./constants'),
-    currency = require('./util/currency');
+    currency = require('./util/currency'),
+	Pubsub = require('./util/pubsub'),
+	mixin = require('./util/mixin');
 
 
 function Cart(data) {
@@ -11,7 +13,8 @@ function Cart(data) {
 
     this._products = [];
 	this._settings = {};
-	this._eventCache = {};
+
+	Pubsub.call(this);
 
 	if (data) {
         for (i = 0, len = data.length; i < len; i++) {
@@ -21,45 +24,7 @@ function Cart(data) {
 }
 
 
-Cart.prototype.on = function on(name, fn) {
-    var cache = this._eventCache[name];
-
-    if (!cache) {
-        cache = this._eventCache[name] = [];
-    }
-
-    cache.push(fn);
-};
-
-
-Cart.prototype.off = function off(name, fn) {
-    var cache = this._eventCache[name],
-        i, len;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            if (cache[i] === fn) {
-                cache = cache.splice(i, 1);
-            }
-        }
-    }
-};
-
-
-Cart.prototype.fire = function on(name) {
-    var cache = this._eventCache[name],
-        i, len, fn;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            fn = cache[i];
-
-            if (typeof fn === 'function') {
-                fn.apply(this, Array.prototype.slice.call(arguments, 1));
-            }
-        }
-    }
-};
+mixin(Cart.prototype, Pubsub.prototype);
 
 
 Cart.prototype.add = function add(data) {

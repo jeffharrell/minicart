@@ -1,6 +1,9 @@
 'use strict';
 
 
+var mixin = require('./util/mixin');
+
+
 var config = module.exports = {
 
     name: 'PPMiniCart',
@@ -47,5 +50,5 @@ function merge(dest, source) {
 
 
 module.exports.load = function load(userConfig) {
-    return merge(config, userConfig);
+    return mixin(config, userConfig);
 };

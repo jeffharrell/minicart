@@ -1,10 +1,12 @@
 'use strict';
 
 
-var currency = require('./util/currency');
+var currency = require('./util/currency'),
+	Pubsub = require('./util/pubsub'),
+	mixin = require('./util/mixin');
 
 
-var setters = {
+var parser = {
 	quantity: function (value) {
 		value = parseInt(value, 10);
 
@@ -21,53 +23,17 @@ var setters = {
 
 
 function Product(data) {
-	data.quantity = setters.quantity(data.quantity);
-	data.amount = setters.amount(data.amount);
+	data.quantity = parser.quantity(data.quantity);
+	data.amount = parser.amount(data.amount);
 	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
 
     this._data = data;
-    this._eventCache = {};
+
+	Pubsub.call(this);
 }
 
 
-Product.prototype.on = function on(name, fn) {
-    var cache = this._eventCache[name];
-
-    if (!cache) {
-        cache = this._eventCache[name] = [];
-    }
-
-    cache.push(fn);
-};
-
-
-Product.prototype.off = function off(name, fn) {
-    var cache = this._eventCache[name],
-        i, len;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            if (cache[i] === fn) {
-                cache = cache.splice(i, 1);
-            }
-        }
-    }
-};
-
-
-Product.prototype.fire = function on(name) {
-    var cache = this._eventCache[name], i, len, fn;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            fn = cache[i];
-
-            if (typeof fn === 'function') {
-                fn.apply(this, Array.prototype.slice.call(arguments, 1));
-            }
-        }
-    }
-};
+mixin(Product.prototype, Pubsub.prototype);
 
 
 Product.prototype.get = function get(key) {
@@ -76,7 +42,7 @@ Product.prototype.get = function get(key) {
 
 
 Product.prototype.set = function set(key, value) {
-	var setter = setters[key];
+	var setter = parser[key];
 
 	this._data[key] = setter ? setter(value) : value;
     this.fire('change', key);
@@ -98,7 +64,7 @@ Product.prototype.options = function options() {
 
 		while (typeof this.get('option_select' + j) !== 'undefined') {
 			if (this.get('option_select' + j) === value) {
-				amount = setters.amount(this.get('option_amount' + j));
+				amount = parser.amount(this.get('option_amount' + j));
 				break;
 			}
 
@@ -119,8 +85,8 @@ Product.prototype.options = function options() {
 
 
 Product.prototype.discount = function discount() {
-	var flat = setters.amount(this.get('discount_amount')),
-		rate = setters.amount(this.get('discount_rate')),
+	var flat = parser.amount(this.get('discount_amount')),
+		rate = parser.amount(this.get('discount_rate')),
 		num = parseInt(this.get('discount_num'), 10) || 0,
 		limit = Math.max(num, this.get('quantity') - 1),
 		result = 0,
@@ -128,12 +94,12 @@ Product.prototype.discount = function discount() {
 
 	if (flat) {
 		result += flat;
-		result += setters.amount(this.get('discount_amount2') || flat) * limit;
+		result += parser.amount(this.get('discount_amount2') || flat) * limit;
 	} else if (rate) {
 		amount = this.amount();
 
 		result += rate * amount / 100;
-		result += setters.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+		result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
 	}
 
 	return result.toFixed(2);

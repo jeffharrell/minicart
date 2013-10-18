@@ -996,7 +996,9 @@ EJS.Helpers.prototype = {
 
 var Product = require('./product'),
     constants = require('./constants'),
-    currency = require('./util/currency');
+    currency = require('./util/currency'),
+	Pubsub = require('./util/pubsub'),
+	mixin = require('./util/mixin');
 
 
 function Cart(data) {
@@ -1004,7 +1006,8 @@ function Cart(data) {
 
     this._products = [];
 	this._settings = {};
-	this._eventCache = {};
+
+	Pubsub.call(this);
 
 	if (data) {
         for (i = 0, len = data.length; i < len; i++) {
@@ -1014,45 +1017,7 @@ function Cart(data) {
 }
 
 
-Cart.prototype.on = function on(name, fn) {
-    var cache = this._eventCache[name];
-
-    if (!cache) {
-        cache = this._eventCache[name] = [];
-    }
-
-    cache.push(fn);
-};
-
-
-Cart.prototype.off = function off(name, fn) {
-    var cache = this._eventCache[name],
-        i, len;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            if (cache[i] === fn) {
-                cache = cache.splice(i, 1);
-            }
-        }
-    }
-};
-
-
-Cart.prototype.fire = function on(name) {
-    var cache = this._eventCache[name],
-        i, len, fn;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            fn = cache[i];
-
-            if (typeof fn === 'function') {
-                fn.apply(this, Array.prototype.slice.call(arguments, 1));
-            }
-        }
-    }
-};
+mixin(Cart.prototype, Pubsub.prototype);
 
 
 Cart.prototype.add = function add(data) {
@@ -1149,8 +1114,11 @@ Cart.prototype.destroy = function destroy() {
 
 module.exports = Cart;
 
-},{"./constants":3,"./product":5,"./util/currency":6}],2:[function(require,module,exports){
+},{"./constants":3,"./product":5,"./util/currency":6,"./util/mixin":9,"./util/pubsub":10}],2:[function(require,module,exports){
 'use strict';
+
+
+var mixin = require('./util/mixin');
 
 
 var config = module.exports = {
@@ -1199,10 +1167,10 @@ function merge(dest, source) {
 
 
 module.exports.load = function load(userConfig) {
-    return merge(config, userConfig);
+    return mixin(config, userConfig);
 };
 
-},{}],3:[function(require,module,exports){
+},{"./util/mixin":9}],3:[function(require,module,exports){
 'use strict';
 
 
@@ -1219,6 +1187,7 @@ module.exports = {
 // TODO:
 // - storage
 // - UI tests
+
 
 var Cart = require('./cart'),
     config = require('./config'),
@@ -1414,14 +1383,16 @@ minicart.reset = function reset() {
     win.paypal.minicart = minicart;
 })(window || module.exports);
 
-},{"./cart":1,"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":10}],5:[function(require,module,exports){
+},{"./cart":1,"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}],5:[function(require,module,exports){
 'use strict';
 
 
-var currency = require('./util/currency');
+var currency = require('./util/currency'),
+	Pubsub = require('./util/pubsub'),
+	mixin = require('./util/mixin');
 
 
-var setters = {
+var parser = {
 	quantity: function (value) {
 		value = parseInt(value, 10);
 
@@ -1438,53 +1409,17 @@ var setters = {
 
 
 function Product(data) {
-	data.quantity = setters.quantity(data.quantity);
-	data.amount = setters.amount(data.amount);
+	data.quantity = parser.quantity(data.quantity);
+	data.amount = parser.amount(data.amount);
 	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
 
     this._data = data;
-    this._eventCache = {};
+
+	Pubsub.call(this);
 }
 
 
-Product.prototype.on = function on(name, fn) {
-    var cache = this._eventCache[name];
-
-    if (!cache) {
-        cache = this._eventCache[name] = [];
-    }
-
-    cache.push(fn);
-};
-
-
-Product.prototype.off = function off(name, fn) {
-    var cache = this._eventCache[name],
-        i, len;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            if (cache[i] === fn) {
-                cache = cache.splice(i, 1);
-            }
-        }
-    }
-};
-
-
-Product.prototype.fire = function on(name) {
-    var cache = this._eventCache[name], i, len, fn;
-
-    if (cache) {
-        for (i = 0, len = cache.length; i < len; i++) {
-            fn = cache[i];
-
-            if (typeof fn === 'function') {
-                fn.apply(this, Array.prototype.slice.call(arguments, 1));
-            }
-        }
-    }
-};
+mixin(Product.prototype, Pubsub.prototype);
 
 
 Product.prototype.get = function get(key) {
@@ -1493,7 +1428,7 @@ Product.prototype.get = function get(key) {
 
 
 Product.prototype.set = function set(key, value) {
-	var setter = setters[key];
+	var setter = parser[key];
 
 	this._data[key] = setter ? setter(value) : value;
     this.fire('change', key);
@@ -1515,7 +1450,7 @@ Product.prototype.options = function options() {
 
 		while (typeof this.get('option_select' + j) !== 'undefined') {
 			if (this.get('option_select' + j) === value) {
-				amount = setters.amount(this.get('option_amount' + j));
+				amount = parser.amount(this.get('option_amount' + j));
 				break;
 			}
 
@@ -1536,8 +1471,8 @@ Product.prototype.options = function options() {
 
 
 Product.prototype.discount = function discount() {
-	var flat = setters.amount(this.get('discount_amount')),
-		rate = setters.amount(this.get('discount_rate')),
+	var flat = parser.amount(this.get('discount_amount')),
+		rate = parser.amount(this.get('discount_rate')),
 		num = parseInt(this.get('discount_num'), 10) || 0,
 		limit = Math.max(num, this.get('quantity') - 1),
 		result = 0,
@@ -1545,12 +1480,12 @@ Product.prototype.discount = function discount() {
 
 	if (flat) {
 		result += flat;
-		result += setters.amount(this.get('discount_amount2') || flat) * limit;
+		result += parser.amount(this.get('discount_amount2') || flat) * limit;
 	} else if (rate) {
 		amount = this.amount();
 
 		result += rate * amount / 100;
-		result += setters.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+		result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
 	}
 
 	return result.toFixed(2);
@@ -1629,7 +1564,7 @@ Product.prototype.destroy = function destroy() {
 
 module.exports = Product;
 
-},{"./util/currency":6}],6:[function(require,module,exports){
+},{"./util/currency":6,"./util/mixin":9,"./util/pubsub":10}],6:[function(require,module,exports){
 'use strict';
 
 
@@ -1873,6 +1808,77 @@ var forms = module.exports = {
 'use strict';
 
 
+var mixin = module.exports = function mixin(dest, source) {
+	var value;
+
+	for (var key in source) {
+		value = source[key];
+
+		if (value && value.constructor === Object) {
+			mixin(dest[key], value);
+		} else {
+			dest[key] = value;
+		}
+	}
+
+	return dest;
+};
+
+},{}],10:[function(require,module,exports){
+'use strict';
+
+
+function Pubsub() {
+	this._eventCache = {};
+}
+
+
+Pubsub.prototype.on = function on(name, fn) {
+	var cache = this._eventCache[name];
+
+	if (!cache) {
+		cache = this._eventCache[name] = [];
+	}
+
+	cache.push(fn);
+};
+
+
+Pubsub.prototype.off = function off(name, fn) {
+	var cache = this._eventCache[name],
+		i, len;
+
+	if (cache) {
+		for (i = 0, len = cache.length; i < len; i++) {
+			if (cache[i] === fn) {
+				cache = cache.splice(i, 1);
+			}
+		}
+	}
+};
+
+
+Pubsub.prototype.fire = function on(name) {
+	var cache = this._eventCache[name], i, len, fn;
+
+	if (cache) {
+		for (i = 0, len = cache.length; i < len; i++) {
+			fn = cache[i];
+
+			if (typeof fn === 'function') {
+				fn.apply(this, Array.prototype.slice.call(arguments, 1));
+			}
+		}
+	}
+};
+
+
+module.exports = Pubsub;
+
+},{}],11:[function(require,module,exports){
+'use strict';
+
+
 var config = require('../config');
 
 
@@ -2034,7 +2040,7 @@ var storage = module.exports = (function (window, document) {
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
 
-},{"../config":2}],10:[function(require,module,exports){
+},{"../config":2}],12:[function(require,module,exports){
 /*global EJS:true */
 
 'use strict';
@@ -2043,5 +2049,5 @@ var storage = module.exports = (function (window, document) {
 module.exports = function template(str, data) {
     return new EJS({text: str}).render(data);
 };
-},{}]},{},[1,2,3,4,5,6,7,8,9,10])
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12])
 ;
