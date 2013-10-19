@@ -18,6 +18,13 @@ var parser = {
 	},
 	amount: function (value) {
 		return parseFloat(value) || 0;
+	},
+	href: function (value) {
+		if (value) {
+			return value;
+		} else {
+			return (typeof window !== 'undefined') ? window.location.href : null;
+		}
 	}
 };
 
@@ -25,7 +32,7 @@ var parser = {
 function Product(data) {
 	data.quantity = parser.quantity(data.quantity);
 	data.amount = parser.amount(data.amount);
-	data.href = data.href || (typeof window !== 'undefined') ? window.location.href : null,
+	data.href = parser.href(data.href);
 
     this._data = data;
 	this._options = null;
@@ -129,11 +136,7 @@ Product.prototype.amount = function amount(config) {
 		this._amount = result;
 	}
 
-	if (config && config.currency_code) {
-		return currency(this._amount, config.currency_code);
-	} else {
-		return this._amount;
-	}
+	return currency(this._amount, null, config);
 };
 
 Product.prototype.total = function total(config) {
@@ -143,14 +146,10 @@ Product.prototype.total = function total(config) {
 		result  = this.get('quantity') * this.amount();
 		result -= this.discount();
 
-		this._total = result;
+		this._total = parser.amount(result);
 	}
 
-	if (config && config.currency_code) {
-		return currency(this._total, config.currency_code);
-	} else {
-		return this._total;
-	}
+	return currency(this._total, null, config);
 };
 
 
@@ -163,7 +162,7 @@ Product.prototype.isEqual = function isEqual(data) {
 
 	if (this.get('item_name') === data.item_name) {
 		if (this.get('item_number') === data.item_number) {
-			if (this.get('amount') === parseFloat(data.amount)) {
+			if (this.get('amount') === parser.amount(data.amount)) {
 				var i = 0;
 
 				match = true;

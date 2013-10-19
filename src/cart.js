@@ -45,7 +45,7 @@ Cart.prototype.add = function add(data) {
 	for (i = 0, len = items.length; i < len; i++) {
 		if (items[i].isEqual(data)) {
 			product = items[i];
-			product.set('quantity', product.get('quantity') + (data.quantity || 1));
+			product.set('quantity', product.get('quantity') + (parseInt(data.quantity, 10) || 1));
 			idx = i;
 			break;
 		}
@@ -91,12 +91,7 @@ Cart.prototype.total = function total(config) {
         result += products[i].total();
     }
 
-	// TODO: support formatted as a formatting string
-    if (config && config.format) {
-		return currency(result, this.settings('currency_code') || 'USD');
-    } else {
-        return result;
-    }
+	return currency(result, this.settings('currency_code'), config);
 };
 
 

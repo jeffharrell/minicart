@@ -66,11 +66,20 @@ var currencies = {
 };
 
 
-module.exports = function currency(amount, code) {
-    var value = currencies[code] || {},
+module.exports = function currency(amount, code, config) {
+    var value = currencies[code || 'USD'] || {},
         before = value.before || '',
         after = value.after || '',
-        length = value.length || 2;
+        length = value.length || 2,
+		result = amount;
 
-    return before + amount.toFixed(length) + after + ' ' + code;
+	if (config && config.format) {
+		result = before + result.toFixed(length) + after;
+	}
+
+	if (config && config.currencyCode) {
+		result += ' ' + code;
+	}
+
+    return result;
 };

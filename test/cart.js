@@ -86,19 +86,16 @@ describe('Cart Model', function () {
 	});
 
 
-    it('total() returns the cart product total', function () {
-        assert.equal(cart.total({ format: true }), '$3.34 USD');
-        cart.remove(1);
-        assert.equal(cart.total({ format: true }), '$1.00 USD');
+	it('total() returns the cart product total', function () {
+		assert.equal(cart.total(), 3.34);
+		cart.remove(1);
+		assert.equal(cart.total(), 1);
+	});
 
-    });
 
-
-    it('total() returns the unformatted cart product total', function () {
-        assert.equal(cart.total(), 3.34);
-        cart.remove(1);
-        assert.equal(cart.total(), 1);
-
+    it('total() returns the formatted cart product total', function () {
+        assert.equal(cart.total({ format: true }), '$3.34');
+		assert.equal(cart.total({ format: true, currencyCode: true }), '$3.34 USD');
     });
 
 

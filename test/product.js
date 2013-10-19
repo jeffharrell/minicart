@@ -152,14 +152,7 @@ describe('Product Model', function () {
 			amount: 1.23
 		});
 
-		var item2 = new Product({
-			name: 'Bar',
-			desc: 'This is another item',
-			amount: 4.56
-		});
-
-        assert.equal(item1.total({ currency_code: 'USD' }), '$1.23 USD');
-        assert.equal(item2.total({ currency_code: 'JPY' }), '\u00A54.56 JPY');
+        assert.equal(item1.total({ format: true }), '$1.23');
     });
 
 
