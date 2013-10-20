@@ -1004,7 +1004,7 @@ var Product = require('./product'),
 function Cart(data) {
     var i, len;
 
-    this._products = [];
+    this._items = [];
 	this._settings = {};
 
 	Pubsub.call(this);
@@ -1022,7 +1022,7 @@ mixin(Cart.prototype, Pubsub.prototype);
 
 Cart.prototype.add = function add(data) {
     var that = this,
-		items = this.getAll(),
+		items = this.items(),
         product, idx, key, len, i;
 
 
@@ -1047,7 +1047,7 @@ Cart.prototype.add = function add(data) {
 	// If not, then add it
 	if (!product) {
 		product = new Product(data);
-		idx = (this._products.push(product) - 1);
+		idx = (this._items.push(product) - 1);
 
 		product.on('change', function (key, value) {
 			that.fire('change', idx, key, value);
@@ -1060,13 +1060,8 @@ Cart.prototype.add = function add(data) {
 };
 
 
-Cart.prototype.get = function get(idx) {
-    return this._products[idx];
-};
-
-
-Cart.prototype.getAll = function getAll() {
-    return this._products;
+Cart.prototype.items = function get(idx) {
+    return (typeof idx === 'number') ? this._items[idx] : this._items;
 };
 
 
@@ -1076,7 +1071,7 @@ Cart.prototype.settings = function settings(name) {
 
 
 Cart.prototype.total = function total(config) {
-    var products = this.getAll(),
+    var products = this.items(),
         result = 0,
         i, len;
 
@@ -1089,7 +1084,7 @@ Cart.prototype.total = function total(config) {
 
 
 Cart.prototype.remove = function remove(idx) {
-    var data = this._products.splice(idx, 1);
+    var data = this._items.splice(idx, 1);
 
     if (data) {
         this.fire('remove', idx, data[0]);
@@ -1100,7 +1095,7 @@ Cart.prototype.remove = function remove(idx) {
 
 
 Cart.prototype.destroy = function destroy() {
-    this._products = [];
+    this._items = [];
     this.fire('destroy');
 };
 
@@ -1171,17 +1166,19 @@ module.exports.load = function load(userConfig) {
 
 module.exports = {
 
-    CMDS: { _cart: true, _xclick: true, _donations: true },
+    COMMANDS: { _cart: true, _xclick: true, _donations: true },
 
     SETTINGS: /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/
 
 };
+
 },{}],4:[function(require,module,exports){
 'use strict';
 
 // TODO:
 // - storage
 // - UI tests
+// - cross browser support
 
 
 var Cart = require('./cart'),
@@ -1189,6 +1186,7 @@ var Cart = require('./cart'),
     template = require('./util/template'),
     events = require('./util/events'),
     forms = require('./util/forms'),
+	Storage = require('./util/storage'),
     constants = require('./constants'),
     minicart = {},
     cartModel,
@@ -1242,7 +1240,7 @@ function addEvents() {
 
         if (target.className === 'minicart-quantity') {
 			keyupTimer = setTimeout(function () {
-				var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
+				var product = minicart.cart.items(target.getAttribute('data-minicart-idx'));
 				product.set('quantity', target.value);
 			}, 250);
         }
@@ -1262,7 +1260,7 @@ function addEvents() {
     for (i = 0, len = forms.length; i < len; i++) {
         form = forms[i];
 
-        if (form.cmd && constants.CMDS[form.cmd.value]) {
+        if (form.cmd && constants.COMMANDS[form.cmd.value]) {
             minicart.bind(form);
         }
     }
@@ -1275,25 +1273,31 @@ function redrawCart() {
 
 
 function addItem(idx, data) {
-    redrawCart();
+	redrawCart();
     minicart.show();
+
+	minicart.storage.save(minicart.cart.items());
 }
 
 
 function changeItem(idx, data) {
     redrawCart();
     minicart.show();
+
+	minicart.storage.save(minicart.cart.items());
 }
 
 
 function removeItem(idx) {
     redrawCart();
 
-    if (minicart.cart.getAll().length === 0) {
+    if (minicart.cart.items().length === 0) {
         minicart.hide();
     } else {
         minicart.show();
     }
+
+	minicart.storage.save(minicart.cart.items());
 }
 
 
@@ -1302,8 +1306,9 @@ minicart.render = function render(userConfig) {
     var wrapper;
 
     minicart.config = config.load(userConfig);
+	minicart.storage = new Storage(config.name, config.duration);
 
-    cartModel = minicart.cart = new Cart();
+    cartModel = minicart.cart = new Cart(minicart.storage.load());
     cartModel.on('add', addItem);
     cartModel.on('change', changeItem);
     cartModel.on('remove', removeItem);
@@ -1360,10 +1365,11 @@ minicart.toggle = function toggle() {
 
 
 minicart.reset = function reset() {
-    minicart.hide();
     cartModel.destroy();
-
+	minicart.hide();
     redrawCart();
+
+	minicart.storage.destroy();
 };
 
 
@@ -1378,7 +1384,7 @@ minicart.reset = function reset() {
     win.paypal.minicart = minicart;
 })(window || module.exports);
 
-},{"./cart":1,"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}],5:[function(require,module,exports){
+},{"./cart":1,"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/storage":11,"./util/template":12}],5:[function(require,module,exports){
 'use strict';
 
 
@@ -1428,7 +1434,7 @@ mixin(Product.prototype, Pubsub.prototype);
 
 
 Product.prototype.get = function get(key) {
-    return this._data[key];
+    return (key) ? this._data[key] : this._data;
 };
 
 
@@ -1654,7 +1660,7 @@ module.exports = function currency(amount, code, config) {
 		result = before + result.toFixed(length) + after;
 	}
 
-	if (config && config.currencyCode) {
+	if (config && config.currencyCode && code) {
 		result += ' ' + code;
 	}
 
@@ -1898,168 +1904,169 @@ module.exports = Pubsub;
 'use strict';
 
 
-var config = require('../config');
+(function (window, document) {
+
+	var proto;
 
 
-var storage = module.exports = (function (window, document) {
-
-    var name = config.name;
-
-    // NOOP for Node
-    if (!window) {
-        return {
-            load: function () {},
-            save: function () {},
-            remove: function () {}
-        };
-        // Use HTML5 client side storage
-    } else if (window.localStorage) {
-        return {
-
-            /**
-             * Loads the saved data
-             *
-             * @return {object}
-             */
-            load: function () {
-                var data = localStorage.getItem(name),
-                    todayDate, expiresDate;
-
-                if (data) {
-                    data = JSON.parse(decodeURIComponent(data));
-                }
-
-                if (data && data.expires) {
-                    todayDate = new Date();
-                    expiresDate = new Date(data.expires);
-
-                    if (todayDate > expiresDate) {
-                        storage.remove();
-                        return;
-                    }
-                }
-
-                // A little bit of backwards compatibility for the moment
-                if (data && data.value) {
-                    return data.value;
-                } else {
-                    return data;
-                }
-            },
+	var Storage = module.exports = function Storage(name, duration) {
+		this._name = name;
+		this._duration = duration || 30;
+	};
 
 
-            /**
-             * Saves the data
-             *
-             * @param items {object} The list of items to save
-             * @param duration {Number} The number of days to keep the data
-             */
-            save: function (items, duration) {
-                var date = new Date(),
-                    data = [],
-                    wrappedData, item, len, i;
-
-                if (items) {
-                    for (i = 0, len = items.length; i < len; i++) {
-                        item = items[i];
-                        data.push({
-                            product: item.product,
-                            settings: item.settings
-                        });
-                    }
-
-                    date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-                    wrappedData = {
-                        value: data,
-                        expires: date.toGMTString()
-                    };
-
-                    localStorage.setItem(name, encodeURIComponent(JSON.stringify(wrappedData)));
-                }
-            },
+	proto = Storage.prototype;
 
 
-            /**
-             * Removes the saved data
-             */
-            remove: function () {
-                localStorage.removeItem(name);
-            }
-        };
+	// Node
+	if (!window) {
 
-        // Otherwise use cookie based storage
-    } else {
-        return {
+		proto.load = function () {};
+		proto.save = function (items) {};
+		proto.destroy = function () {};
 
-            /**
-             * Loads the saved data
-             *
-             * @return {object}
-             */
-            load: function () {
-                var key = name + '=',
-                    data, cookies, cookie, value, i;
+	// HTML5
+	} else if (window.localStorage) {
 
-                try {
-                    cookies = document.cookie.split(';');
+		proto.load = function () {
+			var data = localStorage.getItem(this._name),
+				todayDate,
+				expiresDate;
 
-                    for (i = 0; i < cookies.length; i++) {
-                        cookie = cookies[i];
+			if (data) {
+				data = JSON.parse(decodeURIComponent(data));
+			}
 
-                        while (cookie.charAt(0) === ' ') {
-                            cookie = cookie.substring(1, cookie.length);
-                        }
+			console.log(data);
 
-                        if (cookie.indexOf(key) === 0) {
-                            value = cookie.substring(key.length, cookie.length);
-                            data = JSON.parse(decodeURIComponent(value));
-                        }
-                    }
-                } catch (e) {}
+			if (data && data.expires) {
+				todayDate = new Date();
+				expiresDate = new Date(data.expires);
 
-                return data;
-            },
+				if (todayDate > expiresDate) {
+					this.remove();
+					return;
+				}
+			}
+
+			return data && data.value;
+		};
+
+		proto.save = function (items) {
+			var date = new Date(),
+				data = [],
+				wrappedData,
+				item,
+				len,
+				i;
+
+			console.log(items);
+
+			if (items) {
+				for (i = 0, len = items.length; i < len; i++) {
+					item = items[i];
+					data.push({
+						product: item.product,
+						settings: item.settings
+					});
+				}
+
+				date.setTime(date.getTime() + this._duration * 24 * 60 * 60 * 1000);
+				wrappedData = {
+					value: data,
+					expires: date.toGMTString()
+				};
+
+				localStorage.setItem(this._name, encodeURIComponent(JSON.stringify(wrappedData)));
+			}
+		};
+
+		proto.destroy = function () {
+			localStorage.removeItem(this._name);
+		};
+
+	// Legacy
+	} else {
+		proto.load = function () {};
+		proto.save = function (items) {};
+		proto.destroy = function () {};
+	}
 
 
-            /**
-             * Saves the data
-             *
-             * @param items {object} The list of items to save
-             * @param duration {Number} The number of days to keep the data
-             */
-            save: function (items, duration) {
-                var date = new Date(),
-                    data = [],
-                    item, len, i;
-
-                if (items) {
-                    for (i = 0, len = items.length; i < len; i++) {
-                        item = items[i];
-                        data.push({
-                            product: item.product,
-                            settings: item.settings
-                        });
-                    }
-
-                    date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-                    document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
-                }
-            },
 
 
-            /**
-             * Removes the saved data
-             */
-            remove: function () {
-                this.save(null, -1);
-            }
-        };
-    }
+//		} else {
+//			return {
+//
+//				/**
+//				 * Loads the saved data
+//				 *
+//				 * @return {object}
+//				 */
+//				load: function () {
+//					var key = name + '=',
+//						data, cookies, cookie, value, i;
+//
+//					try {
+//						cookies = document.cookie.split(';');
+//
+//						for (i = 0; i < cookies.length; i++) {
+//							cookie = cookies[i];
+//
+//							while (cookie.charAt(0) === ' ') {
+//								cookie = cookie.substring(1, cookie.length);
+//							}
+//
+//							if (cookie.indexOf(key) === 0) {
+//								value = cookie.substring(key.length, cookie.length);
+//								data = JSON.parse(decodeURIComponent(value));
+//							}
+//						}
+//					} catch (e) {}
+//
+//					return data;
+//				},
+//
+//
+//				/**
+//				 * Saves the data
+//				 *
+//				 * @param items {object} The list of items to save
+//				 * @param duration {Number} The number of days to keep the data
+//				 */
+//				save: function (items, duration) {
+//					var date = new Date(),
+//						data = [],
+//						item, len, i;
+//
+//					if (items) {
+//						for (i = 0, len = items.length; i < len; i++) {
+//							item = items[i];
+//							data.push({
+//								product: item.product,
+//								settings: item.settings
+//							});
+//						}
+//
+//						date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
+//						document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
+//					}
+//				},
+//
+//
+//				/**
+//				 * Removes the saved data
+//				 */
+//				remove: function () {
+//					this.save(null, -1);
+//				}
+//			};
+//		}
 
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
 
-},{"../config":2}],12:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*global EJS:true */
 
 'use strict';
@@ -2068,5 +2075,5 @@ var storage = module.exports = (function (window, document) {
 module.exports = function template(str, data) {
     return new EJS({text: str}).render(data);
 };
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12])
+},{}]},{},[1,3,2,4,5,6,7,8,10,9,12,11])
 ;

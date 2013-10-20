@@ -47,7 +47,7 @@ mixin(Product.prototype, Pubsub.prototype);
 
 
 Product.prototype.get = function get(key) {
-    return this._data[key];
+    return (key) ? this._data[key] : this._data;
 };
 
 

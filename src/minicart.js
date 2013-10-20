@@ -3,6 +3,7 @@
 // TODO:
 // - storage
 // - UI tests
+// - cross browser support
 
 
 var Cart = require('./cart'),
@@ -10,6 +11,7 @@ var Cart = require('./cart'),
     template = require('./util/template'),
     events = require('./util/events'),
     forms = require('./util/forms'),
+	Storage = require('./util/storage'),
     constants = require('./constants'),
     minicart = {},
     cartModel,
@@ -63,7 +65,7 @@ function addEvents() {
 
         if (target.className === 'minicart-quantity') {
 			keyupTimer = setTimeout(function () {
-				var product = minicart.cart.get(target.getAttribute('data-minicart-idx'));
+				var product = minicart.cart.items(target.getAttribute('data-minicart-idx'));
 				product.set('quantity', target.value);
 			}, 250);
         }
@@ -83,7 +85,7 @@ function addEvents() {
     for (i = 0, len = forms.length; i < len; i++) {
         form = forms[i];
 
-        if (form.cmd && constants.CMDS[form.cmd.value]) {
+        if (form.cmd && constants.COMMANDS[form.cmd.value]) {
             minicart.bind(form);
         }
     }
@@ -96,25 +98,31 @@ function redrawCart() {
 
 
 function addItem(idx, data) {
-    redrawCart();
+	redrawCart();
     minicart.show();
+
+	minicart.storage.save(minicart.cart.items());
 }
 
 
 function changeItem(idx, data) {
     redrawCart();
     minicart.show();
+
+	minicart.storage.save(minicart.cart.items());
 }
 
 
 function removeItem(idx) {
     redrawCart();
 
-    if (minicart.cart.getAll().length === 0) {
+    if (minicart.cart.items().length === 0) {
         minicart.hide();
     } else {
         minicart.show();
     }
+
+	minicart.storage.save(minicart.cart.items());
 }
 
 
@@ -123,8 +131,9 @@ minicart.render = function render(userConfig) {
     var wrapper;
 
     minicart.config = config.load(userConfig);
+	minicart.storage = new Storage(config.name, config.duration);
 
-    cartModel = minicart.cart = new Cart();
+    cartModel = minicart.cart = new Cart(minicart.storage.load());
     cartModel.on('add', addItem);
     cartModel.on('change', changeItem);
     cartModel.on('remove', removeItem);
@@ -181,10 +190,11 @@ minicart.toggle = function toggle() {
 
 
 minicart.reset = function reset() {
-    minicart.hide();
     cartModel.destroy();
-
+	minicart.hide();
     redrawCart();
+
+	minicart.storage.destroy();
 };
 
 

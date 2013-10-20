@@ -11,7 +11,7 @@ var Product = require('./product'),
 function Cart(data) {
     var i, len;
 
-    this._products = [];
+    this._items = [];
 	this._settings = {};
 
 	Pubsub.call(this);
@@ -29,7 +29,7 @@ mixin(Cart.prototype, Pubsub.prototype);
 
 Cart.prototype.add = function add(data) {
     var that = this,
-		items = this.getAll(),
+		items = this.items(),
         product, idx, key, len, i;
 
 
@@ -54,7 +54,7 @@ Cart.prototype.add = function add(data) {
 	// If not, then add it
 	if (!product) {
 		product = new Product(data);
-		idx = (this._products.push(product) - 1);
+		idx = (this._items.push(product) - 1);
 
 		product.on('change', function (key, value) {
 			that.fire('change', idx, key, value);
@@ -67,13 +67,8 @@ Cart.prototype.add = function add(data) {
 };
 
 
-Cart.prototype.get = function get(idx) {
-    return this._products[idx];
-};
-
-
-Cart.prototype.getAll = function getAll() {
-    return this._products;
+Cart.prototype.items = function get(idx) {
+    return (typeof idx === 'number') ? this._items[idx] : this._items;
 };
 
 
@@ -83,7 +78,7 @@ Cart.prototype.settings = function settings(name) {
 
 
 Cart.prototype.total = function total(config) {
-    var products = this.getAll(),
+    var products = this.items(),
         result = 0,
         i, len;
 
@@ -96,7 +91,7 @@ Cart.prototype.total = function total(config) {
 
 
 Cart.prototype.remove = function remove(idx) {
-    var data = this._products.splice(idx, 1);
+    var data = this._items.splice(idx, 1);
 
     if (data) {
         this.fire('remove', idx, data[0]);
@@ -107,7 +102,7 @@ Cart.prototype.remove = function remove(idx) {
 
 
 Cart.prototype.destroy = function destroy() {
-    this._products = [];
+    this._items = [];
     this.fire('destroy');
 };
 

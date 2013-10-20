@@ -21,15 +21,15 @@ describe('Cart Model', function () {
 
 
     it('get() returns a valid product', function () {
-        assert.equal(cart.get(0).get('item_name'), 'Item 1');
-        assert.equal(cart.get(0).get('amount'), 1.00);
-        assert.equal(cart.get(1).get('item_name'), 'Item 2');
-        assert.equal(cart.get(1).get('amount'),  2.34);
+        assert.equal(cart.items(0).get('item_name'), 'Item 1');
+        assert.equal(cart.items(0).get('amount'), 1.00);
+        assert.equal(cart.items(1).get('item_name'), 'Item 2');
+        assert.equal(cart.items(1).get('amount'),  2.34);
     });
 
 
     it('getAll() returns all products', function () {
-        var products = cart.getAll();
+        var products = cart.items();
 
         assert.equal(products.length, 2);
         assert.equal(products[0].get('item_name'), cartData[0].item_name);
@@ -43,8 +43,8 @@ describe('Cart Model', function () {
         var product = { item_name: 'Item 3', amount: 3.00 },
             idx = cart.add(product);
 
-        assert.equal(cart.get(idx).get('item_name'), product.item_name);
-        assert.equal(cart.get(idx).get('amount'), product.amount);
+        assert.equal(cart.items(idx).get('item_name'), product.item_name);
+        assert.equal(cart.items(idx).get('amount'), product.amount);
     });
 
 
@@ -52,18 +52,18 @@ describe('Cart Model', function () {
 		var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },
 			idx = cart.add(product);
 
-		assert.equal(cart.getAll().length, 3);
-		assert.equal(cart.get(idx).get('quantity'), 1);
+		assert.equal(cart.items().length, 3);
+		assert.equal(cart.items(idx).get('quantity'), 1);
 		cart.add(product);
-		assert.equal(cart.getAll().length, 3);
-		assert.equal(cart.get(idx).get('quantity'), 2);
+		assert.equal(cart.items().length, 3);
+		assert.equal(cart.items(idx).get('quantity'), 2);
 
 	});
 
 
     it('add() fires an event', function (done) {
         var product = { item_name: 'Item 3', amount: 3.00 },
-            len = cart.getAll().length;
+            len = cart.items().length;
 
         cart.on('add', function (idx, data) {
             assert.equal(len, idx);
@@ -100,12 +100,12 @@ describe('Cart Model', function () {
 
 
     it('remove() removes a product', function () {
-        var len = cart.getAll().length;
+        var len = cart.items().length;
 
         cart.remove(0);
 
-        assert.deepEqual(len - 1, cart.getAll().length);
-        assert.notDeepEqual(cart.get(0), cartData[0]);
+        assert.deepEqual(len - 1, cart.items().length);
+        assert.notDeepEqual(cart.items(0), cartData[0]);
     });
 
 
@@ -124,7 +124,7 @@ describe('Cart Model', function () {
 
 
     it('remove() fires an event', function (done) {
-        var prodArr = cart.getAll().slice(0),
+        var prodArr = cart.items().slice(0),
             product = prodArr[0],
             len = 0;
 
@@ -140,13 +140,13 @@ describe('Cart Model', function () {
 
     it('destroy() empties the cart', function () {
         cart.destroy();
-        assert.equal(cart.getAll().length, 0);
+        assert.equal(cart.items().length, 0);
     });
 
 
     it('destroy() fires an event', function (done) {
         cart.on('destroy', function () {
-            assert.equal(cart.getAll().length, 0);
+            assert.equal(cart.items().length, 0);
             done();
         });
 
