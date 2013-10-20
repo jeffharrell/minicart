@@ -103,20 +103,5 @@
 		};
 	}
 
-
-
-
-//				},
-//
-//
-//				/**
-//				 * Removes the saved data
-//				 */
-//				remove: function () {
-//					this.save(null, -1);
-//				}
-//			};
-//		}
-
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
