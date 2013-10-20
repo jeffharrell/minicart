@@ -16,8 +16,6 @@ var config = module.exports = {
 
     duration: 30,
 
-    cookiePath: '/',
-
     template: '$TEMPLATE$',
 
     styles: '$STYLES$',

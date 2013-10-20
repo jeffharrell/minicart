@@ -20,7 +20,7 @@ describe('Cart Model', function () {
     });
 
 
-    it('get() returns a valid product', function () {
+    it('items(idx) returns a valid product', function () {
         assert.equal(cart.items(0).get('item_name'), 'Item 1');
         assert.equal(cart.items(0).get('amount'), 1.00);
         assert.equal(cart.items(1).get('item_name'), 'Item 2');
@@ -28,14 +28,14 @@ describe('Cart Model', function () {
     });
 
 
-    it('getAll() returns all products', function () {
+    it('items() returns all products', function () {
         var products = cart.items();
 
         assert.equal(products.length, 2);
-        assert.equal(products[0].get('item_name'), cartData[0].item_name);
-        assert.equal(products[0].get('amount'), cartData[0].amount);
-        assert.equal(products[1].get('item_name'), cartData[1].item_name);
-        assert.equal(products[1].get('amount'), cartData[1].amount);
+        assert.equal(products[0].get('item_name'), cartData.items[0].item_name);
+        assert.equal(products[0].get('amount'), cartData.items[0].amount);
+        assert.equal(products[1].get('item_name'), cartData.items[1].item_name);
+        assert.equal(products[1].get('amount'), cartData.items[1].amount);
     });
 
 

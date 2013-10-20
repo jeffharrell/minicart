@@ -1,6 +1,6 @@
 <form method="post" action="<%= config.action %>" target="<%= config.target %>">
 	<ul>
-		<% for (var items = cart.getAll(), i= 0, len = items.length; i < len; i++) { %>
+		<% for (var items = cart.items(), i= 0, len = items.length; i < len; i++) { %>
 			<li class="minicart-item">
 				<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>
 				<ul class="minicart-attributes">

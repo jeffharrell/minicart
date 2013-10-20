@@ -13,7 +13,6 @@ describe('Configuration', function () {
 		assert(~keys.indexOf('parent'));
 		assert(~keys.indexOf('target'));
 		assert(~keys.indexOf('duration'));
-		assert(~keys.indexOf('cookiePath'));
 		assert(~keys.indexOf('template'));
 		assert(~keys.indexOf('styles'));
 		assert(~keys.indexOf('strings'));

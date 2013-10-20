@@ -9,17 +9,26 @@ var Product = require('./product'),
 
 
 function Cart(data) {
-    var i, len;
+    var items, settings, len, i;
 
-    this._items = [];
+	this._items = [];
 	this._settings = {};
 
 	Pubsub.call(this);
 
 	if (data) {
-        for (i = 0, len = data.length; i < len; i++) {
-            this.add(data[i]);
-        }
+		items = data.items;
+		settings = data.settings;
+
+		if (items) {
+			for (i = 0, len = items.length; i < len; i++) {
+				this.add(items[i]);
+			}
+		}
+
+		if (settings) {
+			this._settings = settings;
+		}
     }
 }
 
@@ -31,7 +40,6 @@ Cart.prototype.add = function add(data) {
     var that = this,
 		items = this.items(),
         product, idx, key, len, i;
-
 
 	// Prune cart settings data from the product
 	for (key in data) {

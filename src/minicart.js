@@ -1,7 +1,6 @@
 'use strict';
 
 // TODO:
-// - storage
 // - UI tests
 // - cross browser support
 
@@ -97,32 +96,45 @@ function redrawCart() {
 }
 
 
+function saveCart() {
+	var items = minicart.cart.items(),
+		data = [],
+		i, len;
+
+	for (i = 0, len = items.length; i < len; i++) {
+		data.push(items[i].get());
+	}
+
+	minicart.storage.save({
+		items: data,
+		settings: minicart.cart.settings()
+	});
+}
+
+
 function addItem(idx, data) {
 	redrawCart();
+	saveCart();
     minicart.show();
-
-	minicart.storage.save(minicart.cart.items());
 }
 
 
 function changeItem(idx, data) {
     redrawCart();
+	saveCart();
     minicart.show();
-
-	minicart.storage.save(minicart.cart.items());
 }
 
 
 function removeItem(idx) {
     redrawCart();
+	saveCart();
 
     if (minicart.cart.items().length === 0) {
         minicart.hide();
     } else {
         minicart.show();
     }
-
-	minicart.storage.save(minicart.cart.items());
 }
 
 

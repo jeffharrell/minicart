@@ -27,18 +27,18 @@
 
 		proto.load = function () {
 			var data = localStorage.getItem(this._name),
-				todayDate,
-				expiresDate;
+				today,
+				expires;
 
 			if (data) {
 				data = JSON.parse(decodeURIComponent(data));
 			}
 
 			if (data && data.expires) {
-				todayDate = new Date();
-				expiresDate = new Date(data.expires);
+				today = new Date();
+				expires = new Date(data.expires);
 
-				if (todayDate > expiresDate) {
+				if (today > expires) {
 					this.remove();
 					return;
 				}
@@ -47,31 +47,18 @@
 			return data && data.value;
 		};
 
-		proto.save = function (items) {
-			var date = new Date(),
-				data = [],
-				wrappedData,
-				item,
-				len,
-				i;
+		proto.save = function (data) {
+			var expires = new Date(),
+				wrapped = {};
 
-			if (items) {
-				for (i = 0, len = items.length; i < len; i++) {
-					item = items[i];
-					data.push({
-						product: item.product,
-						settings: item.settings
-					});
-				}
+			expires.setTime(expires.getTime() + this._duration * 24 * 60 * 60 * 1000);
 
-				date.setTime(date.getTime() + this._duration * 24 * 60 * 60 * 1000);
-				wrappedData = {
-					value: data,
-					expires: date.toGMTString()
-				};
+			wrapped = {
+				value: data,
+				expires: expires.toGMTString()
+			};
 
-				localStorage.setItem(this._name, encodeURIComponent(JSON.stringify(wrappedData)));
-			}
+			localStorage.setItem(this._name, encodeURIComponent(JSON.stringify(wrapped)));
 		};
 
 		proto.destroy = function () {
@@ -80,70 +67,45 @@
 
 	// Legacy
 	} else {
-		proto.load = function () {};
-		proto.save = function (items) {};
-		proto.destroy = function () {};
+		proto.load = function () {
+			var key = this._name + '=',
+				data, cookies, cookie, value, i;
+
+			try {
+				cookies = document.cookie.split(';');
+
+				for (i = 0; i < cookies.length; i++) {
+					cookie = cookies[i];
+
+					while (cookie.charAt(0) === ' ') {
+						cookie = cookie.substring(1, cookie.length);
+					}
+
+					if (cookie.indexOf(key) === 0) {
+						value = cookie.substring(key.length, cookie.length);
+						data = JSON.parse(decodeURIComponent(value));
+					}
+				}
+			} catch (e) {}
+
+			return data;
+		};
+
+		proto.save = function (data, expiry) {
+			var expires = new Date();
+
+			expires.setTime(expires.getTime() + (expiry || this._duration) * 24 * 60 * 60 * 1000);
+			document.cookie = this._.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + expires.toGMTString() + '; path=/';
+		};
+
+		proto.destroy = function () {
+			this.save(null, -1);
+		};
 	}
 
 
 
 
-//		} else {
-//			return {
-//
-//				/**
-//				 * Loads the saved data
-//				 *
-//				 * @return {object}
-//				 */
-//				load: function () {
-//					var key = name + '=',
-//						data, cookies, cookie, value, i;
-//
-//					try {
-//						cookies = document.cookie.split(';');
-//
-//						for (i = 0; i < cookies.length; i++) {
-//							cookie = cookies[i];
-//
-//							while (cookie.charAt(0) === ' ') {
-//								cookie = cookie.substring(1, cookie.length);
-//							}
-//
-//							if (cookie.indexOf(key) === 0) {
-//								value = cookie.substring(key.length, cookie.length);
-//								data = JSON.parse(decodeURIComponent(value));
-//							}
-//						}
-//					} catch (e) {}
-//
-//					return data;
-//				},
-//
-//
-//				/**
-//				 * Saves the data
-//				 *
-//				 * @param items {object} The list of items to save
-//				 * @param duration {Number} The number of days to keep the data
-//				 */
-//				save: function (items, duration) {
-//					var date = new Date(),
-//						data = [],
-//						item, len, i;
-//
-//					if (items) {
-//						for (i = 0, len = items.length; i < len; i++) {
-//							item = items[i];
-//							data.push({
-//								product: item.product,
-//								settings: item.settings
-//							});
-//						}
-//
-//						date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-//						document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
-//					}
 //				},
 //
 //
