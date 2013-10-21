@@ -10,8 +10,21 @@ describe('Cart Model', function () {
     var cart;
 
     beforeEach(function () {
-		var myCartData = JSON.parse(JSON.stringify(cartData));
-        cart = new Cart(myCartData);
+		var data, items, settings, i, len;
+
+        cart = new Cart();
+
+		if ((data = JSON.parse(JSON.stringify(cartData)))) {
+			items = data.items;
+			settings = data.settings;
+
+			if (items) {
+				for (i = 0, len = items.length; i < len; i++) {
+					cart.add(items[i]);
+				}
+			}
+		}
+
     });
 
 

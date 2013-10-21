@@ -4,7 +4,7 @@ var assert = require('assert'),
 	config = require('../src/config');
 
 
-describe('Configuration', function () {
+describe('Config', function () {
 
 	it('has the required keys', function () {
 		var keys = Object.keys(config);

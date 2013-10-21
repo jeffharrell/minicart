@@ -6,14 +6,14 @@ function Pubsub() {
 }
 
 
-Pubsub.prototype.on = function on(name, fn) {
+Pubsub.prototype.on = function on(name, fn, scope) {
 	var cache = this._eventCache[name];
 
 	if (!cache) {
 		cache = this._eventCache[name] = [];
 	}
 
-	cache.push(fn);
+	cache.push([fn, scope]);
 };
 
 
@@ -32,14 +32,15 @@ Pubsub.prototype.off = function off(name, fn) {
 
 
 Pubsub.prototype.fire = function on(name) {
-	var cache = this._eventCache[name], i, len, fn;
+	var cache = this._eventCache[name], i, len, fn, scope;
 
 	if (cache) {
 		for (i = 0, len = cache.length; i < len; i++) {
-			fn = cache[i];
+			fn = cache[i][0];
+			scope = cache[i][1] || this;
 
 			if (typeof fn === 'function') {
-				fn.apply(this, Array.prototype.slice.call(arguments, 1));
+				fn.apply(scope, Array.prototype.slice.call(arguments, 1));
 			}
 		}
 	}

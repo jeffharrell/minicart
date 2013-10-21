@@ -4,7 +4,7 @@
 var mixin = require('./util/mixin');
 
 
-var config = module.exports = {
+var defaults = module.exports = {
 
     name: 'PPMiniCart',
 
@@ -30,23 +30,6 @@ var config = module.exports = {
 };
 
 
-function merge(dest, source) {
-	var value;
-
-	for (var key in source) {
-		value = source[key];
-
-		if (value && value.constructor === Object) {
-			merge(dest[key], value);
-		} else {
-			dest[key] = value;
-		}
-	}
-
-	return dest;
-}
-
-
 module.exports.load = function load(userConfig) {
-    return mixin(config, userConfig);
+    return mixin(defaults, userConfig);
 };

@@ -2,18 +2,14 @@
 
 
 var assert = require('assert'),
-    Product = require('../src/product');
+	View = require('../src/view');
 
 
-describe('ui', function () {
-
+describe('View', function () {
 
     beforeEach(function () {});
 
 
     afterEach(function () {});
-
-
-    it.skip('renders', function () {});
 
 });

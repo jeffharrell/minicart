@@ -2,21 +2,23 @@
 
 
 var Product = require('./product'),
+	Pubsub = require('./util/pubsub'),
+	Storage = require('./util/storage'),
     constants = require('./constants'),
     currency = require('./util/currency'),
-	Pubsub = require('./util/pubsub'),
 	mixin = require('./util/mixin');
 
 
-function Cart(data) {
-    var items, settings, len, i;
+function Cart(name, duration) {
+    var data, items, settings, len, i;
 
 	this._items = [];
 	this._settings = {};
 
 	Pubsub.call(this);
+	Storage.call(this, name, duration);
 
-	if (data) {
+	if ((data = this.load())) {
 		items = data.items;
 		settings = data.settings;
 
@@ -34,6 +36,7 @@ function Cart(data) {
 
 
 mixin(Cart.prototype, Pubsub.prototype);
+mixin(Cart.prototype, Storage.prototype);
 
 
 Cart.prototype.add = function add(data) {
@@ -68,6 +71,7 @@ Cart.prototype.add = function add(data) {
 			that.fire('change', idx, key, value);
 		});
 
+		this.save();
 		this.fire('add', idx, data);
 	}
 
@@ -102,6 +106,7 @@ Cart.prototype.remove = function remove(idx) {
     var data = this._items.splice(idx, 1);
 
     if (data) {
+		this.save();
         this.fire('remove', idx, data[0]);
     }
 
@@ -109,7 +114,25 @@ Cart.prototype.remove = function remove(idx) {
 };
 
 
+Cart.prototype.save = function save() {
+	var items = this.items(),
+		data = [],
+		i, len;
+
+	for (i = 0, len = items.length; i < len; i++) {
+		data.push(items[i].get());
+	}
+
+	Storage.prototype.save.call(this, {
+		items: data,
+		settings: this.settings()
+	});
+};
+
+
 Cart.prototype.destroy = function destroy() {
+	Storage.prototype.destroy.call(this);
+
     this._items = [];
     this.fire('destroy');
 };
