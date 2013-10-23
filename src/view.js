@@ -152,12 +152,18 @@ View.prototype.bind = function bind(form) {
 View.prototype.addItem = function addItem(idx, data) {
 	this.redraw();
 	this.show();
+
+	var els = this._el.getElementsByClassName('minicart-item');
+	els[idx].classList.add('minicart-item-new');
 };
 
 
 View.prototype.changeItem = function changeItem(idx, data) {
 	this.redraw();
 	this.show();
+
+	var els = this._el.getElementsByClassName('minicart-item');
+	els[idx].classList.add('minicart-item-new');
 };
 
 

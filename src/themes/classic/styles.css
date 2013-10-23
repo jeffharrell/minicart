@@ -1,3 +1,9 @@
+@-webkit-keyframes yellow-fade {
+	0% { background-color: rgba(225, 225, 17, 0.3); }
+	100% { background-color: rgba(225, 225, 17, 0); }
+}
+
+
 #PPMiniCart form {
 	position: fixed;
 	top: 0;
@@ -39,6 +45,10 @@
 	height: 30px;
 	padding: 6px;
 	border-top: 1px solid #f2f2f2;
+}
+
+#PPMiniCart .minicart-item-new {
+	-webkit-animation: yellow-fade 1s;
 }
 
 #PPMiniCart .minicart-item a {
