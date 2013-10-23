@@ -33,7 +33,8 @@ module.exports = function (grunt) {
 			},
 			dist: {
 				files: {
-					'dist/minicart.min.js': ['dist/minicart.js']
+					'dist/minicart.min.js': ['dist/minicart.js'],
+					'dist/minicart.classic.min.js': ['dist/minicart.classic.js']
 				}
 			}
 		},
@@ -50,7 +51,7 @@ module.exports = function (grunt) {
 		replace: {
 			classic: {
 				src: ['dist/minicart.js'],
-				overwrite: true,
+				dest: 'dist/minicart.classic.js',
 				options: {
 					processTemplates: false
 				},
@@ -68,6 +69,27 @@ module.exports = function (grunt) {
 						}
 					}
 				]
+			},
+			default: {
+				src: ['dist/minicart.js'],
+				overwrite: true,
+				options: {
+					processTemplates: false
+				},
+				replacements: [
+					{
+						from: '$TEMPLATE$',
+						to: function (word) {
+							return grunt.file.read('src/themes/default/index.html').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
+						}
+					},
+					{
+						from: '$STYLES$',
+						to: function (word) {
+							return grunt.file.read('src/themes/default/styles.css').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
+						}
+					}
+				]
 			}
 		}
 	});
@@ -82,7 +104,7 @@ module.exports = function (grunt) {
 
 	// Tasks
 	grunt.registerTask('lint', ['jshint']);
-	grunt.registerTask('test', ['lint', 'browserify', 'replace', 'concat', 'mochaTest']);
+	grunt.registerTask('test', ['lint', 'browserify', 'concat', 'replace', 'mochaTest']);
 	grunt.registerTask('build', ['test', 'uglify']);
 
 };
