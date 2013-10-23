@@ -1,6 +1,10 @@
-<form method="post" action="<%= config.action %>" target="<%= config.target %>">
+<%
+	var items = cart.items();
+	var settings = cart.settings();
+%>
+<form method="post" class="<% if (!items.length) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">
 	<ul>
-		<% for (var items = cart.items(), i= 0, len = items.length; i < len; i++) { %>
+		<% for (i= 0, len = items.length; i < len; i++) { %>
 			<li class="minicart-item">
 				<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>
 				<ul class="minicart-attributes">
@@ -30,7 +34,7 @@
 	<input type="hidden" name="cmd" value="_cart" />
 	<input type="hidden" name="upload" value="1" />
 	<input type="hidden" name="bn" value="MiniCart_AddToCart_WPS_US" />
-	<% var settings = cart.settings(); for (var key in settings) { %>
+	<% for (var key in settings) { %>
 		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />
 	<% } %>
 </form>

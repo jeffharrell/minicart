@@ -1,33 +1,37 @@
-.minicart-showing #PPMiniCart {
-	display: block;
-}
-
-#PPMiniCart {
-	display: none;
-}
-
 #PPMiniCart form {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 300px;
-	max-height: 400px;
-	margin-left: -150px;
-	margin-top: -200px;
+	position: fixed;
+	top: 0;
+	right: 50px;
+	width: 265px;
+	height: 210px;
 	padding: 10px;
 	background: #fff url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -125px -60px;
 	border: 1px solid #999;
 	border-radius: 5px;
+	border-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
 	box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
 	font: 13px/normal arial, helvetica;
 	color: #333;
+
+	-webkit-transition: all .15s ease-out;
+	-webkit-transform: translate3d(0, -187px, 0);
 }
 
+.minicart-showing #PPMiniCart form {
+	-webkit-transform: translate3d(0, 0, 0);
+}
+
+
+
 #PPMiniCart ul {
+	height: 129px;
 	margin: 45px 0 13px;
 	padding: 0;
 	list-style-type: none;
 	border-bottom: 1px solid #ccc;
+	overflow: scroll;
 }
 
 #PPMiniCart .minicart-item {
@@ -41,8 +45,11 @@
 	position: absolute;
 	top: 6px;
 	left: 0;
-	width: 185px;
+	width: 158px;
 	text-decoration: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #PPMiniCart .minicart-attributes {
@@ -68,14 +75,14 @@
 
 #PPMiniCart .minicart-quantity {
 	position: absolute;
-	left: 190px;
+	left: 160px;
 	width: 30px;
 }
 
 #PPMiniCart .minicart-remove {
 	position: absolute;
 	top: 10px;
-	left: 230px;
+	left: 200px;
 	width: 14px;
 	height: 14px;
 	background: url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -134px -4px;
