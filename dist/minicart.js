@@ -1204,7 +1204,6 @@ var Cart = require('./cart'),
 	viewModel;
 
 
-
 minicart.render = function render(userConfig) {
 	confModel = config.load(userConfig);
 	cartModel = new Cart(confModel.name, confModel.duration);
@@ -1214,23 +1213,25 @@ minicart.render = function render(userConfig) {
 		cart: cartModel
 	});
 
-	minicart.show = viewModel.show();
-	minicart.hide = viewModel.hide();
-	minicart.toggle = viewModel.toggle();
-
 	cartModel.on('add', viewModel.addItem, viewModel);
 	cartModel.on('change', viewModel.changeItem, viewModel);
 	cartModel.on('remove', viewModel.removeItem, viewModel);
 };
 
 
-minicart.show = function () {};
+minicart.show = function () {
+	viewModel && viewModel.show();
+};
 
 
-minicart.hide = function () {};
+minicart.hide = function () {
+	viewModel && viewModel.hide();
+};
 
 
-minicart.toggle = function () {};
+minicart.toggle = function () {
+	viewModel && viewModel.toggle();
+};
 
 
 minicart.reset = function reset() {
@@ -2077,5 +2078,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13])
+},{"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}]},{},[2,1,3,4,5,6,7,8,9,10,11,12,13])
 ;

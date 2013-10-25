@@ -14,7 +14,6 @@ var Cart = require('./cart'),
 	viewModel;
 
 
-
 minicart.render = function render(userConfig) {
 	confModel = config.load(userConfig);
 	cartModel = new Cart(confModel.name, confModel.duration);
@@ -24,23 +23,25 @@ minicart.render = function render(userConfig) {
 		cart: cartModel
 	});
 
-	minicart.show = viewModel.show();
-	minicart.hide = viewModel.hide();
-	minicart.toggle = viewModel.toggle();
-
 	cartModel.on('add', viewModel.addItem, viewModel);
 	cartModel.on('change', viewModel.changeItem, viewModel);
 	cartModel.on('remove', viewModel.removeItem, viewModel);
 };
 
 
-minicart.show = function () {};
+minicart.show = function () {
+	viewModel && viewModel.show();
+};
 
 
-minicart.hide = function () {};
+minicart.hide = function () {
+	viewModel && viewModel.hide();
+};
 
 
-minicart.toggle = function () {};
+minicart.toggle = function () {
+	viewModel && viewModel.toggle();
+};
 
 
 minicart.reset = function reset() {

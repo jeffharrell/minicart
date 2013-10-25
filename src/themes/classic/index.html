@@ -25,9 +25,8 @@
 		<% } %>
 	</ul>
 	<div>
-		<div class="minicart-subtotal">
-			<%= config.strings.subtotal %>
-			<span class="minicart-subtotal-amount"><%= cart.total({ format: true, currencyCode: true }) %></span>
+		<div class="minicart-subtotal" onclick="paypal.minicart.toggle()">
+			<%= config.strings.subtotal %> <%= cart.total({ format: true, currencyCode: true }) %>
 		</div>
 		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />
 	</div>
