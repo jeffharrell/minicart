@@ -1927,11 +1927,11 @@ function addEvents(view) {
 		var target = e.target;
 
 		if (target.className === 'minicart-remove') {
-			view._model.cart.remove(target.getAttribute('data-minicart-idx'));
-		} else if (view._isShowing) {
+			view.model.cart.remove(target.getAttribute('data-minicart-idx'));
+		} else if (view.isShowing) {
 			if (!(/input|button|select|option/i.test(target.tagName))) {
 				while (target.nodeType === 1) {
-					if (target === view._el) {
+					if (target === view.el) {
 						return;
 					}
 
@@ -1949,8 +1949,11 @@ function addEvents(view) {
 
 		if (target.className === 'minicart-quantity') {
 			keyupTimer = setTimeout(function () {
-				var product = view._model.cart.items(target.getAttribute('data-minicart-idx'));
-				product.set('quantity', target.value);
+				var product = view.model.cart.items(parseInt(target.getAttribute('data-minicart-idx'), 10));
+
+				if (product) {
+					product.set('quantity', target.value);
+				}
 			}, 250);
 		}
 	});
@@ -1983,9 +1986,9 @@ function View(model) {
 
 	config.parent.appendChild(wrapper);
 
-	this._el = wrapper;
-	this._model = model;
-	this._isShowing = false;
+	this.el = wrapper;
+	this.model = model;
+	this.isShowing = false;
 	this.redraw();
 
 	addStyles();
@@ -1994,28 +1997,28 @@ function View(model) {
 
 
 View.prototype.redraw = function redraw() {
-	this._el.innerHTML = template(config.template, this._model);
+	this.el.innerHTML = template(config.template, this.model);
 };
 
 
 View.prototype.show = function show() {
-	if (!this._isShowing) {
+	if (!this.isShowing) {
 		document.body.classList.add(constants.SHOWING);
-		this._isShowing = true;
+		this.isShowing = true;
 	}
 };
 
 
 View.prototype.hide = function hide() {
-	if (this._isShowing) {
+	if (this.isShowing) {
 		document.body.classList.remove(constants.SHOWING);
-		this._isShowing = false;
+		this.isShowing = false;
 	}
 };
 
 
 View.prototype.toggle = function toggle() {
-	this[this._isShowing ? 'hide' : 'show']();
+	this[this.isShowing ? 'hide' : 'show']();
 };
 
 
@@ -2025,7 +2028,7 @@ View.prototype.bind = function bind(form) {
 	if (form.add) {
 		events.add(form, 'submit', function (e) {
 			e.preventDefault(e);
-			that._model.cart.add(forms.parse(form));
+			that.model.cart.add(forms.parse(form));
 		});
 	} else if (form.display) {
 		events.add(form, 'submit', function (e) {
@@ -2044,7 +2047,7 @@ View.prototype.addItem = function addItem(idx, data) {
 	this.redraw();
 	this.show();
 
-	var els = this._el.getElementsByClassName('minicart-item');
+	var els = this.el.getElementsByClassName('minicart-item');
 	els[idx].classList.add('minicart-item-new');
 };
 
@@ -2053,7 +2056,7 @@ View.prototype.changeItem = function changeItem(idx, data) {
 	this.redraw();
 	this.show();
 
-	var els = this._el.getElementsByClassName('minicart-item');
+	var els = this.el.getElementsByClassName('minicart-item');
 	els[idx].classList.add('minicart-item-new');
 };
 
@@ -2061,7 +2064,7 @@ View.prototype.changeItem = function changeItem(idx, data) {
 View.prototype.removeItem = function removeItem(idx) {
 	this.redraw();
 
-	if (this._model.cart.items().length === 0) {
+	if (this.model.cart.items().length === 0) {
 		this.hide();
 	} else {
 		this.show();
