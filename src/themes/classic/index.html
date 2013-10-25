@@ -4,7 +4,7 @@
 %>
 <form method="post" class="<% if (!items.length) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">
 	<ul>
-		<% for (i= 0, len = items.length; i < len; i++) { %>
+		<% for (i= 0, idx = i + 1, len = items.length; i < len; i++) { %>
 			<li class="minicart-item">
 				<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>
 				<ul class="minicart-attributes">
@@ -15,12 +15,12 @@
 						<li><%= options[j].key %>: <%= options[j].value %></li>
 					<% } %>
 				</ul>
-				<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= i %>" value="<%= items[i].get("quantity") %>" autocomplete="off" />
-				<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />
+				<input class="minicart-quantity" data-minicart-idx="<%= idx %>" name="quantity_<%= idx %>" value="<%= items[i].get("quantity") %>" autocomplete="off" />
+				<input class="minicart-remove" data-minicart-idx="<%= idx %>" type="button" />
 				<span class="minicart-price"><%= items[i].total({ format: true }) %></span>
-				<input type="hidden" name="item_name_<%= i %>" value="<%= items[i].get("item_name") %>" />
-				<input type="hidden" name="item_number_<%= i %>" value="<%= items[i].get("item_number") %>" />
-				<input type="hidden" name="amount_<%= i %>" value="<%= items[i].get("amount") %>" />
+				<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />
+				<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />
+				<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].get("amount") %>" />
 			</li>
 		<% } %>
 	</ul>
