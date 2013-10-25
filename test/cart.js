@@ -95,7 +95,7 @@ describe('Cart Model', function () {
 
 
 	it('settings() returns all when no args are passed', function () {
-		assert.deepEqual(cart.settings(), { currency_code: 'USD', custom: 'foo' });
+		assert.deepEqual(cart.settings(), { bn: 'MiniCart_AddToCart_WPS_US', currency_code: 'USD', custom: 'foo' });
 	});
 
 
@@ -149,6 +149,11 @@ describe('Cart Model', function () {
 
         cart.remove(len);
     });
+
+
+	it('has a bn code', function () {
+		assert(!!cart.settings().bn);
+	});
 
 
     it('destroy() empties the cart', function () {
