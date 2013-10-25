@@ -1015,14 +1015,14 @@ function Cart(name, duration) {
 		items = data.items;
 		settings = data.settings;
 
+		if (settings) {
+			this._settings = settings;
+		}
+
 		if (items) {
 			for (i = 0, len = items.length; i < len; i++) {
 				this.add(items[i]);
 			}
-		}
-
-		if (settings) {
-			this._settings = settings;
 		}
     }
 }
@@ -1110,6 +1110,7 @@ Cart.prototype.remove = function remove(idx) {
 
 Cart.prototype.save = function save() {
 	var items = this.items(),
+		settings = this.settings(),
 		data = [],
 		i, len;
 
@@ -1119,7 +1120,7 @@ Cart.prototype.save = function save() {
 
 	Storage.prototype.save.call(this, {
 		items: data,
-		settings: this.settings()
+		settings: settings
 	});
 };
 
@@ -1206,7 +1207,7 @@ var Cart = require('./cart'),
 
 minicart.render = function render(userConfig) {
 	confModel = config.load(userConfig);
-	cartModel = new Cart(confModel.name, confModel.duration);
+	cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
 
 	viewModel = new View({
 		config: confModel,
@@ -2078,5 +2079,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}]},{},[2,1,3,4,5,6,7,8,9,10,11,12,13])
+},{"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13])
 ;

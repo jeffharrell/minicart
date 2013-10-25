@@ -22,14 +22,14 @@ function Cart(name, duration) {
 		items = data.items;
 		settings = data.settings;
 
+		if (settings) {
+			this._settings = settings;
+		}
+
 		if (items) {
 			for (i = 0, len = items.length; i < len; i++) {
 				this.add(items[i]);
 			}
-		}
-
-		if (settings) {
-			this._settings = settings;
 		}
     }
 }
@@ -117,6 +117,7 @@ Cart.prototype.remove = function remove(idx) {
 
 Cart.prototype.save = function save() {
 	var items = this.items(),
+		settings = this.settings(),
 		data = [],
 		i, len;
 
@@ -126,7 +127,7 @@ Cart.prototype.save = function save() {
 
 	Storage.prototype.save.call(this, {
 		items: data,
-		settings: this.settings()
+		settings: settings
 	});
 };
 

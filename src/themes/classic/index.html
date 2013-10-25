@@ -33,7 +33,6 @@
 	<input type="hidden" name="cmd" value="_cart" />
 	<input type="hidden" name="upload" value="1" />
 	<input type="hidden" name="bn" value="MiniCart_AddToCart_WPS_US" />
-	<% console.log("settings", settings); %>
 	<% for (var key in settings) { %>
 		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />
 	<% } %>
