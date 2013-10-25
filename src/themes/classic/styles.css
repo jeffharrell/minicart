@@ -32,12 +32,11 @@
 
 
 #PPMiniCart ul {
-	height: 129px;
+	min-height: 129px;
 	margin: 45px 0 13px;
 	padding: 0;
 	list-style-type: none;
 	border-bottom: 1px solid #ccc;
-	overflow: scroll;
 }
 
 #PPMiniCart .minicart-item {
