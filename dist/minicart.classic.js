@@ -1061,6 +1061,7 @@ Cart.prototype.add = function add(data) {
 		idx = (this._items.push(product) - 1);
 
 		product.on('change', function (key, value) {
+			that.save();
 			that.fire('change', idx, key, value);
 		});
 
