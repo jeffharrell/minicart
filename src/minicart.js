@@ -3,6 +3,8 @@
 // TODO:
 // - UI tests
 // - cross browser support
+// - Disounts in UI
+// - Cart discounts
 
 
 var Cart = require('./cart'),

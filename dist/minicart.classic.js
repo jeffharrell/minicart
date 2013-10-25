@@ -1196,6 +1196,8 @@ module.exports = {
 // TODO:
 // - UI tests
 // - cross browser support
+// - Disounts in UI
+// - Cart discounts
 
 
 var Cart = require('./cart'),
@@ -2081,5 +2083,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}]},{},[1,2,3,4,5,6,7,8,9,12,10,13,11])
+},{"./config":2,"./constants":3,"./util/events":7,"./util/forms":8,"./util/template":12}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13])
 ;
