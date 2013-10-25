@@ -95,10 +95,14 @@
 	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
 }
 
+#PPMiniCart .minicart-quantity:hover {
+	border-color: #0078c1;
+}
+
 #PPMiniCart .minicart-quantity:focus {
-	border-color: rgba(82, 168, 236, 0.8);
+	border-color: #0078c1;
 	outline: 0;
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px rgba(0, 120, 193, 0.6);
 }
 
 #PPMiniCart .minicart-remove {
