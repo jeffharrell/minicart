@@ -5,6 +5,7 @@
 // - cross browser support
 // - Disounts in UI
 // - Cart discounts
+// - Update examples
 
 
 var Cart = require('./cart'),
