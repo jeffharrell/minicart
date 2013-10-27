@@ -125,14 +125,18 @@ Cart.prototype.total = function total(config) {
 
 
 Cart.prototype.remove = function remove(idx) {
-    var data = this._items.splice(idx, 1);
+    var item = this._items.splice(idx, 1);
 
-    if (data) {
+	if (this._items.length === 0) {
+		this.destroy();
+	}
+
+    if (item) {
 		this.save();
-        this.fire('remove', idx, data[0]);
+        this.fire('remove', idx, item[0]);
     }
 
-    return !!data.length;
+    return !!item.length;
 };
 
 
@@ -157,6 +161,8 @@ Cart.prototype.destroy = function destroy() {
 	Storage.prototype.destroy.call(this);
 
     this._items = [];
+	this._settings = { bn: constants.BN };
+
     this.fire('destroy');
 };
 

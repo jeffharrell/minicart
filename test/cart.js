@@ -164,6 +164,17 @@ describe('Cart Model', function () {
     });
 
 
+	it('remove() calls destroy() on the last product', function (done) {
+		cart.on('destroy', function () {
+			assert(true);
+			done();
+		});
+
+		cart.remove(1);
+		cart.remove(0);
+	});
+
+
     it('remove() fires an event', function (done) {
         var prodArr = cart.items().slice(0),
             product = prodArr[0],
@@ -188,6 +199,12 @@ describe('Cart Model', function () {
         cart.destroy();
         assert.strictEqual(cart.items().length, 0);
     });
+
+
+	it('destroy() clears the cart settings', function () {
+		cart.destroy();
+		assert.deepEqual(cart.settings(), { bn: 'MiniCart_AddToCart_WPS_US' });
+	});
 
 
     it('destroy() fires an event', function (done) {
