@@ -4,7 +4,6 @@
 	100% { -webkit-transform: scale(1); }
 }
 
-
 .minicart-showing #PPMiniCart {
 	display: block;
 	-webkit-animation: pop-in 0.2s;

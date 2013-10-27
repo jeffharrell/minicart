@@ -112,7 +112,7 @@ describe('Product Model', function () {
 		item.set('discount_rate2', 50);
 		item.set('quantity', 3);
 
-		assert.equal(item.total(), 2.15);
+		assert.equal(item.total(), 2.1525);
 	});
 
 

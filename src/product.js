@@ -36,6 +36,7 @@ function Product(data) {
 
     this._data = data;
 	this._options = null;
+	this._discount = null;
 	this._amount = null;
 	this._total = null;
 
@@ -56,6 +57,7 @@ Product.prototype.set = function set(key, value) {
 
 	this._data[key] = setter ? setter(value) : value;
 	this._options = null;
+	this._discount = null;
 	this._amount = null;
 	this._total = null;
 
@@ -100,25 +102,28 @@ Product.prototype.options = function options() {
 };
 
 
-Product.prototype.discount = function discount() {
-	var flat = parser.amount(this.get('discount_amount')),
-		rate = parser.amount(this.get('discount_rate')),
-		num = parseInt(this.get('discount_num'), 10) || 0,
-		limit = Math.max(num, this.get('quantity') - 1),
-		result = 0,
-		amount;
+Product.prototype.discount = function discount(config) {
+	var flat, rate, num, limit, result, amount;
 
-	if (flat) {
-		result += flat;
-		result += parser.amount(this.get('discount_amount2') || flat) * limit;
-	} else if (rate) {
-		amount = this.amount();
+	if (!this._discount) {
+		result = 0;
+		num = parseInt(this.get('discount_num'), 10) || 0;
+		limit = Math.max(num, this.get('quantity') - 1);
 
-		result += rate * amount / 100;
-		result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+		if ((flat = parser.amount(this.get('discount_amount')))) {
+			result += flat;
+			result += parser.amount(this.get('discount_amount2') || flat) * limit;
+		} else if ((rate = parser.amount(this.get('discount_rate')))) {
+			amount = this.amount();
+
+			result += rate * amount / 100;
+			result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+		}
+
+		this._discount = result;
 	}
 
-	return result.toFixed(2);
+	return currency(this._discount, null, config);
 };
 
 
