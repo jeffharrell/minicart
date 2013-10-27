@@ -34,21 +34,21 @@ describe('Cart Model', function () {
 
 
     it('items(idx) returns a valid product', function () {
-        assert.equal(cart.items(0).get('item_name'), 'Item 1');
-        assert.equal(cart.items(0).get('amount'), 1.00);
-        assert.equal(cart.items(1).get('item_name'), 'Item 2');
-        assert.equal(cart.items(1).get('amount'),  2.34);
+        assert.strictEqual(cart.items(0).get('item_name'), 'Item 1');
+        assert.strictEqual(cart.items(0).get('amount'), 1.00);
+        assert.strictEqual(cart.items(1).get('item_name'), 'Item 2');
+        assert.strictEqual(cart.items(1).get('amount'),  2.34);
     });
 
 
     it('items() returns all products', function () {
         var products = cart.items();
 
-        assert.equal(products.length, 2);
-        assert.equal(products[0].get('item_name'), cartData.items[0].item_name);
-        assert.equal(products[0].get('amount'), cartData.items[0].amount);
-        assert.equal(products[1].get('item_name'), cartData.items[1].item_name);
-        assert.equal(products[1].get('amount'), cartData.items[1].amount);
+        assert.strictEqual(products.length, 2);
+        assert.strictEqual(products[0].get('item_name'), cartData.items[0].item_name);
+        assert.strictEqual(products[0].get('amount'), cartData.items[0].amount);
+        assert.strictEqual(products[1].get('item_name'), cartData.items[1].item_name);
+        assert.strictEqual(products[1].get('amount'), cartData.items[1].amount);
     });
 
 
@@ -56,8 +56,8 @@ describe('Cart Model', function () {
         var product = { item_name: 'Item 3', amount: 3.00 },
             idx = cart.add(product);
 
-        assert.equal(cart.items(idx).get('item_name'), product.item_name);
-        assert.equal(cart.items(idx).get('amount'), product.amount);
+        assert.strictEqual(cart.items(idx).get('item_name'), product.item_name);
+        assert.strictEqual(cart.items(idx).get('amount'), product.amount);
     });
 
 
@@ -65,11 +65,11 @@ describe('Cart Model', function () {
 		var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },
 			idx = cart.add(product);
 
-		assert.equal(cart.items().length, 3);
-		assert.equal(cart.items(idx).get('quantity'), 1);
+		assert.strictEqual(cart.items().length, 3);
+		assert.strictEqual(cart.items(idx).get('quantity'), 1);
 		cart.add(product);
-		assert.equal(cart.items().length, 3);
-		assert.equal(cart.items(idx).get('quantity'), 2);
+		assert.strictEqual(cart.items().length, 3);
+		assert.strictEqual(cart.items(idx).get('quantity'), 2);
 
 	});
 
@@ -89,8 +89,8 @@ describe('Cart Model', function () {
 
 
 	it('settings() returns the value for a named setting', function () {
-		assert.equal(cart.settings('currency_code'), 'USD');
-		assert.equal(cart.settings('custom'), 'foo');
+		assert.strictEqual(cart.settings('currency_code'), 'USD');
+		assert.strictEqual(cart.settings('custom'), 'foo');
 	});
 
 
@@ -99,16 +99,44 @@ describe('Cart Model', function () {
 	});
 
 
+	it('subtotal() returns the cart subtotal', function () {
+		assert.strictEqual(cart.subtotal(), 3.34);
+	});
+
+
+	it('subtotal() should not apply discounts', function () {
+		cart._settings.discount_amount_cart = 1.00;
+		assert.strictEqual(cart.subtotal(), 3.34);
+	});
+
+
+	it('subtotal() returns the formatted amount', function () {
+		assert.strictEqual(cart.subtotal({ format: true }), '$3.34');
+	});
+
+
 	it('total() returns the cart product total', function () {
-		assert.equal(cart.total(), 3.34);
+		assert.strictEqual(cart.total(), 3.34);
 		cart.remove(1);
-		assert.equal(cart.total(), 1);
+		assert.strictEqual(cart.total(), 1);
+	});
+
+
+	it('total() uses flat discounts', function () {
+		cart._settings.discount_amount_cart = 1.00;
+		assert.strictEqual(cart.total(), 2.34);
+	});
+
+
+	it('total() uses percentage discounts', function () {
+		cart._settings.discount_rate_cart = 50;
+		assert.strictEqual(cart.total(), 1.67);
 	});
 
 
     it('total() returns the formatted cart product total', function () {
-        assert.equal(cart.total({ format: true }), '$3.34');
-		assert.equal(cart.total({ format: true, currencyCode: true }), '$3.34 USD');
+        assert.strictEqual(cart.total({ format: true }), '$3.34');
+		assert.strictEqual(cart.total({ format: true, currencyCode: true }), '$3.34 USD');
     });
 
 
@@ -158,13 +186,13 @@ describe('Cart Model', function () {
 
     it('destroy() empties the cart', function () {
         cart.destroy();
-        assert.equal(cart.items().length, 0);
+        assert.strictEqual(cart.items().length, 0);
     });
 
 
     it('destroy() fires an event', function (done) {
         cart.on('destroy', function () {
-            assert.equal(cart.items().length, 0);
+            assert.strictEqual(cart.items().length, 0);
             done();
         });
 

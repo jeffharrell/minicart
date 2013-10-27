@@ -8,7 +8,6 @@ var assert = require('assert'),
 describe('Minicart', function () {
 
 	it('show have a render method', function () {
-		console.log(typeof minicart.render);
 		assert(typeof minicart.render === 'function');
 	});
 

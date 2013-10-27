@@ -25,9 +25,9 @@ describe('Product Model', function () {
 
 
     it('get() returns valid data', function () {
-        assert.equal(item.get('name'), 'Foo');
-        assert.equal(item.get('desc'), 'This is an item, foo');
-        assert.equal(item.get('amount'), 1.23);
+        assert.strictEqual(item.get('name'), 'Foo');
+        assert.strictEqual(item.get('desc'), 'This is an item, foo');
+        assert.strictEqual(item.get('amount'), 1.23);
     });
 
 
@@ -37,10 +37,10 @@ describe('Product Model', function () {
         item.set('amount', 4.56);
         item.set('something', 'random');
 
-        assert.equal(item.get('name'), 'Bar');
-        assert.equal(item.get('desc'), 'Where is the bar?');
-        assert.equal(item.get('amount'), 4.56);
-        assert.equal(item.get('something'), 'random');
+        assert.strictEqual(item.get('name'), 'Bar');
+        assert.strictEqual(item.get('desc'), 'Where is the bar?');
+        assert.strictEqual(item.get('amount'), 4.56);
+        assert.strictEqual(item.get('something'), 'random');
     });
 
 
@@ -56,12 +56,12 @@ describe('Product Model', function () {
 
     it('get() returns the correct quantity', function () {
         item.set('quantity', 1234);
-        assert.equal(item.get('quantity'), 1234);
+        assert.strictEqual(item.get('quantity'), 1234);
     });
 
 
     it('get() returns 1 for null quantities', function () {
-        assert.equal(item.get('quantity'), 1);
+        assert.strictEqual(item.get('quantity'), 1);
     });
 
 
@@ -75,7 +75,7 @@ describe('Product Model', function () {
 
 		options = item.options();
 
-		assert.equal(options.length, 2);
+		assert.strictEqual(options.length, 2);
 		assert.deepEqual(options[0], { key: 'color', value: 'blue', amount: 0});
 		assert.deepEqual(options[1], { key: 'size', value: 'large', amount: 0});
 	});
@@ -94,7 +94,7 @@ describe('Product Model', function () {
 		options = item.options();
 
 		assert.deepEqual(options[0].amount, 123.00);
-		assert.equal(options[1].amount, 0);
+		assert.strictEqual(options[1].amount, 0);
 	});
 
 
@@ -103,7 +103,7 @@ describe('Product Model', function () {
 		item.set('discount_amount2', 0.50);
 		item.set('quantity', 3);
 
-		assert.equal(item.discount(), 2.00);
+		assert.strictEqual(item.discount(), 2.00);
 	});
 
 
@@ -112,7 +112,7 @@ describe('Product Model', function () {
 		item.set('discount_rate2', 50);
 		item.set('quantity', 3);
 
-		assert.equal(item.discount(), 1.5375);
+		assert.strictEqual(item.discount(), 1.5375);
 	});
 
 
@@ -121,14 +121,30 @@ describe('Product Model', function () {
 		item.set('discount_amount2', 0.50);
 		item.set('quantity', 3);
 
-		assert.equal(item.discount({ format: true }), '$2.00');
+		assert.strictEqual(item.discount({ format: true }), '$2.00');
 	});
 
+
+	it('amount() returns an individual product amount', function () {
+		assert.strictEqual(item.amount(), 1.23);
+
+		item.set('quantity', 2);
+		assert.strictEqual(item.amount(), 1.23);
+
+		item.set('on0', 'color');
+		item.set('os0', 'blue');
+		item.set('option_select0', 'blue');
+		item.set('option_amount0', 123.00);
+
+		assert.strictEqual(item.amount(), 124.23);
+	});
+
+
     it('total() returns the product total', function () {
-        assert.equal(item.total(), 1.23);
+        assert.strictEqual(item.total(), 1.23);
 
         item.set('quantity', 2);
-        assert.equal(item.total(), 2.46);
+        assert.strictEqual(item.total(), 2.46);
 
     });
 
@@ -139,17 +155,17 @@ describe('Product Model', function () {
 		item.set('option_select0', 'blue');
 		item.set('option_amount0', 123.00);
 
-		assert.equal(item.total(), 124.23);
+		assert.strictEqual(item.total(), 124.23);
 
 		item.set('quantity', 2);
-		assert.equal(item.total(), 248.46);
+		assert.strictEqual(item.total(), 248.46);
 	});
 
 
 	it('total() takes into account discounts', function () {
 		item.set('discount_amount', 0.23);
 
-		assert.equal(item.total(), 1.00);
+		assert.strictEqual(item.total(), 1.00);
 	});
 
 
@@ -160,7 +176,7 @@ describe('Product Model', function () {
 			amount: 1.23
 		});
 
-        assert.equal(item1.total({ format: true }), '$1.23');
+        assert.strictEqual(item1.total({ format: true }), '$1.23');
     });
 
 
@@ -204,9 +220,9 @@ describe('Product Model', function () {
     it('destroy() empties data', function () {
         item.destroy();
 
-        assert.equal(item.get('name'), undefined);
-        assert.equal(item.get('desc'), undefined);
-        assert.equal(item.get('amount'), undefined);
+        assert.strictEqual(item.get('name'), undefined);
+        assert.strictEqual(item.get('desc'), undefined);
+        assert.strictEqual(item.get('amount'), undefined);
     });
 
 

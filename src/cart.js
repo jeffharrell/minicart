@@ -90,14 +90,35 @@ Cart.prototype.settings = function settings(name) {
 };
 
 
-Cart.prototype.total = function total(config) {
-    var products = this.items(),
-        result = 0,
-        i, len;
+Cart.prototype.discount = function discount(config) {
+	var result = parseFloat(this.settings('discount_amount_cart')) || 0;
 
-    for (i = 0, len = products.length; i < len; i++) {
-        result += products[i].total();
-    }
+	if (!result) {
+		result = (parseFloat(this.settings('discount_rate_cart')) || 0) * this.subtotal() / 100;
+	}
+
+	return currency(result, this.settings('currency_code'), config);
+};
+
+
+Cart.prototype.subtotal = function subtotal(config) {
+	var products = this.items(),
+		result = 0,
+		i, len;
+
+	for (i = 0, len = products.length; i < len; i++) {
+		result += products[i].total();
+	}
+
+	return currency(result, this.settings('currency_code'), config);
+};
+
+
+Cart.prototype.total = function total(config) {
+    var result = 0;
+
+	result += this.subtotal();
+	result -= this.discount();
 
 	return currency(result, this.settings('currency_code'), config);
 };

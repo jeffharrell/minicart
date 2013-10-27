@@ -2,8 +2,8 @@
 
 // TODO:
 // - UI tests
+// - View tests
 // - cross browser support
-// - Cart discounts
 // - Update examples
 
 

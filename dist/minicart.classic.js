@@ -1083,14 +1083,35 @@ Cart.prototype.settings = function settings(name) {
 };
 
 
-Cart.prototype.total = function total(config) {
-    var products = this.items(),
-        result = 0,
-        i, len;
+Cart.prototype.discount = function discount(config) {
+	var result = parseFloat(this.settings('discount_amount_cart')) || 0;
 
-    for (i = 0, len = products.length; i < len; i++) {
-        result += products[i].total();
-    }
+	if (!result) {
+		result = (parseFloat(this.settings('discount_rate_cart')) || 0) * this.subtotal() / 100;
+	}
+
+	return currency(result, this.settings('currency_code'), config);
+};
+
+
+Cart.prototype.subtotal = function subtotal(config) {
+	var products = this.items(),
+		result = 0,
+		i, len;
+
+	for (i = 0, len = products.length; i < len; i++) {
+		result += products[i].total();
+	}
+
+	return currency(result, this.settings('currency_code'), config);
+};
+
+
+Cart.prototype.total = function total(config) {
+    var result = 0;
+
+	result += this.subtotal();
+	result -= this.discount();
 
 	return currency(result, this.settings('currency_code'), config);
 };
@@ -1182,7 +1203,7 @@ module.exports = {
 
     COMMANDS: { _cart: true, _xclick: true, _donations: true },
 
-    SETTINGS: /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/,
+    SETTINGS: /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|discount_amount_cart|discount_rate_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/,
 
 	SHOWING: 'minicart-showing',
 
@@ -1195,8 +1216,8 @@ module.exports = {
 
 // TODO:
 // - UI tests
+// - View tests
 // - cross browser support
-// - Cart discounts
 // - Update examples
 
 
@@ -1406,6 +1427,7 @@ Product.prototype.amount = function amount(config) {
 
 	return currency(this._amount, null, config);
 };
+
 
 Product.prototype.total = function total(config) {
 	var result;

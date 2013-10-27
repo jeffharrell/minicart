@@ -144,6 +144,7 @@ Product.prototype.amount = function amount(config) {
 	return currency(this._amount, null, config);
 };
 
+
 Product.prototype.total = function total(config) {
 	var result;
 
