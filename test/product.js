@@ -116,6 +116,14 @@ describe('Product Model', function () {
 	});
 
 
+	it('discount() returns a formatted discount', function () {
+		item.set('discount_amount', 1.00);
+		item.set('discount_amount2', 0.50);
+		item.set('quantity', 3);
+
+		assert.equal(item.discount({ format: true }), 1.69);
+	});
+
     it('total() returns the product total', function () {
         assert.equal(item.total(), 1.23);
 
