@@ -103,7 +103,7 @@ describe('Product Model', function () {
 		item.set('discount_amount2', 0.50);
 		item.set('quantity', 3);
 
-		assert.equal(item.total(), 1.69);
+		assert.equal(item.discount(), 2.00);
 	});
 
 
@@ -112,7 +112,7 @@ describe('Product Model', function () {
 		item.set('discount_rate2', 50);
 		item.set('quantity', 3);
 
-		assert.equal(item.total(), 2.1525);
+		assert.equal(item.discount(), 1.5375);
 	});
 
 
@@ -121,7 +121,7 @@ describe('Product Model', function () {
 		item.set('discount_amount2', 0.50);
 		item.set('quantity', 3);
 
-		assert.equal(item.discount({ format: true }), 1.69);
+		assert.equal(item.discount({ format: true }), '$2.00');
 	});
 
     it('total() returns the product total', function () {
