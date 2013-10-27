@@ -1,6 +1,9 @@
 'use strict';
 
 
+require('JSON');
+
+
 (function (window, document) {
 
 	var proto;

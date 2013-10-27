@@ -1,8 +1,9 @@
-/*global EJS:true */
-
 'use strict';
 
 
+var ejs = require('ejs');
+
+
 module.exports = function template(str, data) {
-    return new EJS({text: str}).render(data);
+    return ejs.render(str, data);
 };

@@ -1,0 +1,3 @@
+[submodule "lib/ejs"]
+	path = lib/ejs
+	url = https://github.com/visionmedia/ejs.git

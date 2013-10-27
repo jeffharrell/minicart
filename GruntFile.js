@@ -15,13 +15,6 @@ module.exports = function (grunt) {
 			}
 		},
 
-		concat: {
-			dist: {
-				src: ['lib/json2.js', 'lib/ejs.js', 'dist/minicart.js'],
-				dest: 'dist/minicart.js'
-			}
-		},
-
 		jshint: {
 			options: grunt.file.readJSON('.jshintrc'),
 			all: ['src/**/*.js', 'test/**/*.js']
@@ -95,7 +88,6 @@ module.exports = function (grunt) {
 	});
 
 	// Dependencies
-	grunt.task.loadNpmTasks('grunt-contrib-concat');
 	grunt.task.loadNpmTasks('grunt-contrib-jshint');
 	grunt.task.loadNpmTasks('grunt-contrib-uglify');
 	grunt.task.loadNpmTasks('grunt-mocha-test');
@@ -104,7 +96,7 @@ module.exports = function (grunt) {
 
 	// Tasks
 	grunt.registerTask('lint', ['jshint']);
-	grunt.registerTask('test', ['lint', 'browserify', 'concat', 'replace', 'mochaTest']);
+	grunt.registerTask('test', ['lint', 'browserify', 'replace', 'mochaTest']);
 	grunt.registerTask('build', ['test', 'uglify']);
 
 };

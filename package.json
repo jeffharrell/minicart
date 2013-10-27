@@ -31,12 +31,14 @@
   "engines": {
     "node": ">=0.10.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ejs": "~0.8.4",
+    "JSON": "~1.0.0"
+  },
   "devDependencies": {
     "mocha": "~1.13.0",
     "grunt": "~0.4.1",
-	"grunt-cli": "~0.1.9",
-    "grunt-contrib-concat": "~0.3.0",
+    "grunt-cli": "~0.1.9",
     "grunt-contrib-uglify": "~0.2.4",
     "grunt-contrib-jshint": "~0.6.4",
     "grunt-mocha-test": "~0.7.0",
