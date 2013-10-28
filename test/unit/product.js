@@ -2,7 +2,7 @@
 
 
 var assert = require('assert'),
-    Product = require('../src/product');
+    Product = require('../../src/product');
 
 
 describe('Product Model', function () {

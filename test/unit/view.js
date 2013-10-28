@@ -2,7 +2,7 @@
 
 
 var assert = require('assert'),
-	View = require('../src/view');
+	View = require('../../src/view');
 
 
 describe('View', function () {

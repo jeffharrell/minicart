@@ -2,7 +2,7 @@
 
 
 var assert = require('assert'),
-	minicart = require('../src/minicart');
+	minicart = require('../../src/minicart');
 
 
 describe('Minicart', function () {

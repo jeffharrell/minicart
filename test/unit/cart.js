@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('assert'),
-    Cart = require('../src/cart'),
+    Cart = require('../../src/cart'),
     cartData = require('./fixtures/cartData');
 
 

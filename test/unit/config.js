@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('assert'),
-	config = require('../src/config');
+	config = require('../../src/config');
 
 
 describe('Config', function () {
