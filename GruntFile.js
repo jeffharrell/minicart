@@ -8,7 +8,7 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 
 		browserify: {
-			dist: {
+			all: {
 				files: {
 					'dist/minicart.js': ['src/**/*.js']
 				}
@@ -24,7 +24,7 @@ module.exports = function (grunt) {
 			options: {
 				banner: '/*!\n * <%= pkg.name %>\n *\n * <%= pkg.description %>\n *\n * @version <%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n * @author <%= pkg.author.name %> <<%= pkg.author.url %>>\n * @url <%= pkg.homepage %> \n * @license <%= pkg.licenses[0].type %> <<%= pkg.licenses[0].url %>>\n */\n'
 			},
-			dist: {
+			all: {
 				files: {
 					'dist/minicart.min.js': ['dist/minicart.js'],
 					'dist/minicart.classic.min.js': ['dist/minicart.classic.js']
@@ -32,8 +32,12 @@ module.exports = function (grunt) {
 			}
 		},
 
+		mocha: {
+
+		},
+
 		mochaTest: {
-			test: {
+			all: {
 				options: {
 					reporter: 'spec'
 				},

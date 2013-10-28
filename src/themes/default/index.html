@@ -7,7 +7,7 @@ var hasItems = !!items.length;
 	<ul>
 		<% for (i= 0, idx = i + 1, len = items.length; i < len; i++) { %>
 		<li class="minicart-item">
-			<a class="minicart-name" href="<%= items[i].link %>"><%= items[i].get("item_name") %></a>
+			<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>
 			<ul class="minicart-attributes">
 				<% if (items[i].get("item_number")) { %>
 				<li><%= items[i].get("item_number") %></li>

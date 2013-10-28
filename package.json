@@ -41,6 +41,7 @@
     "grunt-cli": "~0.1.9",
     "grunt-contrib-uglify": "~0.2.4",
     "grunt-contrib-jshint": "~0.6.4",
+    "grunt-mocha": "~0.4.1",
     "grunt-mocha-test": "~0.7.0",
     "browserify": "~2.33.1",
     "grunt-browserify": "~1.2.8",
