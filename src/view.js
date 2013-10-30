@@ -157,7 +157,7 @@ View.prototype.addItem = function addItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	els[idx].classList.add('minicart-item-new');
+	els[idx].classList.add('minicart-item-changed');
 };
 
 
@@ -166,18 +166,12 @@ View.prototype.changeItem = function changeItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	els[idx].classList.add('minicart-item-new');
+	els[idx].classList.add('minicart-item-changed');
 };
 
 
 View.prototype.removeItem = function removeItem(idx) {
 	this.redraw();
-
-	if (this.model.cart.items().length === 0) {
-		this.hide();
-	} else {
-		this.show();
-	}
 };
 
 

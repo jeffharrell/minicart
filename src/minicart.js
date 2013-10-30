@@ -28,6 +28,7 @@ minicart.render = function render(userConfig) {
 	cartModel.on('add', viewModel.addItem, viewModel);
 	cartModel.on('change', viewModel.changeItem, viewModel);
 	cartModel.on('remove', viewModel.removeItem, viewModel);
+	cartModel.on('destroy', viewModel.hide, viewModel);
 };
 
 

@@ -4737,6 +4737,7 @@ minicart.render = function render(userConfig) {
 	cartModel.on('add', viewModel.addItem, viewModel);
 	cartModel.on('change', viewModel.changeItem, viewModel);
 	cartModel.on('remove', viewModel.removeItem, viewModel);
+	cartModel.on('destroy', viewModel.hide, viewModel);
 };
 
 
@@ -5582,7 +5583,7 @@ View.prototype.addItem = function addItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	els[idx].classList.add('minicart-item-new');
+	els[idx].classList.add('minicart-item-changed');
 };
 
 
@@ -5591,18 +5592,12 @@ View.prototype.changeItem = function changeItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	els[idx].classList.add('minicart-item-new');
+	els[idx].classList.add('minicart-item-changed');
 };
 
 
 View.prototype.removeItem = function removeItem(idx) {
 	this.redraw();
-
-	if (this.model.cart.items().length === 0) {
-		this.hide();
-	} else {
-		this.show();
-	}
 };
 
 
@@ -5610,5 +5605,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":12,"./constants":13,"./util/events":17,"./util/forms":18,"./util/template":22}]},{},[11,13,12,14,15,16,17,18,19,20,21,22,23])
+},{"./config":12,"./constants":13,"./util/events":17,"./util/forms":18,"./util/template":22}]},{},[11,12,13,14,15,16,17,19,18,20,21,22,23])
 ;
