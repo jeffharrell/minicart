@@ -4710,10 +4710,10 @@ module.exports = {
 'use strict';
 
 // TODO:
-// - UI tests
 // - View tests
 // - cross browser support
 // - Update examples
+// - Code comments
 
 
 var Cart = require('./cart'),
@@ -5560,18 +5560,20 @@ View.prototype.toggle = function toggle() {
 View.prototype.bind = function bind(form) {
 	var that = this;
 
-	if (form.add) {
-		events.add(form, 'submit', function (e) {
-			e.preventDefault(e);
-			that.model.cart.add(forms.parse(form));
-		});
-	} else if (form.display) {
+	if (!constants.COMMANDS[form.cmd.value]) {
+		return false;
+	}
+
+	if (form.display) {
 		events.add(form, 'submit', function (e) {
 			e.preventDefault();
 			that.show();
 		});
 	} else {
-		return false;
+		events.add(form, 'submit', function (e) {
+			e.preventDefault(e);
+			that.model.cart.add(forms.parse(form));
+		});
 	}
 
 	return true;
@@ -5605,5 +5607,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":12,"./constants":13,"./util/events":17,"./util/forms":18,"./util/template":22}]},{},[11,12,13,14,15,16,17,19,18,20,21,22,23])
+},{"./config":12,"./constants":13,"./util/events":17,"./util/forms":18,"./util/template":22}]},{},[11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;

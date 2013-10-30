@@ -1,10 +1,10 @@
 'use strict';
 
 // TODO:
-// - UI tests
 // - View tests
 // - cross browser support
 // - Update examples
+// - Code comments
 
 
 var Cart = require('./cart'),

@@ -8,7 +8,7 @@
 <body>
 	<div id="mocha"></div>
 
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="cartButton">
         <fieldset>
             <input type="hidden" name="cmd" value="_cart" />
             <input type="hidden" name="add" value="1" />
@@ -28,10 +28,9 @@
         </fieldset>
     </form>
 
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="buyNowButton">
 		<fieldset>
-			<input type="hidden" name="cmd" value="_cart" />
-			<input type="hidden" name="add" value="1" />
+			<input type="hidden" name="cmd" value="_xclick" />
 			<input type="hidden" name="business" value="example@minicartjs.com" />
 			<input type="hidden" name="item_name" value="Rainbow" />
 			<input type="hidden" name="item_number" value="ROYGBIV" />
@@ -49,10 +48,9 @@
 		</fieldset>
 	</form>
 
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="donateButton">
 		<fieldset>
-			<input type="hidden" name="cmd" value="_cart" />
-			<input type="hidden" name="add" value="1" />
+			<input type="hidden" name="cmd" value="_donations" />
 			<input type="hidden" name="business" value="example@minicartjs.com" />
 			<input type="hidden" name="item_name" value="Pony" />
 			<input type="hidden" name="item_number" value="12345" />
@@ -105,7 +103,7 @@
 		</fieldset>
 	</form>
 
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" class="last">
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="viewButton">
 		<fieldset>
 			<input type="hidden" name="business" value="example@minicartjs.com" />
 			<input type="hidden" name="cmd" value="_cart" />

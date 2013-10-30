@@ -134,18 +134,20 @@ View.prototype.toggle = function toggle() {
 View.prototype.bind = function bind(form) {
 	var that = this;
 
-	if (form.add) {
-		events.add(form, 'submit', function (e) {
-			e.preventDefault(e);
-			that.model.cart.add(forms.parse(form));
-		});
-	} else if (form.display) {
+	if (!constants.COMMANDS[form.cmd.value]) {
+		return false;
+	}
+
+	if (form.display) {
 		events.add(form, 'submit', function (e) {
 			e.preventDefault();
 			that.show();
 		});
 	} else {
-		return false;
+		events.add(form, 'submit', function (e) {
+			e.preventDefault(e);
+			that.model.cart.add(forms.parse(form));
+		});
 	}
 
 	return true;
