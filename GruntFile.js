@@ -33,7 +33,16 @@ module.exports = function (grunt) {
 		},
 
 		mocha: {
+			browser: [ 'test/functional/**/*.html' ],
 
+			options: {
+				bail: true,
+				log: true,
+				mocha: {},
+				reporter: 'Spec',
+				run: true,
+				timeout: 10000
+			}
 		},
 
 		mochaTest: {
@@ -94,13 +103,14 @@ module.exports = function (grunt) {
 	// Dependencies
 	grunt.task.loadNpmTasks('grunt-contrib-jshint');
 	grunt.task.loadNpmTasks('grunt-contrib-uglify');
+	grunt.task.loadNpmTasks('grunt-mocha');
 	grunt.task.loadNpmTasks('grunt-mocha-test');
 	grunt.task.loadNpmTasks('grunt-browserify');
 	grunt.task.loadNpmTasks('grunt-text-replace');
 
 	// Tasks
-	grunt.registerTask('lint', ['jshint']);
-	grunt.registerTask('test', ['lint', 'browserify', 'replace', 'mochaTest']);
+	grunt.registerTask('lint',  ['jshint']);
+	grunt.registerTask('test',  ['lint', 'browserify', 'replace', 'mochaTest', 'mocha']);
 	grunt.registerTask('build', ['test', 'uglify']);
 
 };

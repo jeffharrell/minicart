@@ -4726,7 +4726,7 @@ var Cart = require('./cart'),
 
 
 minicart.render = function render(userConfig) {
-	confModel = config.load(userConfig);
+	confModel = minicart.config = config.load(userConfig);
 	cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
 
 	viewModel = new View({
@@ -5610,5 +5610,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":12,"./constants":13,"./util/events":17,"./util/forms":18,"./util/template":22}]},{},[11,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./config":12,"./constants":13,"./util/events":17,"./util/forms":18,"./util/template":22}]},{},[11,13,12,14,15,16,17,18,19,20,21,22,23])
 ;

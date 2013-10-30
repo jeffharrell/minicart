@@ -2,9 +2,12 @@
 <html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<title>Mini Cart test page</title>
+	<title>Mini Cart</title>
+	<link rel="stylesheet" href="../../node_modules/mocha/mocha.css" type="text/css" charset="utf-8" />
 </head>
 <body>
+	<div id="mocha"></div>
+
     <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
         <fieldset>
             <input type="hidden" name="cmd" value="_cart" />
@@ -114,6 +117,24 @@
 	<script src="../../dist/minicart.js"></script>
 	<script>
 		paypal.minicart.render();
+	</script>
+
+	<script src="../../node_modules/mocha/mocha.js"></script>
+	<script>
+		mocha.setup("bdd");
+
+		function assert(exp) {
+			if (!exp) {
+				throw new Error('Assertion error');
+			}
+		}
+	</script>
+	<script src="minicart.js"></script>
+	<script src="view.js"></script>
+	<script>
+		if (navigator.userAgent.indexOf("PhantomJS") < 0) {
+			mocha.run();
+		}
 	</script>
 </body>
 </html>
