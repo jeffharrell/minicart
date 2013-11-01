@@ -32,11 +32,24 @@ function isCartShowing() {
 
 
 function getItem(idx) {
-	var li = document.getElementsByClassName('minicart-item')[idx];
+	var li, attrsList, attrsData = [], i, len;
 
-	if (li) {
+	if ((li = document.getElementsByClassName('minicart-item')[idx])) {
+
+		attrsList = li.getElementsByClassName('minicart-attributes')[0];
+		attrsList = attrsList && attrsList.getElementsByTagName('li');
+
+		if (attrsList) {
+			for (i = 0, len = attrsList.length; i < len; i++) {
+				attrsData.push(attrsList[i].textContent);
+			}
+		}
+
 		return {
-			name: li.getElementsByTagName('a')[0].textContent
+			name: li.getElementsByTagName('a')[0].textContent,
+			quantity: li.getElementsByClassName('minicart-quantity')[0].value,
+			amount: li.getElementsByClassName('minicart-price')[0].textContent,
+			options: attrsData
 		};
 	} else {
 		return false;
@@ -193,19 +206,34 @@ describe('View', function () {
 	it.skip('should hide when the last product is removed', function () {});
 
 
-	it.skip('should display item names', function () {});
+	it('should display item names', function () {
+		fakeEvent(document.getElementById('cartButton'), 'submit');
+		assert(getItem(0).name === 'Unicorn');
+	});
 
 
-	it.skip('should display item numbers', function () {});
+	it('should display item numbers', function () {
+		fakeEvent(document.getElementById('buyNowButton'), 'submit');
+		assert(getItem(0).options[0] === 'ROYGBIV');
+	});
 
 
-	it.skip('should display item amounts', function () {});
+	it('should display item amounts', function () {
+		fakeEvent(document.getElementById('cartButton'), 'submit');
+		assert(getItem(0).amount === '$1.00');
+	});
 
 
-	it.skip('should display discounts', function () {});
+	it('should display discounts', function () {
+		fakeEvent(document.getElementById('cartButton'), 'submit');
+		assert(getItem(0).options[0] === 'Discount: $1.00');
+	});
 
 
-	it.skip('should display options', function () {});
+	it('should display options', function () {
+		fakeEvent(document.getElementById('donateButton'), 'submit');
+		assert(getItem(0).options[1] === 'Size: Small');
+	});
 
 
 	it.skip('should display a subtotal', function () {});
