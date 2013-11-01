@@ -34,9 +34,13 @@ function isCartShowing() {
 function getItem(idx) {
 	var li = document.getElementsByClassName('minicart-item')[idx];
 
-	return {
-		name: li.getElementsByTagName('a')[0].textContent
-	};
+	if (li) {
+		return {
+			name: li.getElementsByTagName('a')[0].textContent
+		};
+	} else {
+		return false;
+	}
 }
 
 
@@ -66,37 +70,37 @@ describe('View', function () {
 
 	it('should add a class on the body on show()', function () {
 		assert(!isCartShowing());
-		minicart.show();
+		minicart.view.show();
 		assert(isCartShowing());
 	});
 
 
 	it('should remove the class on the body hide()', function () {
-		minicart.show();
+		minicart.view.show();
 		assert(isCartShowing());
-		minicart.hide();
+		minicart.view.hide();
 		assert(!isCartShowing());
 	});
 
 
 	it('should show/hide correctly on toggle()', function () {
 		assert(!isCartShowing());
-		minicart.toggle();
+		minicart.view.toggle();
 		assert(isCartShowing());
-		minicart.toggle();
+		minicart.view.toggle();
 		assert(!isCartShowing());
 	});
 
 
 	it('should remain visible if the cart is selected', function () {
-		minicart.show();
+		minicart.view.show();
 		fakeEvent(document.getElementById(config.name), 'click');
 		assert(isCartShowing());
 	});
 
 
 	it('should hide if anything but the cart is selected', function () {
-		minicart.show();
+		minicart.view.show();
 		fakeEvent(document.body, 'click');
 		assert(!isCartShowing());
 	});
@@ -132,19 +136,52 @@ describe('View', function () {
 	});
 
 
-	it.skip('should bind() to forms', function () {});
+	it('should bind() to forms', function () {
+		var form, input;
+
+		form = document.createElement('form');
+		form.action = 'https://www.paypal.com/cgi-bin/webscr';
+		form.method = 'post';
+
+		input = document.createElement('input');
+		input.name = 'business';
+		input.value = 'business@minicartjs.com';
+		form.appendChild(input);
+
+		input = document.createElement('input');
+		input.name = 'cmd';
+		input.value = '_cart';
+		form.appendChild(input);
+
+		input = document.createElement('input');
+		input.name = 'display';
+		input.value = '1';
+		form.appendChild(input);
+
+		document.body.appendChild(form);
+		minicart.view.bind(form);
+
+		fakeEvent(form, 'submit');
+		assert(isCartShowing());
+	});
 
 
-	it.skip('should add items using the API', function () {});
+	it('should add items using the API', function () {
+		var data = { item_name: 'Test item', amount: 123.00 };
+
+		minicart.cart.add(data);
+		assert(getItem(0).name === data.item_name);
+	});
 
 
-	it.skip('should remove items using the API', function () {});
+	it('should remove items using the API', function () {
+		var data = { item_name: 'Test item', amount: 123.00 };
 
-
-	it.skip('should update when a new product is added', function () {});
-
-
-	it.skip('should should when a new product is added', function () {});
+		minicart.cart.add(data);
+		assert(typeof getItem(0) === 'object');
+		minicart.cart.remove(0);
+		assert(getItem(0) === false);
+	});
 
 
 	it.skip('should update when a product is changed', function () {});
@@ -174,7 +211,8 @@ describe('View', function () {
 	it.skip('should display a subtotal', function () {});
 
 
-	it.skip('should clear the contents on reset()', function () {
+	it.skip('should clear the contents on reset()', function () {});
 
-	});
+
+	it.skip('should not leave the page on checkout if no items are in the page', function () {});
 });

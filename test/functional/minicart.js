@@ -16,21 +16,6 @@ describe('Minicart', function () {
 	});
 
 
-	it('show have a show method', function () {
-		assert(typeof window.paypal.minicart.show === 'function');
-	});
-
-
-	it('show have a hide method', function () {
-		assert(typeof window.paypal.minicart.hide === 'function');
-	});
-
-
-	it('show have a toggle method', function () {
-		assert(typeof window.paypal.minicart.toggle === 'function');
-	});
-
-
 	it('show have a reset method', function () {
 		assert(typeof window.paypal.minicart.reset === 'function');
 	});
