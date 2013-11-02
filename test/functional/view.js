@@ -3,8 +3,15 @@
 'use strict';
 
 
-var minicart = window.paypal.minicart,
-	config = minicart.config;
+var minicart = window.paypal.minicart;
+var config = minicart.config;
+var cartData = [
+	{ item_name: 'Test item 1', amount: 1.00 },
+	{ item_name: 'Test item 2', amount: 2.00, quantity: 2 },
+	{ item_name: 'Test item 3', amount: 3, item_number: '123ABC' },
+	{ item_name: 'Test item 4', amount: 100.00, discount_amount: 99.00 },
+	{ item_name: 'Test item 5', amount: 0.00, on0: 'Size', os0: 'Large', option_select0: 'Large', option_amount0: 50.00 }
+];
 
 
 function fakeEvent(el, type) {
@@ -61,9 +68,31 @@ function getItem(idx) {
 
 describe('View', function () {
 
+	var mockData;
+
+
+	after(function () {
+		minicart.reset();
+	});
+
 
 	beforeEach(function () {
 		minicart.reset();
+		mockData = JSON.parse(JSON.stringify(cartData));
+	});
+
+
+	it('should clear the contents on reset()', function () {
+		minicart.cart.add(mockData[0]);
+		minicart.cart.add(mockData[1]);
+
+		assert(getItem(0) !== false);
+		assert(getItem(1) !== false);
+
+		minicart.reset();
+
+		assert(getItem(0) === false);
+		assert(getItem(1) === false);
 	});
 
 
@@ -176,70 +205,110 @@ describe('View', function () {
 
 		fakeEvent(form, 'submit');
 		assert(isCartShowing());
+
+		document.body.removeChild(form);
 	});
 
 
-	it('should add items using the API', function () {
-		var data = { item_name: 'Test item', amount: 123.00 };
-
-		minicart.cart.add(data);
-		assert(getItem(0).name === data.item_name);
+	it('should add items via the API', function () {
+		minicart.cart.add(mockData[0]);
+		assert(getItem(0).name === 'Test item 1');
 	});
 
 
-	it('should remove items using the API', function () {
-		var data = { item_name: 'Test item', amount: 123.00 };
+	it('should update items via the API', function () {
+		minicart.cart.add(mockData[0]);
 
-		minicart.cart.add(data);
+		var item = minicart.cart.items(0);
+		item.set('quantity', 2);
+
+		assert(getItem(0).quantity === '2');
+		assert(getItem(0).amount === '$2.00');
+	});
+
+
+	it('should remove items via the API', function () {
+		minicart.cart.add(mockData[0]);
 		assert(typeof getItem(0) === 'object');
+
 		minicart.cart.remove(0);
 		assert(getItem(0) === false);
 	});
 
 
-	it.skip('should update when a product is changed', function () {});
+	it('should update products via the UI', function (done) {
+		var input;
+
+		minicart.cart.add(mockData[0]);
+
+		input = document.getElementsByClassName('minicart-quantity')[0];
+		input.value = 3;
+		fakeEvent(input, 'keyup');
+
+		setTimeout(function () {
+			assert(getItem(0).amount === '$3.00');
+			done();
+		}, 300);
+	});
 
 
-	it.skip('should update when a product is removed', function () {});
+	it('should update when a product is removed', function () {
+		minicart.cart.add(cartData[0]);
+		assert(typeof getItem(0) === 'object');
+
+		fakeEvent(document.getElementsByClassName('minicart-remove')[0], 'click');
+		assert(getItem(0) === false);
+	});
 
 
-	it.skip('should hide when the last product is removed', function () {});
+	it('should hide when the last product is removed', function () {
+		minicart.cart.add(cartData[0]);
+		minicart.cart.add(cartData[1]);
+
+		minicart.cart.remove(0);
+		assert(isCartShowing());
+		minicart.cart.remove(0);
+		assert(!isCartShowing());
+	});
 
 
 	it('should display item names', function () {
-		fakeEvent(document.getElementById('cartButton'), 'submit');
-		assert(getItem(0).name === 'Unicorn');
+		minicart.cart.add(mockData[0]);
+		assert(getItem(0).name === 'Test item 1');
 	});
 
 
 	it('should display item numbers', function () {
-		fakeEvent(document.getElementById('buyNowButton'), 'submit');
-		assert(getItem(0).options[0] === 'ROYGBIV');
+		minicart.cart.add(mockData[2]);
+		assert(getItem(0).options[0] === '123ABC');
 	});
 
 
 	it('should display item amounts', function () {
-		fakeEvent(document.getElementById('cartButton'), 'submit');
-		assert(getItem(0).amount === '$1.00');
+		minicart.cart.add(mockData[1]);
+		assert(getItem(0).amount === '$4.00');
 	});
 
 
 	it('should display discounts', function () {
-		fakeEvent(document.getElementById('cartButton'), 'submit');
-		assert(getItem(0).options[0] === 'Discount: $1.00');
+		minicart.cart.add(mockData[3]);
+		assert(getItem(0).options[0] === 'Discount: $99.00');
 	});
 
 
 	it('should display options', function () {
-		fakeEvent(document.getElementById('donateButton'), 'submit');
-		assert(getItem(0).options[1] === 'Size: Small');
+		minicart.cart.add(mockData[4]);
+		assert(getItem(0).amount === '$50.00');
+		assert(getItem(0).options[0] === 'Size: Large');
 	});
 
 
-	it.skip('should display a subtotal', function () {});
+	it('should display a subtotal', function () {
+		minicart.cart.add(mockData[0]);
+		minicart.cart.add(mockData[1]);
 
-
-	it.skip('should clear the contents on reset()', function () {});
+		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.trim() === 'Subtotal: $5.00');
+	});
 
 
 	it.skip('should not leave the page on checkout if no items are in the page', function () {});

@@ -9,6 +9,8 @@ module.exports = {
 
 	SHOWING: 'minicart-showing',
 
-	BN: 'MiniCart_AddToCart_WPS_US'
+	BN: 'MiniCart_AddToCart_WPS_US',
+
+	KEYUP_TIMEOUT: 250
 
 };

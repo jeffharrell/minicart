@@ -63,7 +63,7 @@ function addEvents(view) {
 				if (product) {
 					product.set('quantity', target.value);
 				}
-			}, 250);
+			}, constants.KEYUP_TIMEOUT);
 		}
 	});
 
