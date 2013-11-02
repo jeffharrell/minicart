@@ -3217,5 +3217,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":11,"./constants":12,"./util/events":16,"./util/forms":17,"./util/template":21}]},{},[10,11,12,13,14,16,17,15,18,19,20,21,22])
+},{"./config":11,"./constants":12,"./util/events":16,"./util/forms":17,"./util/template":21}]},{},[10,11,12,13,14,15,16,17,18,19,20,21,22])
 ;

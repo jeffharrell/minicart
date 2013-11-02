@@ -1,7 +1,8 @@
 'use strict';
 
 // TODO: code comments!
-// - cross browser support
+// - IE
+// - "fixed" positioning
 // - Update examples
 
 

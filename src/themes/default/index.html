@@ -21,7 +21,7 @@ var hasItems = !!items.length;
 				<% } %>
 			</ul>
 			<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" type="text" value="<%= items[i].get("quantity") %>" autocomplete="off" />
-			<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" value="&times;" />
+			<button type="button" class="minicart-remove" data-minicart-idx="<%= i %>">&times;</button>
 			<span class="minicart-price"><%= items[i].total({ format: true }) %></span>
 			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />
 			<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />
