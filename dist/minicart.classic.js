@@ -2335,11 +2335,9 @@ module.exports = {
 },{}],13:[function(require,module,exports){
 'use strict';
 
-// TODO:
-// - View tests
+// TODO: code comments!
 // - cross browser support
 // - Update examples
-// - Code comments
 
 
 var Cart = require('./cart'),
@@ -3073,6 +3071,8 @@ function addEvents(view) {
 
 		if (target.className === 'minicart-remove') {
 			view.model.cart.remove(target.getAttribute('data-minicart-idx'));
+		} else if (target.className === 'minicart-closer') {
+			view.hide();
 		} else if (view.isShowing) {
 			if (!(/input|button|select|option/i.test(target.tagName))) {
 				while (target.nodeType === 1) {
@@ -3217,5 +3217,5 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":11,"./constants":12,"./util/events":16,"./util/forms":17,"./util/template":21}]},{},[10,11,12,13,14,15,16,17,18,19,20,21,22])
+},{"./config":11,"./constants":12,"./util/events":16,"./util/forms":17,"./util/template":21}]},{},[10,11,12,13,15,16,14,17,18,19,20,21,22])
 ;

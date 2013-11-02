@@ -37,6 +37,8 @@ function addEvents(view) {
 
 		if (target.className === 'minicart-remove') {
 			view.model.cart.remove(target.getAttribute('data-minicart-idx'));
+		} else if (target.className === 'minicart-closer') {
+			view.hide();
 		} else if (view.isShowing) {
 			if (!(/input|button|select|option/i.test(target.tagName))) {
 				while (target.nodeType === 1) {

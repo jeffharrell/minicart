@@ -4,6 +4,10 @@
 	100% { -webkit-transform: scale(1); }
 }
 
+.minicart-showing {
+	overflow: hidden;
+}
+
 .minicart-showing #PPMiniCart {
 	display: block;
 	-webkit-animation: pop-in 0.2s;
@@ -18,8 +22,8 @@
 	left: 50%;
 	width: 400px;
 	max-height: 400px;
-	margin-left: -150px;
-	margin-top: -200px;
+	margin-left: -200px;
+	margin-top: -400px;
 	padding: 10px;
 	background: #fbfbfb;
 	border: 1px solid rgba(0, 0, 0, 0.2);
@@ -30,7 +34,8 @@
 }
 
 #PPMiniCart ul {
-	margin: 0 0 15px;
+	clear: right;
+	margin: 15px 0;
 	padding: 10px;
 	list-style-type: none;
 	background: #fff;
@@ -42,6 +47,18 @@
 #PPMiniCart .minicart-empty ul {
 	display: none;
 }
+
+
+#PPMiniCart .minicart-closer {
+	float: right;
+	padding: 0 0 8px;
+	background: 0;
+	border: 0;
+	font-size: 14px;
+	line-height: 8px;
+	cursor: pointer;
+}
+
 
 #PPMiniCart .minicart-item {
 	position: relative;

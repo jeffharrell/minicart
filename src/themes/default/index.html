@@ -4,6 +4,7 @@ var settings = cart.settings();
 var hasItems = !!items.length;
 %>
 <form method="post" class="<% if (!hasItems) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">
+	<button type="button" class="minicart-closer">&times;</button>
 	<ul>
 		<% for (i= 0, idx = i + 1, len = items.length; i < len; i++) { %>
 		<li class="minicart-item">
