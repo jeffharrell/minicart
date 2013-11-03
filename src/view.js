@@ -11,41 +11,36 @@ var config = require('./config'),
 
 
 
+function View(model) {
+	var wrapper, forms, form, i, len;
 
-function addEvents(view) {
-	var forms, form, i, len;
+	this.el = wrapper = document.createElement('div');
+	this.model = model;
+	this.isShowing = false;
+	this.redraw();
 
-	events.add(document, 'click', viewevents.click, view);
-	events.add(document, 'keyup', viewevents.keyup, view);
-	events.add(window, 'pageshow', viewevents.pageshow, view);
+	// HTML
+	wrapper.id = config.name;
+	config.parent.appendChild(wrapper);
 
+	// CSS
+	css.inject(document.getElementsByTagName('head')[0], config.styles);
+
+	// JavaScript
+	events.add(document, 'click', viewevents.click, this);
+	events.add(document, 'keyup', viewevents.keyup, this);
+	events.add(window, 'pageshow', viewevents.pageshow, this);
+
+	// Bind to page's forms
 	forms = document.getElementsByTagName('form');
 
 	for (i = 0, len = forms.length; i < len; i++) {
 		form = forms[i];
 
 		if (form.cmd && constants.COMMANDS[form.cmd.value]) {
-			view.bind(form);
+			this.bind(form);
 		}
 	}
-}
-
-
-
-function View(model) {
-	var wrapper = document.createElement('div');
-	wrapper.id = config.name;
-
-	config.parent.appendChild(wrapper);
-
-	this.el = wrapper;
-	this.model = model;
-	this.isShowing = false;
-	this.redraw();
-
-	css.inject(document.getElementsByTagName('head')[0], config.styles);
-
-	addEvents(this);
 }
 
 
@@ -102,8 +97,8 @@ View.prototype.addItem = function addItem(idx, data) {
 	this.redraw();
 	this.show();
 
-	var els = this.el.getElementsByClassName('minicart-item');
-	css.add(els[idx], 'minicart-item-changed');
+	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
 
@@ -111,8 +106,8 @@ View.prototype.changeItem = function changeItem(idx, data) {
 	this.redraw();
 	this.show();
 
-	var els = this.el.getElementsByClassName('minicart-item');
-	css.add(els[idx], 'minicart-item-changed');
+	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
 

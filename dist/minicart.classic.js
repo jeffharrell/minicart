@@ -1784,7 +1784,7 @@ Cart.prototype.destroy = function destroy() {
 
 module.exports = Cart;
 
-},{"./constants":11,"./product":13,"./util/currency":14,"./util/mixin":17,"./util/pubsub":18,"./util/storage":19}],10:[function(require,module,exports){
+},{"./constants":11,"./product":13,"./util/currency":15,"./util/mixin":18,"./util/pubsub":19,"./util/storage":20}],10:[function(require,module,exports){
 'use strict';
 
 
@@ -1821,7 +1821,7 @@ module.exports.load = function load(userConfig) {
     return mixin(defaults, userConfig);
 };
 
-},{"./util/mixin":17}],11:[function(require,module,exports){
+},{"./util/mixin":18}],11:[function(require,module,exports){
 'use strict';
 
 
@@ -1831,11 +1831,23 @@ module.exports = {
 
     SETTINGS: /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|discount_amount_cart|discount_rate_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/,
 
-	SHOWING_CLASS: 'minicart-showing',
-
 	BN: 'MiniCart_AddToCart_WPS_US',
 
-	KEYUP_TIMEOUT: 250
+	KEYUP_TIMEOUT: 250,
+
+	SHOWING_CLASS: 'minicart-showing',
+
+	REMOVE_CLASS: 'minicart-remove',
+
+	CLOSER_CLASS: 'minicart-closer',
+
+	QUANTITY_CLASS: 'minicart-quantity',
+
+	ITEM_CLASS: 'minicart-item',
+
+	ITEM_CHANGED_CLASS: 'minicart-item-changed',
+
+	DATA_IDX: 'data-minicart-idx'
 
 };
 
@@ -2095,7 +2107,62 @@ Product.prototype.destroy = function destroy() {
 
 module.exports = Product;
 
-},{"./util/currency":14,"./util/mixin":17,"./util/pubsub":18}],14:[function(require,module,exports){
+},{"./util/currency":15,"./util/mixin":18,"./util/pubsub":19}],14:[function(require,module,exports){
+/* jshint quotmark:double */
+
+
+"use strict";
+
+
+
+module.exports.add = function add(el, str) {
+	var re;
+
+	if (el.classList && el.classList.add) {
+		el.classList.add(str);
+	} else {
+		re = new RegExp("\\b" + str + "\\b");
+
+		if (!re.test(el.className)) {
+			el.className += " " + str;
+		}
+	}
+};
+
+
+module.exports.remove = function remove(el, str) {
+	var re;
+
+	if (el.classList && el.classList.add) {
+		el.classList.remove(str);
+	} else {
+		re = new RegExp("\\b" + str + "\\b");
+
+		if (re.test(el.className)) {
+			el.className = el.className.replace(re, "");
+		}
+	}
+};
+
+
+module.exports.inject = function inject(el, str) {
+	var style;
+
+	if (str) {
+		style = document.createElement("style");
+		style.type = "text/css";
+
+		if (style.styleSheet) {
+			style.styleSheet.cssText = str;
+		} else {
+			style.appendChild(document.createTextNode(str));
+		}
+
+		el.appendChild(style);
+	}
+};
+
+},{}],15:[function(require,module,exports){
 'use strict';
 
 
@@ -2182,7 +2249,7 @@ module.exports = function currency(amount, code, config) {
     return result;
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 
@@ -2302,7 +2369,7 @@ module.exports = (function (window, document) {
     }
 
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 
@@ -2344,7 +2411,7 @@ var forms = module.exports = {
     }
 
 };
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 
@@ -2364,7 +2431,7 @@ var mixin = module.exports = function mixin(dest, source) {
 	return dest;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 
@@ -2416,7 +2483,7 @@ Pubsub.prototype.fire = function on(name) {
 
 module.exports = Pubsub;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 
@@ -2525,61 +2592,6 @@ module.exports = Pubsub;
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
 
-},{}],20:[function(require,module,exports){
-/* jshint quotmark:double */
-
-
-"use strict";
-
-
-
-module.exports.add = function add(el, str) {
-	var re;
-
-	if (el.classList && el.classList.add) {
-		el.classList.add(str);
-	} else {
-		re = new RegExp("\\b" + str + "\\b");
-
-		if (!re.test(el.className)) {
-			el.className += " " + str;
-		}
-	}
-};
-
-
-module.exports.remove = function remove(el, str) {
-	var re;
-
-	if (el.classList && el.classList.add) {
-		el.classList.remove(str);
-	} else {
-		re = new RegExp("\\b" + str + "\\b");
-
-		if (re.test(el.className)) {
-			el.className = el.className.replace(re, "");
-		}
-	}
-};
-
-
-module.exports.inject = function inject(el, str) {
-	var style;
-
-	if (str) {
-		style = document.createElement("style");
-		style.type = "text/css";
-
-		if (style.styleSheet) {
-			style.styleSheet.cssText = str;
-		} else {
-			style.appendChild(document.createTextNode(str));
-		}
-
-		el.appendChild(style);
-	}
-};
-
 },{}],21:[function(require,module,exports){
 'use strict';
 
@@ -2599,46 +2611,42 @@ var config = require('./config'),
 	events = require('./util/events'),
 	template = require('./util/template'),
 	forms = require('./util/forms'),
-	styles = require('./util/styles'),
+	css = require('./util/css'),
 	viewevents = require('./viewevents'),
 	constants = require('./constants');
 
 
 
+function View(model) {
+	var wrapper, forms, form, i, len;
 
-function addEvents(view) {
-	var forms, form, i, len;
+	this.el = wrapper = document.createElement('div');
+	this.model = model;
+	this.isShowing = false;
+	this.redraw();
 
-	events.add(document, 'click', viewevents.click, view);
-	events.add(document, 'keyup', viewevents.keyup, view);
-	events.add(window, 'pageshow', viewevents.pageshow, view);
+	// HTML
+	wrapper.id = config.name;
+	config.parent.appendChild(wrapper);
 
+	// CSS
+	css.inject(document.getElementsByTagName('head')[0], config.styles);
+
+	// JavaScript
+	events.add(document, 'click', viewevents.click, this);
+	events.add(document, 'keyup', viewevents.keyup, this);
+	events.add(window, 'pageshow', viewevents.pageshow, this);
+
+	// Bind to page's forms
 	forms = document.getElementsByTagName('form');
 
 	for (i = 0, len = forms.length; i < len; i++) {
 		form = forms[i];
 
 		if (form.cmd && constants.COMMANDS[form.cmd.value]) {
-			view.bind(form);
+			this.bind(form);
 		}
 	}
-}
-
-
-
-function View(model) {
-	var wrapper = document.createElement('div');
-	wrapper.id = config.name;
-
-	styles.inject(document.getElementsByTagName('head')[0], config.styles);
-	config.parent.appendChild(wrapper);
-
-	this.el = wrapper;
-	this.model = model;
-	this.isShowing = false;
-	this.redraw();
-
-	addEvents(this);
 }
 
 
@@ -2649,7 +2657,7 @@ View.prototype.redraw = function redraw() {
 
 View.prototype.show = function show() {
 	if (!this.isShowing) {
-		styles.add(document.body, constants.SHOWING_CLASS);
+		css.add(document.body, constants.SHOWING_CLASS);
 		this.isShowing = true;
 	}
 };
@@ -2657,7 +2665,7 @@ View.prototype.show = function show() {
 
 View.prototype.hide = function hide() {
 	if (this.isShowing) {
-		styles.remove(document.body, constants.SHOWING_CLASS);
+		css.remove(document.body, constants.SHOWING_CLASS);
 		this.isShowing = false;
 	}
 };
@@ -2695,8 +2703,8 @@ View.prototype.addItem = function addItem(idx, data) {
 	this.redraw();
 	this.show();
 
-	var els = this.el.getElementsByClassName('minicart-item');
-	styles.add(els[idx], 'minicart-item-changed');
+	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
 
@@ -2704,8 +2712,8 @@ View.prototype.changeItem = function changeItem(idx, data) {
 	this.redraw();
 	this.show();
 
-	var els = this.el.getElementsByClassName('minicart-item');
-	styles.add(els[idx], 'minicart-item-changed');
+	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
 
@@ -2718,7 +2726,7 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":10,"./constants":11,"./util/events":15,"./util/forms":16,"./util/styles":20,"./util/template":21,"./viewevents":23}],23:[function(require,module,exports){
+},{"./config":10,"./constants":11,"./util/css":14,"./util/events":16,"./util/forms":17,"./util/template":21,"./viewevents":23}],23:[function(require,module,exports){
 'use strict';
 
 
@@ -2731,11 +2739,11 @@ module.exports = {
 	click: function (e) {
 		var target = e.target;
 
-		if (target.className === 'minicart-remove') {
-			this.model.cart.remove(target.getAttribute('data-minicart-idx'));
+		if (target.className === constants.REMOVE_CLASS) {
+			this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
 			e.stopPropagation();
 			e.preventDefault();
-		} else if (target.className === 'minicart-closer') {
+		} else if (target.className === constants.CLOSER_CLASS) {
 			this.hide();
 			e.stopPropagation();
 			e.preventDefault();
@@ -2761,9 +2769,9 @@ module.exports = {
 		var that = this,
 			target = e.target, timer;
 
-		if (target.className === 'minicart-quantity') {
+		if (target.className === constants.QUANTITY_CLASS) {
 			timer = setTimeout(function () {
-				var product = that.model.cart.items(parseInt(target.getAttribute('data-minicart-idx'), 10));
+				var product = that.model.cart.items(parseInt(target.getAttribute(constants.DATA_IDX), 10));
 
 				if (product) {
 					product.set('quantity', target.value);
