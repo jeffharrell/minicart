@@ -5,27 +5,10 @@ var config = require('./config'),
 	events = require('./util/events'),
 	template = require('./util/template'),
 	forms = require('./util/forms'),
+	styles = require('./util/styles'),
 	constants = require('./constants');
 
 
-
-function addStyles() {
-	var head, style;
-
-	if (config.styles) {
-		style = document.createElement('style');
-		style.type = 'text/css';
-
-		if (style.styleSheet) {
-			style.styleSheet.cssText = config.styles;
-		} else {
-			style.appendChild(document.createTextNode(config.styles));
-		}
-
-		head = document.getElementsByTagName('head')[0];
-		head.appendChild(style);
-	}
-}
 
 
 function addEvents(view) {
@@ -95,6 +78,7 @@ function View(model) {
 	var wrapper = document.createElement('div');
 	wrapper.id = config.name;
 
+	styles.inject(document.getElementsByTagName('head')[0], config.styles);
 	config.parent.appendChild(wrapper);
 
 	this.el = wrapper;
@@ -102,7 +86,6 @@ function View(model) {
 	this.isShowing = false;
 	this.redraw();
 
-	addStyles();
 	addEvents(this);
 }
 
@@ -114,7 +97,7 @@ View.prototype.redraw = function redraw() {
 
 View.prototype.show = function show() {
 	if (!this.isShowing) {
-		document.body.classList.add(constants.SHOWING);
+		styles.add(document.body, constants.SHOWING_CLASS);
 		this.isShowing = true;
 	}
 };
@@ -122,7 +105,7 @@ View.prototype.show = function show() {
 
 View.prototype.hide = function hide() {
 	if (this.isShowing) {
-		document.body.classList.remove(constants.SHOWING);
+		styles.remove(document.body, constants.SHOWING_CLASS);
 		this.isShowing = false;
 	}
 };
@@ -161,7 +144,7 @@ View.prototype.addItem = function addItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	els[idx].classList.add('minicart-item-changed');
+	styles.add(els[idx], 'minicart-item-changed');
 };
 
 
@@ -170,7 +153,7 @@ View.prototype.changeItem = function changeItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	els[idx].classList.add('minicart-item-changed');
+	styles.add(els[idx], 'minicart-item-changed');
 };
 
 
