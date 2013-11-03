@@ -252,7 +252,39 @@ describe('View', function () {
 		setTimeout(function () {
 			assert(getItem(0).amount === '$3.00');
 			done();
-		}, 300);
+		}, 600);
+	});
+
+
+	it('should not update empty quantities via the UI', function (done) {
+		var input;
+
+		minicart.cart.add(mockData[0]);
+
+		input = document.getElementsByClassName('minicart-quantity')[0];
+		input.value = '';
+		fakeEvent(input, 'keyup');
+
+		setTimeout(function () {
+			assert(getItem(0).amount === '$1.00');
+			done();
+		}, 600);
+	});
+
+
+	it('should not update non-numeric quantities via the UI', function (done) {
+		var input;
+
+		minicart.cart.add(mockData[0]);
+
+		input = document.getElementsByClassName('minicart-quantity')[0];
+		input.value = 'asdf';
+		fakeEvent(input, 'keyup');
+
+		setTimeout(function () {
+			assert(getItem(0).amount === '$1.00');
+			done();
+		}, 600);
 	});
 
 
@@ -315,5 +347,4 @@ describe('View', function () {
 	});
 
 
-	it.skip('should not leave the page on checkout if no items are in the page', function () {});
 });

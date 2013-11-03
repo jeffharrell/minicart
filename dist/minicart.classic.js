@@ -1833,7 +1833,7 @@ module.exports = {
 
 	BN: 'MiniCart_AddToCart_WPS_US',
 
-	KEYUP_TIMEOUT: 250,
+	KEYUP_TIMEOUT: 500,
 
 	SHOWING_CLASS: 'minicart-showing',
 
@@ -2756,6 +2756,15 @@ module.exports = {
 
 				e.stopPropagation();
 				e.preventDefault();
+			} else if (target.className === constants.QUANTITY_CLASS) {
+				if (target.setSelectionRange) {
+					target.setSelectionRange(0, 999);
+				} else {
+					target.select();
+				}
+
+				e.stopPropagation();
+				e.preventDefault();
 			} else if (!(/input|button|select|option/i.test(target.tagName))) {
 				while (target.nodeType === 1) {
 					if (target === this.el) {
@@ -2781,10 +2790,17 @@ module.exports = {
 
 		if (target.className === constants.QUANTITY_CLASS) {
 			timer = setTimeout(function () {
-				var product = that.model.cart.items(parseInt(target.getAttribute(constants.DATA_IDX), 10));
+				var idx = parseInt(target.getAttribute(constants.DATA_IDX), 10),
+					cart = that.model.cart,
+					product = cart.items(idx),
+					quantity = parseInt(target.value, 10);
 
 				if (product) {
-					product.set('quantity', target.value);
+					if (quantity > 0) {
+						product.set('quantity', quantity);
+					} else if (quantity === 0) {
+						cart.remove(idx);
+					}
 				}
 			}, constants.KEYUP_TIMEOUT);
 		}

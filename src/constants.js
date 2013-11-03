@@ -9,7 +9,7 @@ module.exports = {
 
 	BN: 'MiniCart_AddToCart_WPS_US',
 
-	KEYUP_TIMEOUT: 250,
+	KEYUP_TIMEOUT: 500,
 
 	SHOWING_CLASS: 'minicart-showing',
 
