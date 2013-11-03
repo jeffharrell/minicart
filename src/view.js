@@ -5,7 +5,7 @@ var config = require('./config'),
 	events = require('./util/events'),
 	template = require('./util/template'),
 	forms = require('./util/forms'),
-	styles = require('./util/styles'),
+	css = require('./util/css'),
 	viewevents = require('./viewevents'),
 	constants = require('./constants');
 
@@ -36,13 +36,14 @@ function View(model) {
 	var wrapper = document.createElement('div');
 	wrapper.id = config.name;
 
-	styles.inject(document.getElementsByTagName('head')[0], config.styles);
 	config.parent.appendChild(wrapper);
 
 	this.el = wrapper;
 	this.model = model;
 	this.isShowing = false;
 	this.redraw();
+
+	css.inject(document.getElementsByTagName('head')[0], config.styles);
 
 	addEvents(this);
 }
@@ -55,7 +56,7 @@ View.prototype.redraw = function redraw() {
 
 View.prototype.show = function show() {
 	if (!this.isShowing) {
-		styles.add(document.body, constants.SHOWING_CLASS);
+		css.add(document.body, constants.SHOWING_CLASS);
 		this.isShowing = true;
 	}
 };
@@ -63,7 +64,7 @@ View.prototype.show = function show() {
 
 View.prototype.hide = function hide() {
 	if (this.isShowing) {
-		styles.remove(document.body, constants.SHOWING_CLASS);
+		css.remove(document.body, constants.SHOWING_CLASS);
 		this.isShowing = false;
 	}
 };
@@ -102,7 +103,7 @@ View.prototype.addItem = function addItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	styles.add(els[idx], 'minicart-item-changed');
+	css.add(els[idx], 'minicart-item-changed');
 };
 
 
@@ -111,7 +112,7 @@ View.prototype.changeItem = function changeItem(idx, data) {
 	this.show();
 
 	var els = this.el.getElementsByClassName('minicart-item');
-	styles.add(els[idx], 'minicart-item-changed');
+	css.add(els[idx], 'minicart-item-changed');
 };
 
 
