@@ -6,60 +6,18 @@ var config = require('./config'),
 	template = require('./util/template'),
 	forms = require('./util/forms'),
 	styles = require('./util/styles'),
+	viewevents = require('./viewevents'),
 	constants = require('./constants');
 
 
 
 
 function addEvents(view) {
-	var forms, form, i, len, keyupTimer;
+	var forms, form, i, len;
 
-
-	events.add(document, 'click', function (e) {
-		var target = e.target;
-
-		if (target.className === 'minicart-remove') {
-			view.model.cart.remove(target.getAttribute('data-minicart-idx'));
-		} else if (target.className === 'minicart-closer') {
-			view.hide();
-		} else if (view.isShowing) {
-			if (!(/input|button|select|option/i.test(target.tagName))) {
-				while (target.nodeType === 1) {
-					if (target === view.el) {
-						return;
-					}
-
-					target = target.parentNode;
-				}
-
-				view.hide();
-			}
-		}
-	});
-
-
-	events.add(document, 'keyup', function (e) {
-		var target = e.target;
-
-		if (target.className === 'minicart-quantity') {
-			keyupTimer = setTimeout(function () {
-				var product = view.model.cart.items(parseInt(target.getAttribute('data-minicart-idx'), 10));
-
-				if (product) {
-					product.set('quantity', target.value);
-				}
-			}, constants.KEYUP_TIMEOUT);
-		}
-	});
-
-
-	events.add(window, 'pageshow', function (e) {
-		if (e.persisted) {
-			view.redraw();
-			view.hide();
-		}
-	});
-
+	events.add(document, 'click', viewevents.click, view);
+	events.add(document, 'keyup', viewevents.keyup, view);
+	events.add(window, 'pageshow', viewevents.pageshow, view);
 
 	forms = document.getElementsByTagName('form');
 

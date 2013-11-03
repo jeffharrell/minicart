@@ -2600,60 +2600,18 @@ var config = require('./config'),
 	template = require('./util/template'),
 	forms = require('./util/forms'),
 	styles = require('./util/styles'),
+	viewevents = require('./viewevents'),
 	constants = require('./constants');
 
 
 
 
 function addEvents(view) {
-	var forms, form, i, len, keyupTimer;
+	var forms, form, i, len;
 
-
-	events.add(document, 'click', function (e) {
-		var target = e.target;
-
-		if (target.className === 'minicart-remove') {
-			view.model.cart.remove(target.getAttribute('data-minicart-idx'));
-		} else if (target.className === 'minicart-closer') {
-			view.hide();
-		} else if (view.isShowing) {
-			if (!(/input|button|select|option/i.test(target.tagName))) {
-				while (target.nodeType === 1) {
-					if (target === view.el) {
-						return;
-					}
-
-					target = target.parentNode;
-				}
-
-				view.hide();
-			}
-		}
-	});
-
-
-	events.add(document, 'keyup', function (e) {
-		var target = e.target;
-
-		if (target.className === 'minicart-quantity') {
-			keyupTimer = setTimeout(function () {
-				var product = view.model.cart.items(parseInt(target.getAttribute('data-minicart-idx'), 10));
-
-				if (product) {
-					product.set('quantity', target.value);
-				}
-			}, constants.KEYUP_TIMEOUT);
-		}
-	});
-
-
-	events.add(window, 'pageshow', function (e) {
-		if (e.persisted) {
-			view.redraw();
-			view.hide();
-		}
-	});
-
+	events.add(document, 'click', viewevents.click, view);
+	events.add(document, 'keyup', viewevents.keyup, view);
+	events.add(window, 'pageshow', viewevents.pageshow, view);
 
 	forms = document.getElementsByTagName('form');
 
@@ -2760,5 +2718,69 @@ View.prototype.removeItem = function removeItem(idx) {
 
 module.exports = View;
 
-},{"./config":10,"./constants":11,"./util/events":15,"./util/forms":16,"./util/styles":20,"./util/template":21}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22])
+},{"./config":10,"./constants":11,"./util/events":15,"./util/forms":16,"./util/styles":20,"./util/template":21,"./viewevents":23}],23:[function(require,module,exports){
+'use strict';
+
+
+var constants = require('./constants');
+
+
+
+module.exports = {
+
+	click: function (e) {
+		var target = e.target;
+
+		if (target.className === 'minicart-remove') {
+			this.model.cart.remove(target.getAttribute('data-minicart-idx'));
+			e.stopPropagation();
+			e.preventDefault();
+		} else if (target.className === 'minicart-closer') {
+			this.hide();
+			e.stopPropagation();
+			e.preventDefault();
+		} else if (this.isShowing) {
+			if (!(/input|button|select|option/i.test(target.tagName))) {
+				while (target.nodeType === 1) {
+					if (target === this.el) {
+						return;
+					}
+
+					target = target.parentNode;
+				}
+
+				this.hide();
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		}
+	},
+
+
+	keyup: function (e) {
+		var that = this,
+			target = e.target, timer;
+
+		if (target.className === 'minicart-quantity') {
+			timer = setTimeout(function () {
+				var product = that.model.cart.items(parseInt(target.getAttribute('data-minicart-idx'), 10));
+
+				if (product) {
+					product.set('quantity', target.value);
+				}
+			}, constants.KEYUP_TIMEOUT);
+		}
+	},
+
+
+	pageshow: function (e) {
+		if (e.persisted) {
+			this.redraw();
+			this.hide();
+		}
+	}
+
+};
+
+},{"./constants":11}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;
