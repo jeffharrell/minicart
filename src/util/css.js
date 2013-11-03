@@ -8,7 +8,9 @@
 module.exports.add = function add(el, str) {
 	var re;
 
-	if (el.classList && el.classList.add) {
+	if (!el) { return false; }
+
+	if (el && el.classList && el.classList.add) {
 		el.classList.add(str);
 	} else {
 		re = new RegExp("\\b" + str + "\\b");
@@ -22,6 +24,8 @@ module.exports.add = function add(el, str) {
 
 module.exports.remove = function remove(el, str) {
 	var re;
+
+	if (!el) { return false; }
 
 	if (el.classList && el.classList.add) {
 		el.classList.remove(str);
@@ -37,6 +41,8 @@ module.exports.remove = function remove(el, str) {
 
 module.exports.inject = function inject(el, str) {
 	var style;
+
+	if (!el) { return false; }
 
 	if (str) {
 		style = document.createElement("style");

@@ -17,6 +17,10 @@ var cartData = [
 function fakeEvent(el, type) {
 	var event;
 
+	if (type === 'click') {
+		type = ('ontouchstart' in window) ? 'touchstart' : 'click';
+	}
+
 	if (document.createEvent) {
 		event = document.createEvent('HTMLEvents');
 		event.initEvent(type, true, true);

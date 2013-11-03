@@ -27,7 +27,7 @@ function View(model) {
 	css.inject(document.getElementsByTagName('head')[0], config.styles);
 
 	// JavaScript
-	events.add(document, 'click', viewevents.click, this);
+	events.add(document, ('ontouchstart' in window) ? 'touchstart' : 'click', viewevents.click, this);
 	events.add(document, 'keyup', viewevents.keyup, this);
 	events.add(window, 'pageshow', viewevents.pageshow, this);
 

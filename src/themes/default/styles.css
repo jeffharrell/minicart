@@ -63,8 +63,8 @@
 
 #PPMiniCart .minicart-closer {
 	float: right;
-	margin: -5px 0 0;
-	padding: 0 0 8px;
+	margin: -12px -10px 0;
+	padding: 10px;
 	background: 0;
 	border: 0;
 	font-size: 18px;

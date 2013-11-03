@@ -2118,7 +2118,9 @@ module.exports = Product;
 module.exports.add = function add(el, str) {
 	var re;
 
-	if (el.classList && el.classList.add) {
+	if (!el) { return false; }
+
+	if (el && el.classList && el.classList.add) {
 		el.classList.add(str);
 	} else {
 		re = new RegExp("\\b" + str + "\\b");
@@ -2132,6 +2134,8 @@ module.exports.add = function add(el, str) {
 
 module.exports.remove = function remove(el, str) {
 	var re;
+
+	if (!el) { return false; }
 
 	if (el.classList && el.classList.add) {
 		el.classList.remove(str);
@@ -2147,6 +2151,8 @@ module.exports.remove = function remove(el, str) {
 
 module.exports.inject = function inject(el, str) {
 	var style;
+
+	if (!el) { return false; }
 
 	if (str) {
 		style = document.createElement("style");
@@ -2633,7 +2639,7 @@ function View(model) {
 	css.inject(document.getElementsByTagName('head')[0], config.styles);
 
 	// JavaScript
-	events.add(document, 'click', viewevents.click, this);
+	events.add(document, ('ontouchstart' in window) ? 'touchstart' : 'click', viewevents.click, this);
 	events.add(document, 'keyup', viewevents.keyup, this);
 	events.add(window, 'pageshow', viewevents.pageshow, this);
 
@@ -2739,16 +2745,18 @@ module.exports = {
 	click: function (e) {
 		var target = e.target;
 
-		if (target.className === constants.REMOVE_CLASS) {
-			this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
-			e.stopPropagation();
-			e.preventDefault();
-		} else if (target.className === constants.CLOSER_CLASS) {
-			this.hide();
-			e.stopPropagation();
-			e.preventDefault();
-		} else if (this.isShowing) {
-			if (!(/input|button|select|option/i.test(target.tagName))) {
+		if (this.isShowing) {
+			if (target.className === constants.REMOVE_CLASS) {
+				this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
+
+				e.stopPropagation();
+				e.preventDefault();
+			} else if (target.className === constants.CLOSER_CLASS) {
+				this.hide();
+
+				e.stopPropagation();
+				e.preventDefault();
+			} else if (!(/input|button|select|option/i.test(target.tagName))) {
 				while (target.nodeType === 1) {
 					if (target === this.el) {
 						return;
@@ -2758,6 +2766,7 @@ module.exports = {
 				}
 
 				this.hide();
+
 				e.stopPropagation();
 				e.preventDefault();
 			}
@@ -2767,7 +2776,8 @@ module.exports = {
 
 	keyup: function (e) {
 		var that = this,
-			target = e.target, timer;
+			target = e.target,
+			timer;
 
 		if (target.className === constants.QUANTITY_CLASS) {
 			timer = setTimeout(function () {

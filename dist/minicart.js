@@ -1805,7 +1805,7 @@ var defaults = module.exports = {
 
     template: '<%var items = cart.items();var settings = cart.settings();var hasItems = !!items.length;%><form method="post" class="<% if (!hasItems) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">	<button type="button" class="minicart-closer">&times;</button>	<ul>		<% for (i= 0, idx = i + 1, len = items.length; i < len; i++) { %>		<li class="minicart-item">			<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>			<ul class="minicart-attributes">				<% if (items[i].get("item_number")) { %>				<li><%= items[i].get("item_number") %></li>				<% } %>				<% if (items[i].discount()) { %>				<li><%= config.strings.discount %> <%= items[i].discount({ format: true }) %></li>				<% } %>				<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>				<li><%= options[j].key %>: <%= options[j].value %></li>				<% } %>			</ul>			<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" type="text" value="<%= items[i].get("quantity") %>" autocomplete="off" />			<button type="button" class="minicart-remove" data-minicart-idx="<%= i %>">&times;</button>			<span class="minicart-price"><%= items[i].total({ format: true }) %></span>			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />			<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].get("amount") %>" />		</li>		<% } %>	</ul>	<div>		<div class="minicart-subtotal">			<%= config.strings.subtotal %> <%= cart.total({ format: true, currencyCode: true }) %>		</div>		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />	</div>	<input type="hidden" name="cmd" value="_cart" />	<input type="hidden" name="upload" value="1" />	<% for (var key in settings) { %>	<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />	<% } %></form>',
 
-    styles: '@keyframes pop-in {	0% { opacity: 0; transform: scale(0.1); }	60% { opacity: 1; transform: scale(1.2); }	100% { transform: scale(1); }}@-webkit-keyframes pop-in {	0% { opacity: 0; -webkit-transform: scale(0.1); }	60% { opacity: 1; -webkit-transform: scale(1.2); }	100% { -webkit-transform: scale(1); }}@-moz-keyframes pop-in {	0% { opacity: 0; -moz-transform: scale(0.1); }	60% { opacity: 1; -moz-transform: scale(1.2); }	100% { -moz-transform: scale(1); }}.minicart-showing #PPMiniCart {	display: block;	animation: pop-in 0.2s;	-webkit-animation: pop-in 0.2s;	-moz-animation: pop-in 0.2s;}#PPMiniCart {	display: none;}#PPMiniCart form {	position: absolute;	left: 50%;	width: 400px;	max-height: 400px;	margin-left: -200px;	margin-top: -400px;	padding: 10px;	background: #fbfbfb;	border: 1px solid rgba(0, 0, 0, 0.2);	border-radius: 4px;	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);	font: 15px/normal arial, helvetica;	color: #333;}#PPMiniCart ul {	clear: right;	margin: 15px 0;	padding: 10px;	list-style-type: none;	background: #fff;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);}#PPMiniCart .minicart-empty ul {	display: none;}#PPMiniCart .minicart-closer {	float: right;	margin: -5px 0 0;	padding: 0 0 8px;	background: 0;	border: 0;	font-size: 18px;	cursor: pointer;}#PPMiniCart .minicart-item {	position: relative;	height: 30px;	padding: 6px;}#PPMiniCart .minicart-item + .minicart-item {	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 6px;	left: 0;	width: 185px;	color: #333;	line-height: 10px;	text-decoration: none;}#PPMiniCart .minicart-attributes {	position: absolute;	top: 20px;	left: 0;	margin: 0;	padding: 0;	border: 0;	border-radius: 0;	box-shadow: 0 0 0;	color: #999;	font-size:12px;	line-height: 22px;}#PPMiniCart .minicart-attributes li {	display: inline;}#PPMiniCart .minicart-attributes li:after {	content: ",";}#PPMiniCart .minicart-attributes li:last-child:after {	content: "";}#PPMiniCart .minicart-quantity {	position: absolute;	left: 235px;	width: 30px;	height: 18px;	padding: 2px 4px;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);	font-size: 13px;	text-align: right;	transition: border linear 0.2s, box-shadow linear 0.2s;	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;}#PPMiniCart .minicart-quantity:hover {	border-color: rgb(0, 120, 193);}#PPMiniCart .minicart-quantity:focus {	border-color: rgb(0, 120, 193);	outline: 0;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px rgba(0, 120, 193, 0.4);}#PPMiniCart .minicart-remove {	position: absolute;	top: 8px;	left: 290px;	width: 18px;	height: 19px;	margin: 0;	padding: 0;	background: #b7b7b7;	border: 1px solid #a3a3a3;	border-radius: 3px;	color: #fff;	font-size: 13px;	cursor: pointer;}#PPMiniCart .minicart-price {	display: block;	text-align: right;}#PPMiniCart .minicart-subtotal {	float: left;	padding: 6px 0 0;	font-size: 16px;	font-weight: bold;}#PPMiniCart .minicart-submit {	float: right;	width: 153px;	height: 33px;	background: #ffa822 url(../../images/checkout.png) no-repeat;	border: 0;	text-indent: -999em;	cursor: pointer;}',
+    styles: '@keyframes pop-in {	0% { opacity: 0; transform: scale(0.1); }	60% { opacity: 1; transform: scale(1.2); }	100% { transform: scale(1); }}@-webkit-keyframes pop-in {	0% { opacity: 0; -webkit-transform: scale(0.1); }	60% { opacity: 1; -webkit-transform: scale(1.2); }	100% { -webkit-transform: scale(1); }}@-moz-keyframes pop-in {	0% { opacity: 0; -moz-transform: scale(0.1); }	60% { opacity: 1; -moz-transform: scale(1.2); }	100% { -moz-transform: scale(1); }}.minicart-showing #PPMiniCart {	display: block;	animation: pop-in 0.2s;	-webkit-animation: pop-in 0.2s;	-moz-animation: pop-in 0.2s;}#PPMiniCart {	display: none;}#PPMiniCart form {	position: absolute;	left: 50%;	width: 400px;	max-height: 400px;	margin-left: -200px;	margin-top: -400px;	padding: 10px;	background: #fbfbfb;	border: 1px solid rgba(0, 0, 0, 0.2);	border-radius: 4px;	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);	font: 15px/normal arial, helvetica;	color: #333;}#PPMiniCart ul {	clear: right;	margin: 15px 0;	padding: 10px;	list-style-type: none;	background: #fff;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);}#PPMiniCart .minicart-empty ul {	display: none;}#PPMiniCart .minicart-closer {	float: right;	margin: -12px -10px 0;	padding: 10px;	background: 0;	border: 0;	font-size: 18px;	cursor: pointer;}#PPMiniCart .minicart-item {	position: relative;	height: 30px;	padding: 6px;}#PPMiniCart .minicart-item + .minicart-item {	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 6px;	left: 0;	width: 185px;	color: #333;	line-height: 10px;	text-decoration: none;}#PPMiniCart .minicart-attributes {	position: absolute;	top: 20px;	left: 0;	margin: 0;	padding: 0;	border: 0;	border-radius: 0;	box-shadow: 0 0 0;	color: #999;	font-size:12px;	line-height: 22px;}#PPMiniCart .minicart-attributes li {	display: inline;}#PPMiniCart .minicart-attributes li:after {	content: ",";}#PPMiniCart .minicart-attributes li:last-child:after {	content: "";}#PPMiniCart .minicart-quantity {	position: absolute;	left: 235px;	width: 30px;	height: 18px;	padding: 2px 4px;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);	font-size: 13px;	text-align: right;	transition: border linear 0.2s, box-shadow linear 0.2s;	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;}#PPMiniCart .minicart-quantity:hover {	border-color: rgb(0, 120, 193);}#PPMiniCart .minicart-quantity:focus {	border-color: rgb(0, 120, 193);	outline: 0;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px rgba(0, 120, 193, 0.4);}#PPMiniCart .minicart-remove {	position: absolute;	top: 8px;	left: 290px;	width: 18px;	height: 19px;	margin: 0;	padding: 0;	background: #b7b7b7;	border: 1px solid #a3a3a3;	border-radius: 3px;	color: #fff;	font-size: 13px;	cursor: pointer;}#PPMiniCart .minicart-price {	display: block;	text-align: right;}#PPMiniCart .minicart-subtotal {	float: left;	padding: 6px 0 0;	font-size: 16px;	font-weight: bold;}#PPMiniCart .minicart-submit {	float: right;	width: 153px;	height: 33px;	background: #ffa822 url(../../images/checkout.png) no-repeat;	border: 0;	text-indent: -999em;	cursor: pointer;}',
 
     strings: {
         button: 'Checkout',
@@ -2118,7 +2118,9 @@ module.exports = Product;
 module.exports.add = function add(el, str) {
 	var re;
 
-	if (el.classList && el.classList.add) {
+	if (!el) { return false; }
+
+	if (el && el.classList && el.classList.add) {
 		el.classList.add(str);
 	} else {
 		re = new RegExp("\\b" + str + "\\b");
@@ -2132,6 +2134,8 @@ module.exports.add = function add(el, str) {
 
 module.exports.remove = function remove(el, str) {
 	var re;
+
+	if (!el) { return false; }
 
 	if (el.classList && el.classList.add) {
 		el.classList.remove(str);
@@ -2147,6 +2151,8 @@ module.exports.remove = function remove(el, str) {
 
 module.exports.inject = function inject(el, str) {
 	var style;
+
+	if (!el) { return false; }
 
 	if (str) {
 		style = document.createElement("style");
@@ -2633,7 +2639,7 @@ function View(model) {
 	css.inject(document.getElementsByTagName('head')[0], config.styles);
 
 	// JavaScript
-	events.add(document, 'click', viewevents.click, this);
+	events.add(document, ('ontouchstart' in window) ? 'touchstart' : 'click', viewevents.click, this);
 	events.add(document, 'keyup', viewevents.keyup, this);
 	events.add(window, 'pageshow', viewevents.pageshow, this);
 
@@ -2739,16 +2745,18 @@ module.exports = {
 	click: function (e) {
 		var target = e.target;
 
-		if (target.className === constants.REMOVE_CLASS) {
-			this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
-			e.stopPropagation();
-			e.preventDefault();
-		} else if (target.className === constants.CLOSER_CLASS) {
-			this.hide();
-			e.stopPropagation();
-			e.preventDefault();
-		} else if (this.isShowing) {
-			if (!(/input|button|select|option/i.test(target.tagName))) {
+		if (this.isShowing) {
+			if (target.className === constants.REMOVE_CLASS) {
+				this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
+
+				e.stopPropagation();
+				e.preventDefault();
+			} else if (target.className === constants.CLOSER_CLASS) {
+				this.hide();
+
+				e.stopPropagation();
+				e.preventDefault();
+			} else if (!(/input|button|select|option/i.test(target.tagName))) {
 				while (target.nodeType === 1) {
 					if (target === this.el) {
 						return;
@@ -2758,6 +2766,7 @@ module.exports = {
 				}
 
 				this.hide();
+
 				e.stopPropagation();
 				e.preventDefault();
 			}
@@ -2767,7 +2776,8 @@ module.exports = {
 
 	keyup: function (e) {
 		var that = this,
-			target = e.target, timer;
+			target = e.target,
+			timer;
 
 		if (target.className === constants.QUANTITY_CLASS) {
 			timer = setTimeout(function () {
