@@ -55,27 +55,6 @@ module.exports = function (grunt) {
 		},
 
 		replace: {
-			classic: {
-				src: ['dist/minicart.js'],
-				dest: 'dist/minicart.classic.js',
-				options: {
-					processTemplates: false
-				},
-				replacements: [
-					{
-						from: '$TEMPLATE$',
-						to: function (word) {
-							return grunt.file.read('src/themes/classic/index.html').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
-						}
-					},
-					{
-						from: '$STYLES$',
-						to: function (word) {
-							return grunt.file.read('src/themes/classic/styles.css').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
-						}
-					}
-				]
-			},
 			default: {
 				src: ['dist/minicart.js'],
 				overwrite: true,
