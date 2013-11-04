@@ -308,6 +308,13 @@ describe('View', function () {
 	});
 
 
+	it('should not have data for undefined values', function () {
+		var form = document.getElementById('cartButton');
+
+		assert(typeof form.item_number === 'undefined');
+	});
+
+
 	it('should display item names', function () {
 		minicart.cart.add(mockData[0]);
 		assert(getItem(0).name === 'Test item 1');
