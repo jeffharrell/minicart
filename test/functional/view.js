@@ -288,7 +288,7 @@ describe('View', function () {
 
 
 	it('should update when a product is removed', function () {
-		minicart.cart.add(cartData[0]);
+		minicart.cart.add(mockData[0]);
 		assert(typeof getItem(0) === 'object');
 
 		fakeEvent(document.getElementsByClassName('minicart-remove')[0], 'click');
@@ -297,8 +297,8 @@ describe('View', function () {
 
 
 	it('should hide when the last product is removed', function () {
-		minicart.cart.add(cartData[0]);
-		minicart.cart.add(cartData[1]);
+		minicart.cart.add(mockData[0]);
+		minicart.cart.add(mockData[1]);
 
 		minicart.cart.remove(0);
 		assert(isCartShowing());
@@ -307,10 +307,17 @@ describe('View', function () {
 	});
 
 
-	it('should not have data for undefined values', function () {
-		var form = document.getElementById('cartButton');
+	it('should not have inputs for undefined values', function () {
+		var cart, form;
 
-		assert(typeof form.item_number === 'undefined');
+		minicart.cart.add(mockData[0]);
+
+		cart = document.getElementById(config.name);
+		form = cart.getElementsByTagName('form')[0];
+
+		assert(typeof form.elements.item_number_1 === 'undefined');
+		assert(typeof form.elements.on0_1 === 'undefined');
+		assert(typeof form.elements.os0_1 === 'undefined');
 	});
 
 
@@ -320,9 +327,34 @@ describe('View', function () {
 	});
 
 
+	it('should have item name data', function () {
+		var cart, form;
+
+		minicart.cart.add(mockData[0]);
+
+		cart = document.getElementById(config.name);
+		form = cart.getElementsByTagName('form')[0];
+
+		assert(form.elements.item_name_1.value === 'Test item 1');
+	});
+
+
 	it('should display item numbers', function () {
 		minicart.cart.add(mockData[2]);
 		assert(getItem(0).options[0] === '123ABC');
+	});
+
+
+	it('should have item number data', function () {
+		var cart, form;
+
+		minicart.cart.add(mockData[2]);
+
+		cart = document.getElementById(config.name);
+		form = cart.getElementsByTagName('form')[0];
+
+
+		assert(form.elements.item_number_1.value === '123ABC');
 	});
 
 
@@ -332,9 +364,33 @@ describe('View', function () {
 	});
 
 
+	it('should have item amount data', function () {
+		var cart, form;
+
+		minicart.cart.add(mockData[1]);
+
+		cart = document.getElementById(config.name);
+		form = cart.getElementsByTagName('form')[0];
+
+		assert(form.elements.amount_1.value === '2');
+	});
+
+
 	it('should display discounts', function () {
 		minicart.cart.add(mockData[3]);
 		assert(getItem(0).options[0] === 'Discount: $99.00');
+	});
+
+
+	it('should have discount data', function () {
+		var cart, form;
+
+		minicart.cart.add(mockData[3]);
+
+		cart = document.getElementById(config.name);
+		form = cart.getElementsByTagName('form')[0];
+
+		assert(form.elements.discount_amount_1.value === '99');
 	});
 
 
@@ -345,11 +401,26 @@ describe('View', function () {
 	});
 
 
+	it('should have option data', function () {
+		var cart, form;
+
+		minicart.cart.add(mockData[4]);
+
+		cart = document.getElementById(config.name);
+		form = cart.getElementsByTagName('form')[0];
+
+		console.log(form.elements);
+
+		assert(form.elements.on0_1.value === 'Size');
+		assert(form.elements.os0_1.value === 'Large');
+	});
+
+
 	it('should display a subtotal', function () {
 		minicart.cart.add(mockData[0]);
 		minicart.cart.add(mockData[1]);
 
-		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.trim() === 'Subtotal: $5.00');
+		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: $5.00');
 	});
 
 
