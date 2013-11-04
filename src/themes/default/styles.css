@@ -20,6 +20,10 @@
 .minicart-showing #PPMiniCart {
 	display: block;
 
+	transform: translatez(0);
+	-webkit-transform: translatez(0);
+	-moz-transform: translatez(0);
+
 	animation: pop-in 0.2s;
 	-webkit-animation: pop-in 0.2s;
 	-moz-animation: pop-in 0.2s;
