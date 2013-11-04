@@ -52,21 +52,20 @@ function getItem(idx) {
 
 		if (attrsList) {
 			for (i = 0, len = attrsList.length; i < len; i++) {
-				attrsData.push(attrsList[i].textContent);
+				attrsData.push(attrsList[i].textContent.replace(/^\s+|\s+$/g, ''));
 			}
 		}
 
 		return {
-			name: li.getElementsByTagName('a')[0].textContent,
+			name: li.getElementsByTagName('a')[0].textContent.replace(/^\s+|\s+$/g, ''),
 			quantity: li.getElementsByClassName('minicart-quantity')[0].value,
-			amount: li.getElementsByClassName('minicart-price')[0].textContent,
+			amount: li.getElementsByClassName('minicart-price')[0].textContent.replace(/^\s+|\s+$/g, ''),
 			options: attrsData
 		};
 	} else {
 		return false;
 	}
 }
-
 
 
 

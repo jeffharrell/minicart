@@ -11,10 +11,16 @@ var hasItems = !!items.length;
 			<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>
 			<ul class="minicart-attributes">
 				<% if (items[i].get("item_number")) { %>
-				<li><%= items[i].get("item_number") %></li>
+				<li>
+					<%= items[i].get("item_number") %>
+					<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />
+				</li>
 				<% } %>
 				<% if (items[i].discount()) { %>
-				<li><%= config.strings.discount %> <%= items[i].discount({ format: true }) %></li>
+				<li>
+					<%= config.strings.discount %> <%= items[i].discount({ format: true }) %>
+					<input type="hidden" name="discount_amount_<%= idx %>" value="<%= items[i].discount() %>" />
+				</li>
 				<% } %>
 				<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>
 				<li><%= options[j].key %>: <%= options[j].value %></li>
@@ -25,9 +31,6 @@ var hasItems = !!items.length;
 			<span class="minicart-price"><%= items[i].total({ format: true }) %></span>
 			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />
 			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].get("amount") %>" />
-			<% if (items[i].get("item_number")) { %>
-				<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />
-			<% } %>
 		</li>
 		<% } %>
 	</ul>
