@@ -26,8 +26,7 @@ module.exports = function (grunt) {
 			},
 			all: {
 				files: {
-					'dist/minicart.min.js': ['dist/minicart.js'],
-					'dist/minicart.classic.min.js': ['dist/minicart.classic.js']
+					'dist/minicart.min.js': ['dist/minicart.js']
 				}
 			}
 		},

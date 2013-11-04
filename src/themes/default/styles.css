@@ -24,9 +24,9 @@
 	-webkit-transform: translatez(0);
 	-moz-transform: translatez(0);
 
-	animation: pop-in 0.2s;
-	-webkit-animation: pop-in 0.2s;
-	-moz-animation: pop-in 0.2s;
+	animation: pop-in 0.25s;
+	-webkit-animation: pop-in 0.25s;
+	-moz-animation: pop-in 0.25s;
 }
 
 #PPMiniCart {
@@ -146,7 +146,7 @@
 #PPMiniCart .minicart-quantity:focus {
 	border-color: rgb(0, 120, 193);
 	outline: 0;
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px rgba(0, 120, 193, 0.4);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 3px rgba(0, 120, 193, 0.4);
 }
 
 #PPMiniCart .minicart-remove {
@@ -162,7 +162,12 @@
 	border-radius: 3px;
 	color: #fff;
 	font-size: 13px;
+	opacity: 0.70;
 	cursor: pointer;
+}
+
+#PPMiniCart .minicart-remove:hover {
+	opacity: 1;
 }
 
 #PPMiniCart .minicart-price {
