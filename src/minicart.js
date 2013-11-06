@@ -1,7 +1,6 @@
 'use strict';
 
 // TODO: code comments!
-// - IE
 // - "fixed" positioning
 // - Update examples
 

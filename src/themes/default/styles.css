@@ -42,7 +42,7 @@
 	margin-top: -400px;
 	padding: 10px;
 	background: #fbfbfb;
-	border: 1px solid rgba(0, 0, 0, 0.2);
+	border: 1px solid #d7d7d7;
 	border-radius: 4px;
 	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
 	font: 15px/normal arial, helvetica;
@@ -106,7 +106,7 @@
 	border-radius: 0;
 	box-shadow: 0 0 0;
 	color: #999;
-	font-size:12px;
+	font-size: 12px;
 	line-height: 22px;
 }
 
@@ -140,11 +140,11 @@
 }
 
 #PPMiniCart .minicart-quantity:hover {
-	border-color: rgb(0, 120, 193);
+	border-color: #0078C1;
 }
 
 #PPMiniCart .minicart-quantity:focus {
-	border-color: rgb(0, 120, 193);
+	border-color: #0078C1;
 	outline: 0;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 3px rgba(0, 120, 193, 0.4);
 }
