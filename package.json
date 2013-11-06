@@ -1,6 +1,6 @@
 {
   "name": "minicart",
-  "description": "Improve your PayPal integration by creating an overlay which appears as a user adds products to their cart.",
+  "description": "The Mini Cart is the way to improve your PayPal shopping cart integration.",
   "version": "3.0.0",
   "author": {
     "name": "Jeff Harrell",

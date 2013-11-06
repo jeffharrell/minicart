@@ -1,6 +1,6 @@
 # The Mini Cart
 
-The Mini Cart is a great way to improve your PayPal integration by creating an overlay which appears as a user adds products to their cart. It’s a simple change that creates a wonderful new experience for your website!
+The Mini Cart is the way to improve your PayPal shopping cart integration. One simple change and your users will be able to manage their items right on your site and not be redirected to PayPal.
 
 [![Build Status](https://travis-ci.org/jeffharrell/minicart.png?branch=master,3.0-alpha)](https://travis-ci.org/jeffharrell/minicart)
 
@@ -72,13 +72,14 @@ Localization and adaption are supported in the Mini Cart using the configuration
         paypal.minicart.render({
             strings: {
                 button: "Caisse",  
-                subtotal: "Total ",
-                shipping: "ne comprend pas les frais de port et d'impôt" 	
+                subtotal: "Total:",
+                discount: "Réduction:"
+                processing: "Traitement"
             }
         });
     </script>
 
-The currency symbol will be automatically adjusted based on the currency_code setting of your button.
+The currency symbol will be automatically adjusted based on the `currency_code` setting of your button.
 
 
 
