@@ -1,6 +1,7 @@
 'use strict';
 
-// TODO: code comments!
+// TODO:
+// - Doc updates
 // - "fixed" positioning
 // - Update examples
 

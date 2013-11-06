@@ -137,13 +137,13 @@ The other cause is that the Mini Cart doesn’t yet work with what PayPal’s ca
 2. Once you’ve created the button click Remove code protection before copying your button’s code.
 
 ### The Mini Cart isn’t emptying after a transaction is completed. Why?
-The Mini Cart appends a fragment to your button’s return URL which sends a command to it when the user successfully returns from a transaction. If this is not working properly you should make sure that your are setting the value correctly and that it does not already contain a fragment.
+You'll want to set a `return` URL parameter for PayPal to redirect back to. On this page make sure to call `paypapl.minicart.reset()`.
 
 ### Is non-JavaScript supported?
-If your users do not have a JavaScript-capable browser, they will still be able to see your cart buttons and make purchases, but the user interface will gracefully degrade to the standard PayPal Cart.
+Sort of. If JavaScript isn't enabled the Mini Cart will not work and the page will fall back to using the standard PayPal HTML buttons. 
 
 ### My website uses frames / iframes for it’s products. How can I make the Mini Cart work?
-Depending upon how your site is setup the Mini Cart isn’t always compatible with websites containing frames. To ensure that it works you need to have the product buttons on the same frame as the main window.
+Frames are not officially supported. You may be able to get some mileage with the `target` configuration setting. Otherwise, make sure your product buttons are on the same frame as the main window.
 
 ### The Mini Cart isn’t appearing the same as on this page. Why?
 This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). Example issues include appearing in the bottom left of the browser, not scrolling properly, or having rendering issues. To check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
