@@ -30,6 +30,12 @@ var defaults = module.exports = {
 };
 
 
+/**
+ * Mixes in the user config with the default config.
+ *
+ * @param {object} userConfig Configuration overrides
+ * @return {object}
+ */
 module.exports.load = function load(userConfig) {
     return mixin(defaults, userConfig);
 };

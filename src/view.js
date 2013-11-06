@@ -11,6 +11,12 @@ var config = require('./config'),
 
 
 
+/**
+ * Creates a view model.
+ *
+ * @constructor
+ * @param {object} model
+ */
 function View(model) {
 	var wrapper, forms, form, i, len;
 
@@ -44,11 +50,17 @@ function View(model) {
 }
 
 
+/**
+ * Tells the view to redraw
+ */
 View.prototype.redraw = function redraw() {
 	this.el.innerHTML = template(config.template, this.model);
 };
 
 
+/**
+ * Tells the view to show
+ */
 View.prototype.show = function show() {
 	if (!this.isShowing) {
 		css.add(document.body, constants.SHOWING_CLASS);
@@ -57,6 +69,9 @@ View.prototype.show = function show() {
 };
 
 
+/**
+ * Tells the view to hide
+ */
 View.prototype.hide = function hide() {
 	if (this.isShowing) {
 		css.remove(document.body, constants.SHOWING_CLASS);
@@ -65,11 +80,20 @@ View.prototype.hide = function hide() {
 };
 
 
+/**
+ * Toggles the visibility of the view
+ */
 View.prototype.toggle = function toggle() {
 	this[this.isShowing ? 'hide' : 'show']();
 };
 
 
+/**
+ * Binds cart submit events to a form.
+ *
+ * @param {HTMLElement} form
+ * @return {booealn}
+ */
 View.prototype.bind = function bind(form) {
 	var that = this;
 
@@ -93,6 +117,12 @@ View.prototype.bind = function bind(form) {
 };
 
 
+/**
+ * Adds an item to the view.
+ *
+ * @param {number} idx
+ * @param {object} data
+ */
 View.prototype.addItem = function addItem(idx, data) {
 	this.redraw();
 	this.show();
@@ -102,6 +132,12 @@ View.prototype.addItem = function addItem(idx, data) {
 };
 
 
+/**
+ * Changes an item in the view.
+ *
+ * @param {number} idx
+ * @param {object} data
+ */
 View.prototype.changeItem = function changeItem(idx, data) {
 	this.redraw();
 	this.show();
@@ -111,6 +147,11 @@ View.prototype.changeItem = function changeItem(idx, data) {
 };
 
 
+/**
+ * Removes an item from the view.
+ *
+ * @param {number} idx
+ */
 View.prototype.removeItem = function removeItem(idx) {
 	this.redraw();
 };

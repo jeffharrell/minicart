@@ -14,6 +14,11 @@ var Cart = require('./cart'),
 	viewModel;
 
 
+/**
+ * Renders the Mini Cart to the page's DOM.
+ *
+ * @param {object} userConfig Configuration overrides
+ */
 minicart.render = function (userConfig) {
 	confModel = minicart.config = config.load(userConfig);
 	cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
@@ -29,6 +34,9 @@ minicart.render = function (userConfig) {
 };
 
 
+/**
+ * Resets the Mini Cart and its view model
+ */
 minicart.reset = function () {
     cartModel.destroy();
 
@@ -39,7 +47,7 @@ minicart.reset = function () {
 
 
 
-// Export for either the browser or node
+// Export to either node or the brower window
 if (typeof window === 'undefined') {
 	module.exports = minicart;
 } else {

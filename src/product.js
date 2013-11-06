@@ -29,6 +29,12 @@ var parser = {
 };
 
 
+/**
+ * Creates a new product.
+ *
+ * @constructor
+ * @param {object} data Item data
+ */
 function Product(data) {
 	data.quantity = parser.quantity(data.quantity);
 	data.amount = parser.amount(data.amount);
@@ -47,11 +53,24 @@ function Product(data) {
 mixin(Product.prototype, Pubsub.prototype);
 
 
+/**
+ * Gets the product data.
+ *
+ * @param {string} key (Optional) A key to restrict the returned data to.
+ * @return {array|string}
+ */
 Product.prototype.get = function get(key) {
     return (key) ? this._data[key] : this._data;
 };
 
 
+/**
+ * Sets a value on the product. This is used rather than manually setting the
+ * value so that we can fire a "change" event.
+ *
+ * @param {string} key
+ * @param {string} value
+ */
 Product.prototype.set = function set(key, value) {
 	var setter = parser[key];
 
@@ -65,6 +84,11 @@ Product.prototype.set = function set(key, value) {
 };
 
 
+/**
+ * Parse and return the options for this product.
+ *
+ * @return {object}
+ */
 Product.prototype.options = function options() {
 	var result, key, value, amount, i, j;
 
@@ -102,6 +126,12 @@ Product.prototype.options = function options() {
 };
 
 
+/**
+ * Parse and return the discount for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Product.prototype.discount = function discount(config) {
 	var flat, rate, num, limit, result, amount;
 
@@ -127,6 +157,12 @@ Product.prototype.discount = function discount(config) {
 };
 
 
+/**
+ * Parse and return the total without discounts for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Product.prototype.amount = function amount(config) {
 	var result, options, len, i;
 
@@ -145,6 +181,12 @@ Product.prototype.amount = function amount(config) {
 };
 
 
+/**
+ * Parse and return the total for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Product.prototype.total = function total(config) {
 	var result;
 
@@ -159,6 +201,12 @@ Product.prototype.total = function total(config) {
 };
 
 
+/**
+ * Determine if this product has the same data as another.
+ *
+ * @param {object|Product} data Other product.
+ * @return {boolean}
+ */
 Product.prototype.isEqual = function isEqual(data) {
 	var match = false;
 
@@ -189,6 +237,9 @@ Product.prototype.isEqual = function isEqual(data) {
 };
 
 
+/**
+ * Destroys this product. Fires a "destroy" event.
+ */
 Product.prototype.destroy = function destroy() {
     this._data = [];
     this.fire('destroy', this);

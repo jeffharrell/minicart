@@ -9,6 +9,14 @@ var Product = require('./product'),
 	mixin = require('./util/mixin');
 
 
+
+/**
+ * Renders the Mini Cart to the page's DOM.
+ *
+ * @constructor
+ * @param {string} name Name of the cart (used as a key for storage)
+ * @param {duration} number Time in milliseconds that the cart data should persist
+ */
 function Cart(name, duration) {
     var data, items, settings, len, i;
 
@@ -39,6 +47,12 @@ mixin(Cart.prototype, Pubsub.prototype);
 mixin(Cart.prototype, Storage.prototype);
 
 
+/**
+ * Adds an item to the cart. This fires an "add" event.
+ *
+ * @param {object} data Item data
+ * @return {number} Item location in the cart
+ */
 Cart.prototype.add = function add(data) {
     var that = this,
 		items = this.items(),
@@ -80,16 +94,34 @@ Cart.prototype.add = function add(data) {
 };
 
 
+/**
+ * Returns the carts current items.
+ *
+ * @param {number} idx (Optional) Returns only that item.
+ * @return {array|object}
+ */
 Cart.prototype.items = function get(idx) {
     return (typeof idx === 'number') ? this._items[idx] : this._items;
 };
 
 
+/**
+ * Returns the carts current settings.
+ *
+ * @param {string} name (Optional) Returns only that setting.
+ * @return {array|string}
+ */
 Cart.prototype.settings = function settings(name) {
 	return (name) ? this._settings[name] : this._settings;
 };
 
 
+/**
+ * Returns the cart discount.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Cart.prototype.discount = function discount(config) {
 	var result = parseFloat(this.settings('discount_amount_cart')) || 0;
 
@@ -101,6 +133,12 @@ Cart.prototype.discount = function discount(config) {
 };
 
 
+/**
+ * Returns the cart total without discounts.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Cart.prototype.subtotal = function subtotal(config) {
 	var products = this.items(),
 		result = 0,
@@ -114,6 +152,12 @@ Cart.prototype.subtotal = function subtotal(config) {
 };
 
 
+/**
+ * Returns the cart total.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Cart.prototype.total = function total(config) {
     var result = 0;
 
@@ -124,6 +168,12 @@ Cart.prototype.total = function total(config) {
 };
 
 
+/**
+ * Remove an item from the cart. This fires a "remove" event.
+ *
+ * @param {number} idx Item index to remove.
+ * @return {boolean}
+ */
 Cart.prototype.remove = function remove(idx) {
     var item = this._items.splice(idx, 1);
 
@@ -140,6 +190,9 @@ Cart.prototype.remove = function remove(idx) {
 };
 
 
+/**
+ * Saves the cart data.
+ */
 Cart.prototype.save = function save() {
 	var items = this.items(),
 		settings = this.settings(),
@@ -157,6 +210,9 @@ Cart.prototype.save = function save() {
 };
 
 
+/**
+ * Destroy the cart data. This fires a "destroy" event.
+ */
 Cart.prototype.destroy = function destroy() {
 	Storage.prototype.destroy.call(this);
 
