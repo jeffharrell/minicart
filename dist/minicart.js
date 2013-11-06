@@ -2609,6 +2609,14 @@ module.exports = function template(str, data) {
     return ejs.render(str, data);
 };
 
+
+// Workaround for IE 8's lack of support
+if (!String.prototype.trim) {
+	String.prototype.trim = function () {
+		return this.replace(/^\s+|\s+$/g, '');
+	};
+}
+
 },{"ejs":6}],22:[function(require,module,exports){
 'use strict';
 
@@ -2816,5 +2824,5 @@ module.exports = {
 
 };
 
-},{"./constants":11}]},{},[9,11,10,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;
