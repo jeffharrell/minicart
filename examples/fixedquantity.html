@@ -26,9 +26,9 @@
 	<script>
 		paypal.minicart.render();
 
-		paypal.minicart.cart.on('add', function (idx, data, isExisting) {
+		paypal.minicart.cart.on('add', function (idx, product, isExisting) {
 			if (isExisting) {
-				data.set('quantity', 1);
+				product.set('quantity', 1);
 				alert('Sorry, you can only have one of those.');
 			}
 		});

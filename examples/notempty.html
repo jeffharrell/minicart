@@ -42,8 +42,8 @@
 	<script>
 		paypal.minicart.render();
 
-		paypal.minicart.cart.on('add', function (idx, data, isExisting) {
-			if (!data.os0) {
+		paypal.minicart.cart.on('add', function (idx, product, isExisting) {
+			if (!product.get('os0')) {
 				this.remove(idx);
 				alert('Please select an option first!');
 			}
