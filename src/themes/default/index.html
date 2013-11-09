@@ -42,7 +42,7 @@ var hasItems = !!items.length;
 		<div class="minicart-subtotal">
 			<%= config.strings.subtotal %> <%= cart.total({ format: true, currencyCode: true }) %>
 		</div>
-		<button class="minicart-submit" type="submit" data-minicart-alt="<%= config.strings.processing %>"><%- config.strings.button %></button>
+		<button class="minicart-submit" type="submit" data-minicart-alt="<%= config.strings.buttonalt %>"><%- config.strings.button %></button>
 	</div>
 	<input type="hidden" name="cmd" value="_cart" />
 	<input type="hidden" name="upload" value="1" />
