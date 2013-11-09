@@ -1622,6 +1622,14 @@ var Product = require('./product'),
 	mixin = require('./util/mixin');
 
 
+
+/**
+ * Renders the Mini Cart to the page's DOM.
+ *
+ * @constructor
+ * @param {string} name Name of the cart (used as a key for storage)
+ * @param {duration} number Time in milliseconds that the cart data should persist
+ */
 function Cart(name, duration) {
     var data, items, settings, len, i;
 
@@ -1652,6 +1660,12 @@ mixin(Cart.prototype, Pubsub.prototype);
 mixin(Cart.prototype, Storage.prototype);
 
 
+/**
+ * Adds an item to the cart. This fires an "add" event.
+ *
+ * @param {object} data Item data
+ * @return {number} Item location in the cart
+ */
 Cart.prototype.add = function add(data) {
     var that = this,
 		items = this.items(),
@@ -1693,16 +1707,34 @@ Cart.prototype.add = function add(data) {
 };
 
 
+/**
+ * Returns the carts current items.
+ *
+ * @param {number} idx (Optional) Returns only that item.
+ * @return {array|object}
+ */
 Cart.prototype.items = function get(idx) {
     return (typeof idx === 'number') ? this._items[idx] : this._items;
 };
 
 
+/**
+ * Returns the carts current settings.
+ *
+ * @param {string} name (Optional) Returns only that setting.
+ * @return {array|string}
+ */
 Cart.prototype.settings = function settings(name) {
 	return (name) ? this._settings[name] : this._settings;
 };
 
 
+/**
+ * Returns the cart discount.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Cart.prototype.discount = function discount(config) {
 	var result = parseFloat(this.settings('discount_amount_cart')) || 0;
 
@@ -1714,6 +1746,12 @@ Cart.prototype.discount = function discount(config) {
 };
 
 
+/**
+ * Returns the cart total without discounts.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Cart.prototype.subtotal = function subtotal(config) {
 	var products = this.items(),
 		result = 0,
@@ -1727,6 +1765,12 @@ Cart.prototype.subtotal = function subtotal(config) {
 };
 
 
+/**
+ * Returns the cart total.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Cart.prototype.total = function total(config) {
     var result = 0;
 
@@ -1737,6 +1781,12 @@ Cart.prototype.total = function total(config) {
 };
 
 
+/**
+ * Remove an item from the cart. This fires a "remove" event.
+ *
+ * @param {number} idx Item index to remove.
+ * @return {boolean}
+ */
 Cart.prototype.remove = function remove(idx) {
     var item = this._items.splice(idx, 1);
 
@@ -1753,6 +1803,9 @@ Cart.prototype.remove = function remove(idx) {
 };
 
 
+/**
+ * Saves the cart data.
+ */
 Cart.prototype.save = function save() {
 	var items = this.items(),
 		settings = this.settings(),
@@ -1770,6 +1823,9 @@ Cart.prototype.save = function save() {
 };
 
 
+/**
+ * Destroy the cart data. This fires a "destroy" event.
+ */
 Cart.prototype.destroy = function destroy() {
 	Storage.prototype.destroy.call(this);
 
@@ -1805,7 +1861,7 @@ var defaults = module.exports = {
 
     template: '<%var items = cart.items();var settings = cart.settings();var hasItems = !!items.length;%><form method="post" class="<% if (!hasItems) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">	<button type="button" class="minicart-closer">&times;</button>	<ul>		<% for (var i= 0, idx = i + 1, len = items.length; i < len; i++, idx++) { %>		<li class="minicart-item">			<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>			<ul class="minicart-attributes">				<% if (items[i].get("item_number")) { %>				<li>					<%= items[i].get("item_number") %>					<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />				</li>				<% } %>				<% if (items[i].discount()) { %>				<li>					<%= config.strings.discount %> <%= items[i].discount({ format: true }) %>					<input type="hidden" name="discount_amount_<%= idx %>" value="<%= items[i].discount() %>" />				</li>				<% } %>				<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>					<li>						<%= options[j].key %>: <%= options[j].value %>						<input type="hidden" name="on<%= j %>_<%= idx %>" value="<%= options[j].key %>" />						<input type="hidden" name="os<%= j %>_<%= idx %>" value="<%= options[j].value %>" />					</li>				<% } %>			</ul>			<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" type="text" pattern="[0-9]*" value="<%= items[i].get("quantity") %>" autocomplete="off" />			<button type="button" class="minicart-remove" data-minicart-idx="<%= i %>">&times;</button>			<span class="minicart-price"><%= items[i].total({ format: true }) %></span>			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].amount() %>" />		</li>		<% } %>	</ul>	<div>		<div class="minicart-subtotal">			<%= config.strings.subtotal %> <%= cart.total({ format: true, currencyCode: true }) %>		</div>		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />	</div>	<input type="hidden" name="cmd" value="_cart" />	<input type="hidden" name="upload" value="1" />	<% for (var key in settings) { %>		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />	<% } %></form>',
 
-    styles: '@keyframes pop-in {	0% { opacity: 0; transform: scale(0.1); }	60% { opacity: 1; transform: scale(1.2); }	100% { transform: scale(1); }}@-webkit-keyframes pop-in {	0% { opacity: 0; -webkit-transform: scale(0.1); }	60% { opacity: 1; -webkit-transform: scale(1.2); }	100% { -webkit-transform: scale(1); }}@-moz-keyframes pop-in {	0% { opacity: 0; -moz-transform: scale(0.1); }	60% { opacity: 1; -moz-transform: scale(1.2); }	100% { -moz-transform: scale(1); }}.minicart-showing #PPMiniCart {	display: block;	transform: translatez(0);	-webkit-transform: translatez(0);	-moz-transform: translatez(0);	animation: pop-in 0.25s;	-webkit-animation: pop-in 0.25s;	-moz-animation: pop-in 0.25s;}#PPMiniCart {	display: none;}#PPMiniCart form {	position: absolute;	left: 50%;	width: 400px;	max-height: 400px;	margin-left: -200px;	margin-top: -400px;	padding: 10px;	background: #fbfbfb;	border: 1px solid #d7d7d7;	border-radius: 4px;	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);	font: 15px/normal arial, helvetica;	color: #333;}#PPMiniCart ul {	clear: right;	margin: 15px 0;	padding: 10px;	list-style-type: none;	background: #fff;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);}#PPMiniCart .minicart-empty ul {	display: none;}#PPMiniCart .minicart-closer {	float: right;	margin: -12px -10px 0;	padding: 10px;	background: 0;	border: 0;	font-size: 18px;	cursor: pointer;}#PPMiniCart .minicart-item {	position: relative;	height: 30px;	padding: 6px;}#PPMiniCart .minicart-item + .minicart-item {	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 6px;	left: 0;	width: 185px;	color: #333;	line-height: 10px;	text-decoration: none;}#PPMiniCart .minicart-attributes {	position: absolute;	top: 20px;	left: 0;	margin: 0;	padding: 0;	border: 0;	border-radius: 0;	box-shadow: 0 0 0;	color: #999;	font-size: 12px;	line-height: 22px;}#PPMiniCart .minicart-attributes li {	display: inline;}#PPMiniCart .minicart-attributes li:after {	content: ",";}#PPMiniCart .minicart-attributes li:last-child:after {	content: "";}#PPMiniCart .minicart-quantity {	position: absolute;	left: 235px;	width: 30px;	height: 18px;	padding: 2px 4px;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);	font-size: 13px;	text-align: right;	transition: border linear 0.2s, box-shadow linear 0.2s;	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;}#PPMiniCart .minicart-quantity:hover {	border-color: #0078C1;}#PPMiniCart .minicart-quantity:focus {	border-color: #0078C1;	outline: 0;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 3px rgba(0, 120, 193, 0.4);}#PPMiniCart .minicart-remove {	position: absolute;	top: 8px;	left: 290px;	width: 18px;	height: 19px;	margin: 0;	padding: 0;	background: #b7b7b7;	border: 1px solid #a3a3a3;	border-radius: 3px;	color: #fff;	font-size: 13px;	opacity: 0.70;	cursor: pointer;}#PPMiniCart .minicart-remove:hover {	opacity: 1;}#PPMiniCart .minicart-price {	display: block;	text-align: right;}#PPMiniCart .minicart-subtotal {	float: left;	padding: 6px 0 0;	font-size: 16px;	font-weight: bold;}#PPMiniCart .minicart-submit {	float: right;	width: 153px;	height: 33px;	background: #ffa822 url(../../images/checkout.png) no-repeat;	border: 0;	text-indent: -999em;	cursor: pointer;}/* IE 8 hacks */@media \0screen {}',
+    styles: '@keyframes pop-in {	0% { opacity: 0; transform: scale(0.1); }	60% { opacity: 1; transform: scale(1.2); }	100% { transform: scale(1); }}@-webkit-keyframes pop-in {	0% { opacity: 0; -webkit-transform: scale(0.1); }	60% { opacity: 1; -webkit-transform: scale(1.2); }	100% { -webkit-transform: scale(1); }}@-moz-keyframes pop-in {	0% { opacity: 0; -moz-transform: scale(0.1); }	60% { opacity: 1; -moz-transform: scale(1.2); }	100% { -moz-transform: scale(1); }}.minicart-showing #PPMiniCart {	display: block;	backface-visibility: hidden;	transform: translateZ(0);	-webkit-transform: translateZ(0);	-moz-transform: translateZ(0);	animation: pop-in 0.25s;	-webkit-animation: pop-in 0.25s;	-moz-animation: pop-in 0.25s;}#PPMiniCart {	display: none;	position: fixed;	left: 50%;}#PPMiniCart form {	position: relative;	width: 400px;	max-height: 400px;	margin-left: -200px;	margin-top: -400px;	padding: 10px 10px 40px;	background: #fbfbfb;	border: 1px solid #d7d7d7;	border-radius: 4px;	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);	font: 15px/normal arial, helvetica;	color: #333;}#PPMiniCart ul {	clear: right;	margin: 15px 0;	padding: 10px;	list-style-type: none;	background: #fff;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);}#PPMiniCart .minicart-empty ul {	display: none;}#PPMiniCart .minicart-closer {	float: right;	margin: -12px -10px 0;	padding: 10px;	background: 0;	border: 0;	font-size: 18px;	cursor: pointer;}#PPMiniCart .minicart-item {	position: relative;	height: 30px;	padding: 6px;}#PPMiniCart .minicart-item + .minicart-item {	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 6px;	left: 0;	width: 185px;	color: #333;	line-height: 10px;	text-decoration: none;}#PPMiniCart .minicart-attributes {	position: absolute;	top: 20px;	left: 0;	margin: 0;	padding: 0;	border: 0;	border-radius: 0;	box-shadow: 0 0 0;	color: #999;	font-size: 12px;	line-height: 22px;}#PPMiniCart .minicart-attributes li {	display: inline;}#PPMiniCart .minicart-attributes li:after {	content: ",";}#PPMiniCart .minicart-attributes li:last-child:after {	content: "";}#PPMiniCart .minicart-quantity {	position: absolute;	left: 235px;	width: 30px;	height: 18px;	padding: 2px 4px;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);	font-size: 13px;	text-align: right;	transition: border linear 0.2s, box-shadow linear 0.2s;	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;}#PPMiniCart .minicart-quantity:hover {	border-color: #0078C1;}#PPMiniCart .minicart-quantity:focus {	border-color: #0078C1;	outline: 0;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 3px rgba(0, 120, 193, 0.4);}#PPMiniCart .minicart-remove {	position: absolute;	top: 8px;	left: 290px;	width: 18px;	height: 19px;	margin: 0;	padding: 0;	background: #b7b7b7;	border: 1px solid #a3a3a3;	border-radius: 3px;	color: #fff;	font-size: 13px;	opacity: 0.70;	cursor: pointer;}#PPMiniCart .minicart-remove:hover {	opacity: 1;}#PPMiniCart .minicart-price {	display: block;	text-align: right;}#PPMiniCart .minicart-subtotal {	position: absolute;	bottom: 17px;	left: 10px;	font-size: 16px;	font-weight: bold;}#PPMiniCart .minicart-submit {	position: absolute;	bottom: 10px;	right: 10px;	width: 153px;	height: 33px;	background: #ffa822 url(../../images/checkout.png) no-repeat;	border: 0;	text-indent: -999em;	cursor: pointer;}',
 
     strings: {
         button: 'Checkout',
@@ -1817,6 +1873,12 @@ var defaults = module.exports = {
 };
 
 
+/**
+ * Mixes in the user config with the default config.
+ *
+ * @param {object} userConfig Configuration overrides
+ * @return {object}
+ */
 module.exports.load = function load(userConfig) {
     return mixin(defaults, userConfig);
 };
@@ -1854,7 +1916,8 @@ module.exports = {
 },{}],12:[function(require,module,exports){
 'use strict';
 
-// TODO: code comments!
+// TODO:
+// - Doc updates
 // - "fixed" positioning
 // - Update examples
 
@@ -1868,6 +1931,11 @@ var Cart = require('./cart'),
 	viewModel;
 
 
+/**
+ * Renders the Mini Cart to the page's DOM.
+ *
+ * @param {object} userConfig Configuration overrides
+ */
 minicart.render = function (userConfig) {
 	confModel = minicart.config = config.load(userConfig);
 	cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
@@ -1883,6 +1951,9 @@ minicart.render = function (userConfig) {
 };
 
 
+/**
+ * Resets the Mini Cart and its view model
+ */
 minicart.reset = function () {
     cartModel.destroy();
 
@@ -1893,7 +1964,7 @@ minicart.reset = function () {
 
 
 
-// Export for either the browser or node
+// Export to either node or the brower window
 if (typeof window === 'undefined') {
 	module.exports = minicart;
 } else {
@@ -1936,6 +2007,12 @@ var parser = {
 };
 
 
+/**
+ * Creates a new product.
+ *
+ * @constructor
+ * @param {object} data Item data
+ */
 function Product(data) {
 	data.quantity = parser.quantity(data.quantity);
 	data.amount = parser.amount(data.amount);
@@ -1954,11 +2031,24 @@ function Product(data) {
 mixin(Product.prototype, Pubsub.prototype);
 
 
+/**
+ * Gets the product data.
+ *
+ * @param {string} key (Optional) A key to restrict the returned data to.
+ * @return {array|string}
+ */
 Product.prototype.get = function get(key) {
     return (key) ? this._data[key] : this._data;
 };
 
 
+/**
+ * Sets a value on the product. This is used rather than manually setting the
+ * value so that we can fire a "change" event.
+ *
+ * @param {string} key
+ * @param {string} value
+ */
 Product.prototype.set = function set(key, value) {
 	var setter = parser[key];
 
@@ -1972,6 +2062,11 @@ Product.prototype.set = function set(key, value) {
 };
 
 
+/**
+ * Parse and return the options for this product.
+ *
+ * @return {object}
+ */
 Product.prototype.options = function options() {
 	var result, key, value, amount, i, j;
 
@@ -2009,6 +2104,12 @@ Product.prototype.options = function options() {
 };
 
 
+/**
+ * Parse and return the discount for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Product.prototype.discount = function discount(config) {
 	var flat, rate, num, limit, result, amount;
 
@@ -2034,6 +2135,12 @@ Product.prototype.discount = function discount(config) {
 };
 
 
+/**
+ * Parse and return the total without discounts for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Product.prototype.amount = function amount(config) {
 	var result, options, len, i;
 
@@ -2052,6 +2159,12 @@ Product.prototype.amount = function amount(config) {
 };
 
 
+/**
+ * Parse and return the total for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
 Product.prototype.total = function total(config) {
 	var result;
 
@@ -2066,6 +2179,12 @@ Product.prototype.total = function total(config) {
 };
 
 
+/**
+ * Determine if this product has the same data as another.
+ *
+ * @param {object|Product} data Other product.
+ * @return {boolean}
+ */
 Product.prototype.isEqual = function isEqual(data) {
 	var match = false;
 
@@ -2096,6 +2215,9 @@ Product.prototype.isEqual = function isEqual(data) {
 };
 
 
+/**
+ * Destroys this product. Fires a "destroy" event.
+ */
 Product.prototype.destroy = function destroy() {
     this._data = [];
     this.fire('destroy', this);
@@ -2630,6 +2752,12 @@ var config = require('./config'),
 
 
 
+/**
+ * Creates a view model.
+ *
+ * @constructor
+ * @param {object} model
+ */
 function View(model) {
 	var wrapper, forms, form, i, len;
 
@@ -2663,11 +2791,17 @@ function View(model) {
 }
 
 
+/**
+ * Tells the view to redraw
+ */
 View.prototype.redraw = function redraw() {
 	this.el.innerHTML = template(config.template, this.model);
 };
 
 
+/**
+ * Tells the view to show
+ */
 View.prototype.show = function show() {
 	if (!this.isShowing) {
 		css.add(document.body, constants.SHOWING_CLASS);
@@ -2676,6 +2810,9 @@ View.prototype.show = function show() {
 };
 
 
+/**
+ * Tells the view to hide
+ */
 View.prototype.hide = function hide() {
 	if (this.isShowing) {
 		css.remove(document.body, constants.SHOWING_CLASS);
@@ -2684,11 +2821,20 @@ View.prototype.hide = function hide() {
 };
 
 
+/**
+ * Toggles the visibility of the view
+ */
 View.prototype.toggle = function toggle() {
 	this[this.isShowing ? 'hide' : 'show']();
 };
 
 
+/**
+ * Binds cart submit events to a form.
+ *
+ * @param {HTMLElement} form
+ * @return {booealn}
+ */
 View.prototype.bind = function bind(form) {
 	var that = this;
 
@@ -2712,6 +2858,12 @@ View.prototype.bind = function bind(form) {
 };
 
 
+/**
+ * Adds an item to the view.
+ *
+ * @param {number} idx
+ * @param {object} data
+ */
 View.prototype.addItem = function addItem(idx, data) {
 	this.redraw();
 	this.show();
@@ -2721,6 +2873,12 @@ View.prototype.addItem = function addItem(idx, data) {
 };
 
 
+/**
+ * Changes an item in the view.
+ *
+ * @param {number} idx
+ * @param {object} data
+ */
 View.prototype.changeItem = function changeItem(idx, data) {
 	this.redraw();
 	this.show();
@@ -2730,6 +2888,11 @@ View.prototype.changeItem = function changeItem(idx, data) {
 };
 
 
+/**
+ * Removes an item from the view.
+ *
+ * @param {number} idx
+ */
 View.prototype.removeItem = function removeItem(idx) {
 	this.redraw();
 };
@@ -2823,5 +2986,5 @@ module.exports = {
 
 };
 
-},{"./constants":11}]},{},[9,10,11,12,13,15,16,14,17,18,19,20,21,22,23])
+},{"./constants":11}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;
