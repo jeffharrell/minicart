@@ -1934,7 +1934,6 @@ module.exports = {
 // TODO:
 // - Doc updates
 // - "fixed" positioning
-// - Update examples
 // - Button to image
 
 
@@ -2998,5 +2997,5 @@ module.exports = {
 
 };
 
-},{"./constants":11}]},{},[9,10,11,14,12,13,15,16,17,18,19,20,21,22,23])
+},{"./constants":11}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;
