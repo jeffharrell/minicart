@@ -2778,7 +2778,7 @@ var config = require('./config'),
  * @param {object} model
  */
 function View(model) {
-	var wrapper, forms, form, i, len;
+	var wrapper;
 
 	this.el = wrapper = document.createElement('div');
 	this.model = model;
@@ -2795,18 +2795,8 @@ function View(model) {
 	// JavaScript
 	events.add(document, ('ontouchstart' in window) ? 'touchstart' : 'click', viewevents.click, this);
 	events.add(document, 'keyup', viewevents.keyup, this);
+	events.add(document, 'readystatechange', viewevents.readystatechange, this);
 	events.add(window, 'pageshow', viewevents.pageshow, this);
-
-	// Bind to page's forms
-	forms = document.getElementsByTagName('form');
-
-	for (i = 0, len = forms.length; i < len; i++) {
-		form = forms[i];
-
-		if (form.cmd && constants.COMMANDS[form.cmd.value]) {
-			this.bind(form);
-		}
-	}
 }
 
 
@@ -2925,11 +2915,12 @@ module.exports = View;
 'use strict';
 
 
-var constants = require('./constants');
+var constants = require('./constants'),
+	events = require('./util/events');
 
 
 
-module.exports = {
+var viewevents = module.exports = {
 
 	click: function (evt) {
 		var target = evt.target,
@@ -2988,6 +2979,27 @@ module.exports = {
 	},
 
 
+	readystatechange: function () {
+		if (/interactive|complete/.test(document.readyState)) {
+			var forms, form, i, len;
+
+			// Bind to page's forms
+			forms = document.getElementsByTagName('form');
+
+			for (i = 0, len = forms.length; i < len; i++) {
+				form = forms[i];
+
+				if (form.cmd && constants.COMMANDS[form.cmd.value]) {
+					this.bind(form);
+				}
+			}
+
+			// Once run this once
+			events.remove(document, 'readystatechange', viewevents.readystatechange);
+		}
+	},
+
+
 	pageshow: function (evt) {
 		if (evt.persisted) {
 			this.redraw();
@@ -2997,5 +3009,5 @@ module.exports = {
 
 };
 
-},{"./constants":11}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;

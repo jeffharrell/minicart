@@ -1,11 +1,12 @@
 'use strict';
 
 
-var constants = require('./constants');
+var constants = require('./constants'),
+	events = require('./util/events');
 
 
 
-module.exports = {
+var viewevents = module.exports = {
 
 	click: function (evt) {
 		var target = evt.target,
@@ -60,6 +61,27 @@ module.exports = {
 					}
 				}
 			}, constants.KEYUP_TIMEOUT);
+		}
+	},
+
+
+	readystatechange: function () {
+		if (/interactive|complete/.test(document.readyState)) {
+			var forms, form, i, len;
+
+			// Bind to page's forms
+			forms = document.getElementsByTagName('form');
+
+			for (i = 0, len = forms.length; i < len; i++) {
+				form = forms[i];
+
+				if (form.cmd && constants.COMMANDS[form.cmd.value]) {
+					this.bind(form);
+				}
+			}
+
+			// Once run this once
+			events.remove(document, 'readystatechange', viewevents.readystatechange);
 		}
 	},
 

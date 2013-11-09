@@ -13,6 +13,11 @@
 <body>
 	<div id="mocha"></div>
 
+	<script src="../../dist/minicart.js"></script>
+	<script>
+		paypal.minicart.render();
+	</script>
+
     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="cartButton">
         <fieldset>
             <input type="hidden" name="cmd" value="_cart" />
@@ -116,11 +121,6 @@
 			<input type="submit" name="submit" value="View your cart" class="button" />
 		</fieldset>
 	</form>
-
-	<script src="../../dist/minicart.js"></script>
-	<script>
-		paypal.minicart.render();
-	</script>
 
 	<script src="../../node_modules/mocha/mocha.js"></script>
 	<script>
