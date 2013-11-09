@@ -5,13 +5,12 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 [![Build Status](https://travis-ci.org/jeffharrell/minicart.png?branch=master,3.0-alpha)](https://travis-ci.org/jeffharrell/minicart)
 
 
+
 1. [Setup](#interested-lets-get-you-setup)
-2. [Customization](#customization)
-3. [Event callback examples](#event-callback-examples)
+2. [Advanced API](#advanced-api)
+3. [API Examples](#api-examples)
 4. [Localization](#localization)
-5. [JavaScript API](#javascript-api)
-6. [FAQ](#faq)
-7. [Questions or comments](#questions-or-comments)
+5. [FAQ](#faq)
 
 
 
@@ -32,7 +31,6 @@ It’s that simple! Now the minicart will appear when a user views or adds a pro
 
 
 
-
 ## Advanced API
 
 The minicart has an advanced JavaScript API which provides you the power to customize the behavior to your needs.
@@ -41,16 +39,14 @@ The minicart has an advanced JavaScript API which provides you the power to cust
 ### General
 
 `paypal.minicart.render(config)`  
-Renders the minicart to the page. Possible values include:
+Renders the minicart to the page. Config is optional and has the following options:
 
  * `parent` - HTMLElement the minicart should render to. Default `document.body`.
  * `target` - HTML target property for the checkout form. Default `null`.
  * `action` - PayPal URL (if you are accessing sandbox or another version of the PayPal website). Default `'https://www.paypal.com/cgi-bin/webscr'`.
- * `template` - HTML template for rendering.
- * `styles` - CSS styles for rendering.
- * `strings` - An object of text strings: `button`, `buttonalt`, `subtotal` and `discount`. 
-
-
+ * `template` - HTML template for rendering. See [customization](#customization) for details.
+ * `styles` - CSS styles for rendering. See [customization](#customization) for details.
+ * `strings` - An object of text strings: `button`, `buttonAlt`, `subtotal` and `discount`. 
 
 `paypal.minicart.reset()`  
 Resets the minicart back to it's default state.
@@ -59,74 +55,95 @@ Resets the minicart back to it's default state.
 ### View
 
 `paypal.minicart.show()`  
-Shows the cart.
+Triggers the minicart to show by adding a "minicart-showing" CSS class to the page.
 
 `paypal.minicart.hide()`  
-Hides the cart.
+Triggers the minicart to hide by removing the "minicart-showing" CSS class on the page.
 
 `paypal.minicart.toggle()`  
-Toggles the visibility of the cart.
+Toggles the visibility of the minicart.
 
 `paypal.minicart.view.bind(form)`  
-Binds a form DOM element's submit event to the minicart. This is useful for forms which may have been added to the page after the initial load. 
+Binds a HTMLFormElement's submit event to the minicart. Useful for forms which may have been added to the page after the initial load. 
 
 
 ### Cart
 
 `paypal.minicart.cart.add(data)`  
-Allows you to manually add a product to your cart, e.g. directly using JavaScript and not through a PayPal form. The parameter `data` is a key / value pair object of parameters and their value. For example: 
+Adds an item to the cart. Fires the `add` event. Example: 
 
-    {"business":"user@example.com","item_name":"Product","amount":"5.00","currency_code":"USD"}
+    { "business": "user@example.com", "item_name": "Product", "amount": 5.00, "currency_code": "USD" }
 
-`paypal.minicart.cart.remove(idx)`
+`paypal.minicart.cart.remove(idx)`  
+Removes an item from the cart by index. Fires the `remove` event.
 
-`paypal.minicart.cart.items(idx)`
+`paypal.minicart.cart.items(idx)`  
+Returns an array of items from the cart. If an index is passed then only that item is returned.
 
-`paypal.minicart.cart.settings(key)`
+`paypal.minicart.cart.settings(key)`  
+Returns an object of global cart settings. If a key is passed then only that value is returned.
 
-`paypal.minicart.cart.discount(config)`
+`paypal.minicart.cart.discount(config)`  
+Calculates the cart discount amount. `config` can be used for formatting.
 
-`paypal.minicart.cart.subtotal(config)`
+`paypal.minicart.cart.subtotal(config)`  
+Calculates the cart total minus discounts. `config` can be used for formatting.
 
-`paypal.minicart.cart.total(config)`
+`paypal.minicart.cart.total(config)`  
+Calculates the cart total. `config` can be used for formatting.
 
-`paypal.minicart.cart.destroy()`
+`paypal.minicart.cart.destroy()`  
+Destroys the cart data and resets it back to it's default state. Fires the `destroy` event.
 
-`paypal.minicart.cart.on(event, fn)`
+`paypal.minicart.cart.on(event, fn, scope)`  
+Subscribe to cart events. Events include:  
+ * `add` - Fired when an item is added. `function (idx, product, isExisting)`  
+ * `remove` - Fired when an item is removed. `function (idx, product)`  
+ * `checkout` - Fired on checkout. `function (evt)`  
+ * `destroy` - Fired when the cart is destroyed. `function ()`  
 
- - `add`
- - `remove`
- - `checkout`
- - `destroy`
+`paypal.minicart.cart.off(event, fn)`  
+Unsubscribe from cart events.
 
 
 ### Products
 
-`product.get(key)`
+`product.get(key)`  
+Returns an object of data for the product. If a key is passed then only that value is returned.
 
-`product.set(key, value)`
+`product.set(key, value)`  
+Sets a value for the product. Fires a `change` event.
 
-`product.options()`
+`product.options()`  
+Returns the options.
 
-`product.discount(config)`
+`product.discount(config)`  
+Calculates the product discount. `config` can be used for formatting.
 
-`product.amount(config)`
+`product.amount(config)`  
+Calculates the product amount discounts. `config` can be used for formatting.
 
-`product.total(config)`
+`product.total(config)`  
+Calculates the product total. `config` can be used for formatting.
 
-`product.isEqual(product2)`
+`product.isEqual(product2)`  
+Determines if the current product is the same as another.
 
-`product.destroy()`
+`product.destroy()`  
+Destroys the product. Fires the `destroy` event.
 
-`product.on(event, fn)`
+`product.on(event, fn, scope)`  
+Subscribe to cart events. Events include:  
+ * `change` - Fired when a value is changed. `function (key)`  
+ * `destroy` - Fired when the product is destroyed. `function ()`  
 
- - `change`
- - `destroy`
+`product.off(event, fn)`  
+Unsubscribe from product events.
 
 
-## Event callback examples
+## API Examples
 
-Examples of how you can use the event callbacks:
+Examples of how you can use the advanced API:
 
 * [Preventing checkout until terms are accepted](http://www.minicartjs.com/examples/terms.html)
 * [Requiring a minimum quantity to checkout](http://www.minicartjs.com/examples/minquantity.html)
@@ -137,13 +154,13 @@ Examples of how you can use the event callbacks:
 
 ## Localization
 
-Localization is supported in the minicart using the `strings` object. For example, if you wanted the cart to appear in French:
+Localization is supported in the minicart using the `strings` configuration object. For example, if you wanted the cart to appear in French:
 
     <script> 
         paypal.minicart.render({
             strings: {
                 button: "Caisse",  
-                subtotal: "Total:",
+                buttonAlt: "Total:",
                 discount: "Réduction:"
                 processing: "Traitement"
             }
@@ -162,39 +179,32 @@ Yes, it’s free and licensed under the [MIT License](https://github.com/jeffhar
 ### What browsers does the minicart support?
 The minicart supports Chrome, Safari, Firefox, and Internet Explorer 8+.
 
-### I have special integration / translation needs. Are there advanced settings?
-Yes, there’s a rich API which can be used to customize the minicart. See the [project page README](https://github.com/jeffharrell/MiniCart#readme) for more details.
+### I made a change and want to integrate it back. Do you accept pull requests?
+Yes, absolutely. Please submit a pull request on Github.
 
 ### Help! I found a bug. I have an issue!
 Please log the issue on the [minicart’s issue tracker](https://github.com/jeffharrell/MiniCart/issues) including a link or sample code that reproduces it.
 
-### I made a change and want to integrate it back into the minicart.
-Awesome! Thanks for helping out. Please fork the minicart code on Github. Once you're done with the change you can submit a pull request back to me. If everything looks good and the change is beneficial to all I will integrate it.
+### The minicart isn’t appearing the same as on this page. Why?
+This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). To check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
 
-### I installed the minicart, but my website still redirects to PayPal when clicking on a button. Why?
+### I installed the minicart, but my website still redirects to PayPal. Why?
 The minicart doesn’t yet work with what PayPal’s call their “hosted” or “encrypted” buttons which is why this is most likely happening. To fix your buttons, you’ll need to log into paypal.com and do the following steps:
 
 1. Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
 2. Once you’ve created the button click Remove code protection before copying your button’s code.
 
 ### The minicart isn’t emptying after a transaction is completed. Why?
-You'll want to set a `return` URL parameter for PayPal to redirect back to. On this page make sure to call `paypapl.minicart.reset();`.
-
-### Is non-JavaScript supported?
-Sort of. If JavaScript isn't enabled the minicart will not work and the page will fall back to using the standard PayPal HTML buttons. 
-
-### My website uses frames / iframes for it’s products. How can I make the minicart work?
-Frames are not officially supported, but you may be able to get some mileage with the `target` configuration setting.
+Your buttons need a `return` URL parameter for PayPal to redirect back to. On this page make sure to call `paypapl.minicart.reset();`.
 
 ### The minicart isn’t appearing the same as on this page. Why?
 This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). To check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
 
+### Does the minicart work with frames?
+Frames are not officially supported, but you may be able to get some mileage with the `target` configuration setting.
+
+### Is non-JavaScript supported?
+Sort of. If JavaScript isn't enabled the minicart will not work and the page will fall back to using the standard PayPal HTML buttons. 
+
 ### Are previous versions of the minicart available?
 All previous versions are [tagged on Github](https://github.com/jeffharrell/MiniCart/tags).
-
-## Questions or comments
-
-If you have questions or suggestions, please use the [issue tracker](https://github.com/jeffharrell/MiniCart/issues) at Github.
-
-
-

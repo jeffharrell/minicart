@@ -1,8 +1,5 @@
 'use strict';
 
-// TODO:
-// - Doc updates
-
 
 var Cart = require('./cart'),
 	View = require('./view'),
