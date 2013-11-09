@@ -1,0 +1,41 @@
+<%
+	var items = cart.items();
+	var settings = cart.settings();
+%>
+<form method="post" class="<% if (!items.length) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">
+	<ul>
+		<% for (i= 0, idx = i + 1, len = items.length; i < len; i++) { %>
+			<li class="minicart-item">
+				<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>
+				<ul class="minicart-attributes">
+					<% if (items[i].get("item_number")) { %>
+						<li><%= items[i].get("item_number") %></li>
+					<% } %>
+					<% if (items[i].discount()) { %>
+					<li><%= config.strings.discount %> <%= items[i].discount({ format: true }) %></li>
+					<% } %>
+					<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>
+						<li><%= options[j].key %>: <%= options[j].value %></li>
+					<% } %>
+				</ul>
+				<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" value="<%= items[i].get("quantity") %>" autocomplete="off" />
+				<input class="minicart-remove" data-minicart-idx="<%= i %>" type="button" />
+				<span class="minicart-price"><%= items[i].total({ format: true }) %></span>
+				<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />
+				<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />
+				<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].get("amount") %>" />
+			</li>
+		<% } %>
+	</ul>
+	<div>
+		<div class="minicart-subtotal" onclick="paypal.minicart.toggle()">
+			<%= config.strings.subtotal %> <%= cart.total({ format: true, currencyCode: true }) %>
+		</div>
+		<input class="minicart-submit" type="submit" value="<%= config.strings.button %>" data-test-processing="<%= config.strings.processing %>" />
+	</div>
+	<input type="hidden" name="cmd" value="_cart" />
+	<input type="hidden" name="upload" value="1" />
+	<% for (var key in settings) { %>
+		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />
+	<% } %>
+</form>

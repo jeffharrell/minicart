@@ -1,0 +1,130 @@
+@-webkit-keyframes yellow-fade {
+	0% { background-color: rgba(225, 225, 17, 0.3); }
+	100% { background-color: rgba(225, 225, 17, 0); }
+}
+
+
+#PPMiniCart form {
+	position: fixed;
+	top: 0;
+	right: 50px;
+	width: 265px;
+	height: 225px;
+	padding: 10px;
+	background: #fff url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -125px -60px;
+	border: 1px solid #999;
+	border-radius: 5px;
+	border-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+	font: 13px/normal arial, helvetica;
+	color: #333;
+
+	-webkit-transition: all .15s ease-out;
+	-webkit-transform: translate3d(0, -200px, 0);
+}
+
+.minicart-showing #PPMiniCart form {
+	-webkit-transform: translate3d(0, 0, 0);
+}
+
+
+
+#PPMiniCart ul {
+	height: 144px;
+	margin: 45px 0 13px;
+	padding: 0;
+	list-style-type: none;
+	border-bottom: 1px solid #ccc;
+	overflow: scroll;
+}
+
+#PPMiniCart .minicart-item {
+	position: relative;
+	height: 30px;
+	padding: 6px;
+	border-top: 1px solid #f2f2f2;
+}
+
+#PPMiniCart .minicart-item-changed {
+	-webkit-animation: yellow-fade 1s;
+}
+
+#PPMiniCart .minicart-item a {
+	position: absolute;
+	top: 6px;
+	left: 0;
+	width: 158px;
+	text-decoration: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#PPMiniCart .minicart-attributes {
+	position: absolute;
+	top: 20px;
+	left: 0;
+	margin: 0;
+	color: #999;
+	border: 0;
+}
+
+#PPMiniCart .minicart-attributes li {
+	display: inline;
+}
+
+#PPMiniCart .minicart-attributes li:after {
+	content: ",";
+}
+
+#PPMiniCart .minicart-attributes li:last-child:after {
+	content: "";
+}
+
+#PPMiniCart .minicart-quantity {
+	position: absolute;
+	left: 160px;
+	width: 30px;
+}
+
+#PPMiniCart .minicart-remove {
+	position: absolute;
+	top: 10px;
+	left: 200px;
+	width: 14px;
+	height: 14px;
+	background: url(http://www.minicartjs.com/build/images/minicart_sprite.png) no-repeat -134px -4px;
+	border: 0;
+	cursor: pointer;
+}
+
+#PPMiniCart .minicart-price {
+	display: block;
+	text-align: right;
+}
+
+#PPMiniCart .minicart-subtotal {
+	position: absolute;
+	bottom: 0;
+	width: 265px;
+	height: 30px;
+	margin: -10px 0 0;
+	padding: 10px 0 0;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#PPMiniCart .minicart-submit {
+	position: absolute;
+	bottom: 12px;
+	right: 10px;
+	padding: 1px 4px;
+	background: #ffa822 url(http://www.minicartjs.com/build/images/minicart_sprite.png) repeat-x left center;
+	border: 1px solid #d5bd98;
+	border-right-color: #935e0d;
+	border-bottom-color: #935e0d;
+	border-radius: 2px;
+	cursor: pointer;
+}

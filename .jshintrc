@@ -2,7 +2,6 @@
     "passfail": false,
     "maxerr": 100,
 
-
     "browser": true,
     "node": true,
     "rhino": false,
@@ -14,7 +13,7 @@
     "mootools": false,
     "dojo": false,
 
-    "predef": [],
+    "predef": [ "describe", "it", "before", "after", "beforeEach", "afterEach" ],
 
     "debug": false,
     "devel": false,

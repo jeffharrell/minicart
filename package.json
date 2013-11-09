@@ -1,17 +1,26 @@
 {
   "name": "minicart",
-  "description": "Improve your PayPal integration by creating an overlay which appears as a user adds products to their cart.",
-  "version": "2.5.0",
+  "description": "The Mini Cart is a great way to improve your PayPal shopping cart integration.",
+  "version": "3.0.0",
   "author": {
     "name": "Jeff Harrell",
     "url": "https://github.com/jeffharrell/"
   },
-  "keywords": ["paypal", "cart", "mini cart", "minicart", "ecommerce"],
+  "keywords": [
+    "paypal",
+    "cart",
+    "mini cart",
+    "minicart",
+    "ecommerce"
+  ],
   "homepage": "http://www.minicartjs.com/",
   "bugs": "https://github.com/jeffharrell/minicart/issues",
   "repository": {
-      "type": "git",
-      "url": "https://github.com/jeffharrell/minicart"
+    "type": "git",
+    "url": "https://github.com/jeffharrell/minicart"
+  },
+  "scripts": {
+    "test": "grunt test"
   },
   "licenses": [
     {
@@ -22,14 +31,19 @@
   "engines": {
     "node": ">=0.10.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ejs": "~0.8.4"
+  },
   "devDependencies": {
     "mocha": "~1.13.0",
-    "should": "~1.3.0",
-    "jsdom": "~0.8.6",
     "grunt": "~0.4.1",
-    "grunt-contrib-concat": "~0.3.0",
+    "grunt-cli": "~0.1.9",
     "grunt-contrib-uglify": "~0.2.4",
-    "grunt-contrib-jshint": "~0.6.4"
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-mocha": "~0.4.1",
+    "grunt-mocha-test": "~0.7.0",
+    "browserify": "~2.35.0",
+    "grunt-browserify": "~1.2.11",
+    "grunt-text-replace": "~0.3.8"
   }
 }

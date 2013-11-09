@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<fieldset>
+			<input type="hidden" name="cmd" value="_cart" />
+			<input type="hidden" name="add" value="1" />
+			<input type="hidden" name="business" value="example@minicartjs.com" />
+			<input type="hidden" name="item_name" value="Test Product" />
+			<input type="hidden" name="amount" value="1.00" />
+			<input type="hidden" name="currency_code" value="USD" />
+			<input type="hidden" name="return" value="http://localhost/minicartjs.com/?success" />
+			<input type="hidden" name="cancel_return" value="http://localhost/minicartjs.com/?cancel" />
+			<p>
+				<label>
+					My color:
+					<input type="hidden" name="on0" value="My option" />
+					<select name="os0">
+						<option value=""></option>
+						<option value="R">Red</option>
+						<option value="O">Orange</option>
+						<option value="Y">Yellow</option>
+						<option value="G">Green</option>
+						<option value="B">Blue</option>
+						<option value="I">Indigo</option>
+						<option value="V">Violet</option>
+					</select>
+				</label>
+			</p>
+
+			<input type="submit" value="Add to cart" />
+		</fieldset>
+	</form>
+
+
+	<script src="../dist/minicart.js"></script>
+	<script>
+		paypal.minicart.render();
+
+		paypal.minicart.cart.on('add', function (idx, product, isExisting) {
+			if (!product.get('os0')) {
+				this.remove(idx);
+				alert('Please select an option first!');
+			}
+		});
+	</script>
+
+</body>
+</html>

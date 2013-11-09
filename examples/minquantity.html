@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<fieldset>
+			<input type="hidden" name="cmd" value="_cart" />
+			<input type="hidden" name="add" value="1" />
+			<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" />
+			<input type="hidden" name="item_name" value="Test Product" />
+			<input type="hidden" name="quantity" value="1" />
+			<input type="hidden" name="amount" value="1.00" />
+			<input type="hidden" name="currency_code" value="USD" />
+			<strong>Test Product</strong>
+			<input type="submit" name="submit" value="Add to cart" />
+		</fieldset>
+	</form>
+
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<fieldset>
+			<input type="hidden" name="cmd" value="_cart" />
+			<input type="hidden" name="add" value="1" />
+			<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" />
+			<input type="hidden" name="item_name" value="Test Product 2" />
+			<input type="hidden" name="quantity" value="1" />
+			<input type="hidden" name="amount" value="1.00" />
+			<input type="hidden" name="currency_code" value="USD" />
+			<strong>Test Product 2</strong>
+			<input type="submit" name="submit" value="Add to cart" />
+		</fieldset>
+	</form>
+
+	<script src="../dist/minicart.js"></script>
+	<script>
+		paypal.minicart.render();
+
+		paypal.minicart.cart.on('checkout', function (evt) {
+			var items = this.items(),
+				len = items.length,
+				total = 0,
+				i;
+
+			// Count the number of each item in the cart
+			for (i = 0; i < len; i++) {
+				total += items[i].get('quantity');
+			}
+
+			if (total < 3) {
+				alert('The minimum order quantity is 3. Please add more to your shopping cart before checking out');
+				evt.preventDefault();
+			}
+		});
+
+	</script>
+</body>
+</html>
