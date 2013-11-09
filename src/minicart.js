@@ -4,6 +4,7 @@
 // - Doc updates
 // - "fixed" positioning
 // - Update examples
+// - Button to image
 
 
 var Cart = require('./cart'),

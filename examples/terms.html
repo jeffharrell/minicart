@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<input type="hidden" name="cmd" value="_cart" />
+		<input type="hidden" name="add" value="1" />
+		<input type="hidden" name="business" value="labs-feedback-minicart@paypal.com" />
+		<input type="hidden" name="item_name" value="Test Product" />
+		<input type="hidden" name="quantity" value="1" />
+		<input type="hidden" name="amount" value="1.00" />
+		<input type="hidden" name="currency_code" value="USD" />
+		<input type="hidden" name="no_shipping" value="2">
+		<input type="hidden" name="no_note" value="1">
+		<input type="hidden" name="shipping2" value="1.50">
+		<input type="hidden" name="shipping" value="2.50">
+		<strong>Test Product</strong>
+
+		<p>
+			<label><input type="checkbox" id="terms" name="terms" value="" /> I agree to the terms</label>
+		</p>
+
+		<input type="submit" name="submit" value="Add to cart" />
+	</form>
+
+
+	<script src="../dist/minicart.js"></script>
+	<script>
+		paypal.minicart.render({
+			events: {
+				onCheckout: function () {
+					var hasAgreed = !!document.getElementById('terms').checked;
+
+					if (hasAgreed) {
+						// Let the checkout continue
+						return true;
+					} else {
+						// Stop checkout
+						alert('You must agree to the terms!');
+						return false;
+					}
+				}
+			}
+		});
+	</script>
+</body>
+</html>
