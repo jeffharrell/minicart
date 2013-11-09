@@ -145,10 +145,10 @@ Unsubscribe from product events.
 
 Examples of how you can use the advanced API:
 
-* [Preventing checkout until terms are accepted](http://www.minicartjs.com/examples/terms.html)
-* [Requiring a minimum quantity to checkout](http://www.minicartjs.com/examples/minquantity.html)
-* [Only allowing a fixed quantity per item](http://www.minicartjs.com/examples/fixedquantity.html)
-* [Ensuring an option is selected](http://www.minicartjs.com/examples/notempty.html)
+* [Preventing checkout until terms are accepted](https://github.com/jeffharrell/minicart/blob/master/examples/terms.html)
+* [Requiring a minimum quantity to checkout](https://github.com/jeffharrell/minicart/blob/master/examples/minquantity.html)
+* [Only allowing a fixed quantity per item](https://github.com/jeffharrell/minicart/blob/master/examples/fixedquantity.html)
+* [Ensuring an option is selected](https://github.com/jeffharrell/minicart/blob/master/examples/notempty.html)
 
 
 
