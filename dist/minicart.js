@@ -1826,6 +1826,16 @@ Cart.prototype.save = function save() {
 
 
 /**
+ * Proxies the checkout event
+ * The assumption is the view triggers this and consumers subscribe to it
+ */
+Cart.prototype.checkout = function checkout(evt) {
+	console.log('hello');
+	this.fire('checkout', evt);
+};
+
+
+/**
  * Destroy the cart data. This fires a "destroy" event.
  */
 Cart.prototype.destroy = function destroy() {
@@ -1910,6 +1920,8 @@ module.exports = {
 	ITEM_CLASS: 'minicart-item',
 
 	ITEM_CHANGED_CLASS: 'minicart-item-changed',
+
+	SUBMIT_CLASS: 'minicart-submit',
 
 	DATA_IDX: 'data-minicart-idx'
 
@@ -2919,29 +2931,24 @@ var constants = require('./constants');
 
 module.exports = {
 
-	click: function (e) {
-		var target = e.target;
+	click: function (evt) {
+		var target = evt.target,
+			className = target.className;
 
 		if (this.isShowing) {
-			if (target.className === constants.REMOVE_CLASS) {
-				this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
-
-				e.stopPropagation();
-				e.preventDefault();
-			} else if (target.className === constants.CLOSER_CLASS) {
+			// Cart checkout button
+			if (className === constants.SUBMIT_CLASS) {
+				this.model.cart.checkout(evt);
+			// Cart close button
+			} else if (className === constants.CLOSER_CLASS) {
 				this.hide();
-
-				e.stopPropagation();
-				e.preventDefault();
-			} else if (target.className === constants.QUANTITY_CLASS) {
-				if (target.setSelectionRange) {
-					target.setSelectionRange(0, 999);
-				} else {
-					target.select();
-				}
-
-				e.stopPropagation();
-				e.preventDefault();
+			// Product remove button
+			} else if (className === constants.REMOVE_CLASS) {
+				this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
+			// Product quantity input
+			} else if (className === constants.QUANTITY_CLASS) {
+				target[target.setSelectionRange ? 'setSelectionRange' : 'select'](0, 999);
+			// Outside the cart
 			} else if (!(/input|button|select|option/i.test(target.tagName))) {
 				while (target.nodeType === 1) {
 					if (target === this.el) {
@@ -2952,17 +2959,14 @@ module.exports = {
 				}
 
 				this.hide();
-
-				e.stopPropagation();
-				e.preventDefault();
 			}
 		}
 	},
 
 
-	keyup: function (e) {
+	keyup: function (evt) {
 		var that = this,
-			target = e.target,
+			target = evt.target,
 			timer;
 
 		if (target.className === constants.QUANTITY_CLASS) {
@@ -2984,8 +2988,8 @@ module.exports = {
 	},
 
 
-	pageshow: function (e) {
-		if (e.persisted) {
+	pageshow: function (evt) {
+		if (evt.persisted) {
 			this.redraw();
 			this.hide();
 		}

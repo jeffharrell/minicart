@@ -213,6 +213,17 @@ Cart.prototype.save = function save() {
 
 
 /**
+ * Proxies the checkout event
+ * The assumption is the view triggers this and consumers subscribe to it
+ *
+ * @param {object} The initiating event
+ */
+Cart.prototype.checkout = function checkout(evt) {
+	this.fire('checkout', evt);
+};
+
+
+/**
  * Destroy the cart data. This fires a "destroy" event.
  */
 Cart.prototype.destroy = function destroy() {

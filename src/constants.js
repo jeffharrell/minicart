@@ -23,6 +23,8 @@ module.exports = {
 
 	ITEM_CHANGED_CLASS: 'minicart-item-changed',
 
+	SUBMIT_CLASS: 'minicart-submit',
+
 	DATA_IDX: 'data-minicart-idx'
 
 };
