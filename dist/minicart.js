@@ -1,2230 +1,2967 @@
-/*!
- * MiniCart
- *
- * @author Jeff Harrell <https://github.com/jeffharrell/>
- * @license MIT <https://github.com/jeffharrell/MiniCart/blob/master/LICENSE>
- */
-if (typeof PAYPAL === 'undefined' || !PAYPAL) {
-	var PAYPAL = {};
+;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
+
+//
+// The shims in this file are not fully implemented shims for the ES5
+// features, but do work for the particular usecases there is in
+// the other modules.
+//
+
+var toString = Object.prototype.toString;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+// Array.isArray is supported in IE9
+function isArray(xs) {
+  return toString.call(xs) === '[object Array]';
+}
+exports.isArray = typeof Array.isArray === 'function' ? Array.isArray : isArray;
+
+// Array.prototype.indexOf is supported in IE9
+exports.indexOf = function indexOf(xs, x) {
+  if (xs.indexOf) return xs.indexOf(x);
+  for (var i = 0; i < xs.length; i++) {
+    if (x === xs[i]) return i;
+  }
+  return -1;
+};
+
+// Array.prototype.filter is supported in IE9
+exports.filter = function filter(xs, fn) {
+  if (xs.filter) return xs.filter(fn);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    if (fn(xs[i], i, xs)) res.push(xs[i]);
+  }
+  return res;
+};
+
+// Array.prototype.forEach is supported in IE9
+exports.forEach = function forEach(xs, fn, self) {
+  if (xs.forEach) return xs.forEach(fn, self);
+  for (var i = 0; i < xs.length; i++) {
+    fn.call(self, xs[i], i, xs);
+  }
+};
+
+// Array.prototype.map is supported in IE9
+exports.map = function map(xs, fn) {
+  if (xs.map) return xs.map(fn);
+  var out = new Array(xs.length);
+  for (var i = 0; i < xs.length; i++) {
+    out[i] = fn(xs[i], i, xs);
+  }
+  return out;
+};
+
+// Array.prototype.reduce is supported in IE9
+exports.reduce = function reduce(array, callback, opt_initialValue) {
+  if (array.reduce) return array.reduce(callback, opt_initialValue);
+  var value, isValueSet = false;
+
+  if (2 < arguments.length) {
+    value = opt_initialValue;
+    isValueSet = true;
+  }
+  for (var i = 0, l = array.length; l > i; ++i) {
+    if (array.hasOwnProperty(i)) {
+      if (isValueSet) {
+        value = callback(value, array[i], i, array);
+      }
+      else {
+        value = array[i];
+        isValueSet = true;
+      }
+    }
+  }
+
+  return value;
+};
+
+// String.prototype.substr - negative index don't work in IE8
+if ('ab'.substr(-1) !== 'b') {
+  exports.substr = function (str, start, length) {
+    // did we get a negative start, calculate how much it is from the beginning of the string
+    if (start < 0) start = str.length + start;
+
+    // call the original function
+    return str.substr(start, length);
+  };
+} else {
+  exports.substr = function (str, start, length) {
+    return str.substr(start, length);
+  };
 }
 
-PAYPAL.apps = PAYPAL.apps || {};
+// String.prototype.trim is supported in IE9
+exports.trim = function (str) {
+  if (str.trim) return str.trim();
+  return str.replace(/^\s+|\s+$/g, '');
+};
+
+// Function.prototype.bind is supported in IE9
+exports.bind = function () {
+  var args = Array.prototype.slice.call(arguments);
+  var fn = args.shift();
+  if (fn.bind) return fn.bind.apply(fn, args);
+  var self = args.shift();
+  return function () {
+    fn.apply(self, args.concat([Array.prototype.slice.call(arguments)]));
+  };
+};
+
+// Object.create is supported in IE9
+function create(prototype, properties) {
+  var object;
+  if (prototype === null) {
+    object = { '__proto__' : null };
+  }
+  else {
+    if (typeof prototype !== 'object') {
+      throw new TypeError(
+        'typeof prototype[' + (typeof prototype) + '] != \'object\''
+      );
+    }
+    var Type = function () {};
+    Type.prototype = prototype;
+    object = new Type();
+    object.__proto__ = prototype;
+  }
+  if (typeof properties !== 'undefined' && Object.defineProperties) {
+    Object.defineProperties(object, properties);
+  }
+  return object;
+}
+exports.create = typeof Object.create === 'function' ? Object.create : create;
+
+// Object.keys and Object.getOwnPropertyNames is supported in IE9 however
+// they do show a description and number property on Error objects
+function notObject(object) {
+  return ((typeof object != "object" && typeof object != "function") || object === null);
+}
+
+function keysShim(object) {
+  if (notObject(object)) {
+    throw new TypeError("Object.keys called on a non-object");
+  }
+
+  var result = [];
+  for (var name in object) {
+    if (hasOwnProperty.call(object, name)) {
+      result.push(name);
+    }
+  }
+  return result;
+}
+
+// getOwnPropertyNames is almost the same as Object.keys one key feature
+//  is that it returns hidden properties, since that can't be implemented,
+//  this feature gets reduced so it just shows the length property on arrays
+function propertyShim(object) {
+  if (notObject(object)) {
+    throw new TypeError("Object.getOwnPropertyNames called on a non-object");
+  }
+
+  var result = keysShim(object);
+  if (exports.isArray(object) && exports.indexOf(object, 'length') === -1) {
+    result.push('length');
+  }
+  return result;
+}
+
+var keys = typeof Object.keys === 'function' ? Object.keys : keysShim;
+var getOwnPropertyNames = typeof Object.getOwnPropertyNames === 'function' ?
+  Object.getOwnPropertyNames : propertyShim;
+
+if (new Error().hasOwnProperty('description')) {
+  var ERROR_PROPERTY_FILTER = function (obj, array) {
+    if (toString.call(obj) === '[object Error]') {
+      array = exports.filter(array, function (name) {
+        return name !== 'description' && name !== 'number' && name !== 'message';
+      });
+    }
+    return array;
+  };
+
+  exports.keys = function (object) {
+    return ERROR_PROPERTY_FILTER(object, keys(object));
+  };
+  exports.getOwnPropertyNames = function (object) {
+    return ERROR_PROPERTY_FILTER(object, getOwnPropertyNames(object));
+  };
+} else {
+  exports.keys = keys;
+  exports.getOwnPropertyNames = getOwnPropertyNames;
+}
+
+// Object.getOwnPropertyDescriptor - supported in IE8 but only on dom elements
+function valueObject(value, key) {
+  return { value: value[key] };
+}
+
+if (typeof Object.getOwnPropertyDescriptor === 'function') {
+  try {
+    Object.getOwnPropertyDescriptor({'a': 1}, 'a');
+    exports.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+  } catch (e) {
+    // IE8 dom element issue - use a try catch and default to valueObject
+    exports.getOwnPropertyDescriptor = function (value, key) {
+      try {
+        return Object.getOwnPropertyDescriptor(value, key);
+      } catch (e) {
+        return valueObject(value, key);
+      }
+    };
+  }
+} else {
+  exports.getOwnPropertyDescriptor = valueObject;
+}
+
+},{}],2:[function(require,module,exports){
+
+// not implemented
+// The reason for having an empty file and not throwing is to allow
+// untraditional implementation of this module.
+
+},{}],3:[function(require,module,exports){
+var process=require("__browserify_process");// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var util = require('util');
+var shims = require('_shims');
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// Split a filename into [root, dir, basename, ext], unix version
+// 'root' is just a slash, or nothing.
+var splitPathRe =
+    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+var splitPath = function(filename) {
+  return splitPathRe.exec(filename).slice(1);
+};
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (!util.isString(path)) {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(shims.filter(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function(path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = shims.substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(shims.filter(path.split('/'), function(p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function(path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(shims.filter(paths, function(p, index) {
+    if (!util.isString(p)) {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
 
 
-(function () {
-	'use strict';
+// path.relative(from, to)
+// posix version
+exports.relative = function(from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
 
-	/**
-	 * Default configuration
-	 */
-	var config = {
-		/**
-		 * The parent element the cart should "pin" to
-		 */
-		parent: document.body,
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
 
-		/**
-		 * Edge of the window to pin the cart to
-		 */
-		displayEdge: 'right',
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
 
-		/**
-		 * Distance from the edge of the window
-		 */
-		edgeDistance: '50px',
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
 
-		/**
-		 * HTML target property for the checkout form
-		 */
-		formTarget: null,
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
 
-		/**
-		 * The base path of your website to set the cookie to
-		 */
-		cookiePath: '/',
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
 
-		/**
-		 * The number of days to keep the cart data
-		 */
-		cartDuration: 30,
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
 
-		/**
-		 * Strings used for display text
-		 */
-		strings: {
-			button: 'Checkout',
-			subtotal: 'Subtotal: ',
-			discount: 'Discount: ',
-			shipping: 'does not include shipping & tax',
-			processing: 'Processing...'
-		},
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
 
-		/**
-		 * Unique ID used on the wrapper element
-		 */
-		name: 'PPMiniCart',
+  return outputParts.join('/');
+};
 
-		/**
-		 * Boolean to determine if the cart should "peek" when it's hidden with items
-		 */
-		peekEnabled: true,
+exports.sep = '/';
+exports.delimiter = ':';
 
-		/**
-		 * The URL of the PayPal website
-		 */
-		paypalURL: 'https://www.paypal.com/cgi-bin/webscr',
+exports.dirname = function(path) {
+  var result = splitPath(path),
+      root = result[0],
+      dir = result[1];
 
-		/**
-		 * The base URL to the visual assets
-		 */
-		assetURL: 'http://www.minicartjs.com/build/',
+  if (!root && !dir) {
+    // No dirname whatsoever
+    return '.';
+  }
 
-		/**
-		 * Boolean to determine if the cart should be reset on payment completion
-		 */
-		resetCartOnSuccess: true,
+  if (dir) {
+    // It has a dirname, strip trailing slash
+    dir = dir.substr(0, dir.length - 1);
+  }
 
-        /**
-         * Life-cycle events
-         */
-		events: {
-			/**
-			 * Custom event fired before the cart is rendered
-			 */
-			onRender: null,
+  return root + dir;
+};
 
-			/**
-			 * Custom event fired after the cart is rendered
-			 */
-			afterRender: null,
 
-			/**
-			 * Custom event fired before the cart is hidden
-			 *
-			 * @param e {event} The triggering event
-			 */
-			onHide: null,
+exports.basename = function(path, ext) {
+  var f = splitPath(path)[2];
+  // TODO: make this comparison case-insensitive on windows?
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
 
-			/**
-			 * Custom event fired after the cart is hidden
-			 *
-			 * @param e {event} The triggering event
-			 */
-			afterHide: null,
 
-			/**
-			 * Custom event fired before the cart is shown
-			 *
-			 * @param e {event} The triggering event
-			 */
-			onShow: null,
+exports.extname = function(path) {
+  return splitPath(path)[3];
+};
 
-			/**
-			 * Custom event fired after the cart is shown
-			 *
-			 * @param e {event} The triggering event
-			 */
-			afterShow: null,
+},{"__browserify_process":5,"_shims":1,"util":4}],4:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-			/**
-			 * Custom event fired before a product is added to the cart
-			 *
-			 * @param data {object} Product object
-			 */
-			onAddToCart: null,
+var shims = require('_shims');
 
-			/**
-			 * Custom event fired after a product is added to the cart
-			 *
-			 * @param data {object} Product object
-			 */
-			afterAddToCart: null,
+var formatRegExp = /%[sdj%]/g;
+exports.format = function(f) {
+  if (!isString(f)) {
+    var objects = [];
+    for (var i = 0; i < arguments.length; i++) {
+      objects.push(inspect(arguments[i]));
+    }
+    return objects.join(' ');
+  }
 
-			/**
-			 * Custom event fired before a product is removed from the cart
-			 *
-			 * @param data {object} Product object
-			 */
-			onRemoveFromCart: null,
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  var str = String(f).replace(formatRegExp, function(x) {
+    if (x === '%%') return '%';
+    if (i >= len) return x;
+    switch (x) {
+      case '%s': return String(args[i++]);
+      case '%d': return Number(args[i++]);
+      case '%j':
+        try {
+          return JSON.stringify(args[i++]);
+        } catch (_) {
+          return '[Circular]';
+        }
+      default:
+        return x;
+    }
+  });
+  for (var x = args[i]; i < len; x = args[++i]) {
+    if (isNull(x) || !isObject(x)) {
+      str += ' ' + x;
+    } else {
+      str += ' ' + inspect(x);
+    }
+  }
+  return str;
+};
 
-			/**
-			 * Custom event fired after a product is removed from the cart
-			 *
-			 * @param data {object} Product object
-			 */
-			afterRemoveFromCart: null,
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  };
+  // legacy...
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  }
+  // set default options
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+exports.inspect = inspect;
 
-			/**
-			 * Custom event fired before the checkout action takes place
-			 *
-			 * @param e {event} The triggering event
-			 */
-			onCheckout: null,
 
-			/**
-			 * Custom event fired before the cart is reset
-			 */
-			onReset: null,
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+  'bold' : [1, 22],
+  'italic' : [3, 23],
+  'underline' : [4, 24],
+  'inverse' : [7, 27],
+  'white' : [37, 39],
+  'grey' : [90, 39],
+  'black' : [30, 39],
+  'blue' : [34, 39],
+  'cyan' : [36, 39],
+  'green' : [32, 39],
+  'magenta' : [35, 39],
+  'red' : [31, 39],
+  'yellow' : [33, 39]
+};
 
-			/**
-			 * Custom event fired after the cart is reset
-			 */
-			afterReset: null
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+
+function arrayToHash(array) {
+  var hash = {};
+
+  shims.forEach(array, function(val, idx) {
+    hash[val] = true;
+  });
+
+  return hash;
+}
+
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect &&
+      value &&
+      isFunction(value.inspect) &&
+      // Filter out the util module, it's inspect function is special
+      value.inspect !== exports.inspect &&
+      // Also filter out any prototype objects using the circular check.
+      !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes);
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+    return ret;
+  }
+
+  // Primitive types cannot have properties
+  var primitive = formatPrimitive(ctx, value);
+  if (primitive) {
+    return primitive;
+  }
+
+  // Look up the keys of the object.
+  var keys = shims.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = shims.getOwnPropertyNames(value);
+  }
+
+  // Some type of object without properties can be shortcutted.
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '', array = false, braces = ['{', '}'];
+
+  // Make Array say that they are Array
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  }
+
+  // Make functions say that they are functions
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  }
+
+  // Make RegExps say that they are RegExps
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  }
+
+  // Make dates with properties first say the date
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  }
+
+  // Make error with message first say the error
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+
+  var output;
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function(key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+
+  return reduceToSingleString(output, base, braces);
+}
+
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value))
+    return ctx.stylize('undefined', 'undefined');
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+                                             .replace(/'/g, "\\'")
+                                             .replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+  if (isNumber(value))
+    return ctx.stylize('' + value, 'number');
+  if (isBoolean(value))
+    return ctx.stylize('' + value, 'boolean');
+  // For some reason typeof null is "object", so special case here.
+  if (isNull(value))
+    return ctx.stylize('null', 'null');
+}
+
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+
+  shims.forEach(keys, function(key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          key, true));
+    }
+  });
+  return output;
+}
+
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = shims.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+  if (!str) {
+    if (shims.indexOf(ctx.seen, desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function(line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function(line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+    name = JSON.stringify('' + key);
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'")
+                 .replace(/\\"/g, '"')
+                 .replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = shims.reduce(output, function(prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] +
+           (base === '' ? '' : base + '\n ') +
+           ' ' +
+           output.join(',\n  ') +
+           ' ' +
+           braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+  return shims.isArray(ar);
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) && objectToString(e) === '[object Error]';
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.binarySlice === 'function'
+  ;
+}
+exports.isBuffer = isBuffer;
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+              'Oct', 'Nov', 'Dec'];
+
+// 26 Feb 16:19:34
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()),
+              pad(d.getMinutes()),
+              pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+}
+
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function() {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+
+
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = function(ctor, superCtor) {
+  ctor.super_ = superCtor;
+  ctor.prototype = shims.create(superCtor.prototype, {
+    constructor: {
+      value: ctor,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+};
+
+exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+
+  var keys = shims.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+},{"_shims":1}],5:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    if (canPost) {
+        var queue = [];
+        window.addEventListener('message', function (ev) {
+            if (ev.source === window && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+}
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+
+},{}],6:[function(require,module,exports){
+
+/*!
+ * EJS
+ * Copyright(c) 2012 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * Module dependencies.
+ */
+
+var utils = require('./utils')
+  , path = require('path')
+  , basename = path.basename
+  , dirname = path.dirname
+  , extname = path.extname
+  , join = path.join
+  , fs = require('fs')
+  , read = fs.readFileSync;
+
+/**
+ * Filters.
+ *
+ * @type Object
+ */
+
+var filters = exports.filters = require('./filters');
+
+/**
+ * Intermediate js cache.
+ *
+ * @type Object
+ */
+
+var cache = {};
+
+/**
+ * Clear intermediate js cache.
+ *
+ * @api public
+ */
+
+exports.clearCache = function(){
+  cache = {};
+};
+
+/**
+ * Translate filtered code into function calls.
+ *
+ * @param {String} js
+ * @return {String}
+ * @api private
+ */
+
+function filtered(js) {
+  return js.substr(1).split('|').reduce(function(js, filter){
+    var parts = filter.split(':')
+      , name = parts.shift()
+      , args = parts.join(':') || '';
+    if (args) args = ', ' + args;
+    return 'filters.' + name + '(' + js + args + ')';
+  });
+};
+
+/**
+ * Re-throw the given `err` in context to the
+ * `str` of ejs, `filename`, and `lineno`.
+ *
+ * @param {Error} err
+ * @param {String} str
+ * @param {String} filename
+ * @param {String} lineno
+ * @api private
+ */
+
+function rethrow(err, str, filename, lineno){
+  var lines = str.split('\n')
+    , start = Math.max(lineno - 3, 0)
+    , end = Math.min(lines.length, lineno + 3);
+
+  // Error context
+  var context = lines.slice(start, end).map(function(line, i){
+    var curr = i + start + 1;
+    return (curr == lineno ? ' >> ' : '    ')
+      + curr
+      + '| '
+      + line;
+  }).join('\n');
+
+  // Alter exception message
+  err.path = filename;
+  err.message = (filename || 'ejs') + ':'
+    + lineno + '\n'
+    + context + '\n\n'
+    + err.message;
+  
+  throw err;
+}
+
+/**
+ * Parse the given `str` of ejs, returning the function body.
+ *
+ * @param {String} str
+ * @return {String}
+ * @api public
+ */
+
+var parse = exports.parse = function(str, options){
+  var options = options || {}
+    , open = options.open || exports.open || '<%'
+    , close = options.close || exports.close || '%>'
+    , filename = options.filename
+    , compileDebug = options.compileDebug !== false
+    , buf = [];
+
+  buf.push('var buf = [];');
+  if (false !== options._with) buf.push('\nwith (locals || {}) { (function(){ ');
+  buf.push('\n buf.push(\'');
+
+  var lineno = 1;
+
+  var consumeEOL = false;
+  for (var i = 0, len = str.length; i < len; ++i) {
+    if (str.slice(i, open.length + i) == open) {
+      i += open.length
+  
+      var prefix, postfix, line = (compileDebug ? '__stack.lineno=' : '') + lineno;
+      switch (str.substr(i, 1)) {
+        case '=':
+          prefix = "', escape((" + line + ', ';
+          postfix = ")), '";
+          ++i;
+          break;
+        case '-':
+          prefix = "', (" + line + ', ';
+          postfix = "), '";
+          ++i;
+          break;
+        default:
+          prefix = "');" + line + ';';
+          postfix = "; buf.push('";
+      }
+
+      var end = str.indexOf(close, i)
+        , js = str.substring(i, end)
+        , start = i
+        , include = null
+        , n = 0;
+
+      if ('-' == js[js.length-1]){
+        js = js.substring(0, js.length - 2);
+        consumeEOL = true;
+      }
+
+      if (0 == js.trim().indexOf('include')) {
+        var name = js.trim().slice(7).trim();
+        if (!filename) throw new Error('filename option is required for includes');
+        var path = resolveInclude(name, filename);
+        include = read(path, 'utf8');
+        include = exports.parse(include, { filename: path, _with: false, open: open, close: close, compileDebug: compileDebug });
+        buf.push("' + (function(){" + include + "})() + '");
+        js = '';
+      }
+
+      while (~(n = js.indexOf("\n", n))) n++, lineno++;
+      if (js.substr(0, 1) == ':') js = filtered(js);
+      if (js) {
+        if (js.lastIndexOf('//') > js.lastIndexOf('\n')) js += '\n';
+        buf.push(prefix, js, postfix);
+      }
+      i += end - start + close.length - 1;
+
+    } else if (str.substr(i, 1) == "\\") {
+      buf.push("\\\\");
+    } else if (str.substr(i, 1) == "'") {
+      buf.push("\\'");
+    } else if (str.substr(i, 1) == "\r") {
+      // ignore
+    } else if (str.substr(i, 1) == "\n") {
+      if (consumeEOL) {
+        consumeEOL = false;
+      } else {
+        buf.push("\\n");
+        lineno++;
+      }
+    } else {
+      buf.push(str.substr(i, 1));
+    }
+  }
+
+  if (false !== options._with) buf.push("'); })();\n} \nreturn buf.join('');")
+  else buf.push("');\nreturn buf.join('');");
+
+  return buf.join('');
+};
+
+/**
+ * Compile the given `str` of ejs into a `Function`.
+ *
+ * @param {String} str
+ * @param {Object} options
+ * @return {Function}
+ * @api public
+ */
+
+var compile = exports.compile = function(str, options){
+  options = options || {};
+  var escape = options.escape || utils.escape;
+  
+  var input = JSON.stringify(str)
+    , compileDebug = options.compileDebug !== false
+    , client = options.client
+    , filename = options.filename
+        ? JSON.stringify(options.filename)
+        : 'undefined';
+  
+  if (compileDebug) {
+    // Adds the fancy stack trace meta info
+    str = [
+      'var __stack = { lineno: 1, input: ' + input + ', filename: ' + filename + ' };',
+      rethrow.toString(),
+      'try {',
+      exports.parse(str, options),
+      '} catch (err) {',
+      '  rethrow(err, __stack.input, __stack.filename, __stack.lineno);',
+      '}'
+    ].join("\n");
+  } else {
+    str = exports.parse(str, options);
+  }
+  
+  if (options.debug) console.log(str);
+  if (client) str = 'escape = escape || ' + escape.toString() + ';\n' + str;
+
+  try {
+    var fn = new Function('locals, filters, escape', str);
+  } catch (err) {
+    if ('SyntaxError' == err.name) {
+      err.message += options.filename
+        ? ' in ' + filename
+        : ' while compiling ejs';
+    }
+    throw err;
+  }
+
+  if (client) return fn;
+
+  return function(locals){
+    return fn.call(this, locals, filters, escape);
+  }
+};
+
+/**
+ * Render the given `str` of ejs.
+ *
+ * Options:
+ *
+ *   - `locals`          Local variables object
+ *   - `cache`           Compiled functions are cached, requires `filename`
+ *   - `filename`        Used by `cache` to key caches
+ *   - `scope`           Function execution context
+ *   - `debug`           Output generated function body
+ *   - `open`            Open tag, defaulting to "<%"
+ *   - `close`           Closing tag, defaulting to "%>"
+ *
+ * @param {String} str
+ * @param {Object} options
+ * @return {String}
+ * @api public
+ */
+
+exports.render = function(str, options){
+  var fn
+    , options = options || {};
+
+  if (options.cache) {
+    if (options.filename) {
+      fn = cache[options.filename] || (cache[options.filename] = compile(str, options));
+    } else {
+      throw new Error('"cache" option requires "filename".');
+    }
+  } else {
+    fn = compile(str, options);
+  }
+
+  options.__proto__ = options.locals;
+  return fn.call(options.scope, options);
+};
+
+/**
+ * Render an EJS file at the given `path` and callback `fn(err, str)`.
+ *
+ * @param {String} path
+ * @param {Object|Function} options or callback
+ * @param {Function} fn
+ * @api public
+ */
+
+exports.renderFile = function(path, options, fn){
+  var key = path + ':string';
+
+  if ('function' == typeof options) {
+    fn = options, options = {};
+  }
+
+  options.filename = path;
+
+  var str;
+  try {
+    str = options.cache
+      ? cache[key] || (cache[key] = read(path, 'utf8'))
+      : read(path, 'utf8');
+  } catch (err) {
+    fn(err);
+    return;
+  }
+  fn(null, exports.render(str, options));
+};
+
+/**
+ * Resolve include `name` relative to `filename`.
+ *
+ * @param {String} name
+ * @param {String} filename
+ * @return {String}
+ * @api private
+ */
+
+function resolveInclude(name, filename) {
+  var path = join(dirname(filename), name);
+  var ext = extname(name);
+  if (!ext) path += '.ejs';
+  return path;
+}
+
+// express support
+
+exports.__express = exports.renderFile;
+
+/**
+ * Expose to require().
+ */
+
+if (require.extensions) {
+  require.extensions['.ejs'] = function(module, filename) {
+    source = require('fs').readFileSync(filename, 'utf-8');
+    module._compile(compile(source, {}), filename);
+  };
+} else if (require.registerExtension) {
+  require.registerExtension('.ejs', function(src) {
+    return compile(src, {});
+  });
+}
+
+},{"./filters":7,"./utils":8,"fs":2,"path":3}],7:[function(require,module,exports){
+
+/*!
+ * EJS - Filters
+ * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * First element of the target `obj`.
+ */
+
+exports.first = function(obj) {
+  return obj[0];
+};
+
+/**
+ * Last element of the target `obj`.
+ */
+
+exports.last = function(obj) {
+  return obj[obj.length - 1];
+};
+
+/**
+ * Capitalize the first letter of the target `str`.
+ */
+
+exports.capitalize = function(str){
+  str = String(str);
+  return str[0].toUpperCase() + str.substr(1, str.length);
+};
+
+/**
+ * Downcase the target `str`.
+ */
+
+exports.downcase = function(str){
+  return String(str).toLowerCase();
+};
+
+/**
+ * Uppercase the target `str`.
+ */
+
+exports.upcase = function(str){
+  return String(str).toUpperCase();
+};
+
+/**
+ * Sort the target `obj`.
+ */
+
+exports.sort = function(obj){
+  return Object.create(obj).sort();
+};
+
+/**
+ * Sort the target `obj` by the given `prop` ascending.
+ */
+
+exports.sort_by = function(obj, prop){
+  return Object.create(obj).sort(function(a, b){
+    a = a[prop], b = b[prop];
+    if (a > b) return 1;
+    if (a < b) return -1;
+    return 0;
+  });
+};
+
+/**
+ * Size or length of the target `obj`.
+ */
+
+exports.size = exports.length = function(obj) {
+  return obj.length;
+};
+
+/**
+ * Add `a` and `b`.
+ */
+
+exports.plus = function(a, b){
+  return Number(a) + Number(b);
+};
+
+/**
+ * Subtract `b` from `a`.
+ */
+
+exports.minus = function(a, b){
+  return Number(a) - Number(b);
+};
+
+/**
+ * Multiply `a` by `b`.
+ */
+
+exports.times = function(a, b){
+  return Number(a) * Number(b);
+};
+
+/**
+ * Divide `a` by `b`.
+ */
+
+exports.divided_by = function(a, b){
+  return Number(a) / Number(b);
+};
+
+/**
+ * Join `obj` with the given `str`.
+ */
+
+exports.join = function(obj, str){
+  return obj.join(str || ', ');
+};
+
+/**
+ * Truncate `str` to `len`.
+ */
+
+exports.truncate = function(str, len){
+  str = String(str);
+  return str.substr(0, len);
+};
+
+/**
+ * Truncate `str` to `n` words.
+ */
+
+exports.truncate_words = function(str, n){
+  var str = String(str)
+    , words = str.split(/ +/);
+  return words.slice(0, n).join(' ');
+};
+
+/**
+ * Replace `pattern` with `substitution` in `str`.
+ */
+
+exports.replace = function(str, pattern, substitution){
+  return String(str).replace(pattern, substitution || '');
+};
+
+/**
+ * Prepend `val` to `obj`.
+ */
+
+exports.prepend = function(obj, val){
+  return Array.isArray(obj)
+    ? [val].concat(obj)
+    : val + obj;
+};
+
+/**
+ * Append `val` to `obj`.
+ */
+
+exports.append = function(obj, val){
+  return Array.isArray(obj)
+    ? obj.concat(val)
+    : obj + val;
+};
+
+/**
+ * Map the given `prop`.
+ */
+
+exports.map = function(arr, prop){
+  return arr.map(function(obj){
+    return obj[prop];
+  });
+};
+
+/**
+ * Reverse the given `obj`.
+ */
+
+exports.reverse = function(obj){
+  return Array.isArray(obj)
+    ? obj.reverse()
+    : String(obj).split('').reverse().join('');
+};
+
+/**
+ * Get `prop` of the given `obj`.
+ */
+
+exports.get = function(obj, prop){
+  return obj[prop];
+};
+
+/**
+ * Packs the given `obj` into json string
+ */
+exports.json = function(obj){
+  return JSON.stringify(obj);
+};
+},{}],8:[function(require,module,exports){
+
+/*!
+ * EJS
+ * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * Escape the given string of `html`.
+ *
+ * @param {String} html
+ * @return {String}
+ * @api private
+ */
+
+exports.escape = function(html){
+  return String(html)
+    .replace(/&(?!\w+;)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+};
+ 
+},{}],9:[function(require,module,exports){
+'use strict';
+
+
+var Product = require('./product'),
+	Pubsub = require('./util/pubsub'),
+	Storage = require('./util/storage'),
+    constants = require('./constants'),
+    currency = require('./util/currency'),
+	mixin = require('./util/mixin');
+
+
+
+/**
+ * Renders the Mini Cart to the page's DOM.
+ *
+ * @constructor
+ * @param {string} name Name of the cart (used as a key for storage)
+ * @param {duration} number Time in milliseconds that the cart data should persist
+ */
+function Cart(name, duration) {
+    var data, items, settings, len, i;
+
+	this._items = [];
+	this._settings = { bn: constants.BN };
+
+	Pubsub.call(this);
+	Storage.call(this, name, duration);
+
+	if ((data = this.load())) {
+		items = data.items;
+		settings = data.settings;
+
+		if (settings) {
+			this._settings = settings;
 		}
+
+		if (items) {
+			for (i = 0, len = items.length; i < len; i++) {
+				this.add(items[i]);
+			}
+		}
+    }
+}
+
+
+mixin(Cart.prototype, Pubsub.prototype);
+mixin(Cart.prototype, Storage.prototype);
+
+
+/**
+ * Adds an item to the cart. This fires an "add" event.
+ *
+ * @param {object} data Item data
+ * @return {number} Item location in the cart
+ */
+Cart.prototype.add = function add(data) {
+    var that = this,
+		items = this.items(),
+        product, isExisting, idx, key, len, i;
+
+	// Prune cart settings data from the product
+	for (key in data) {
+		if (constants.SETTINGS.test(key)) {
+			this._settings[key] = data[key];
+			delete data[key];
+		}
+	}
+
+	// Look to see if the same product has already been added
+	for (i = 0, len = items.length; i < len; i++) {
+		if (items[i].isEqual(data)) {
+			product = items[i];
+			product.set('quantity', product.get('quantity') + (parseInt(data.quantity, 10) || 1));
+			idx = i;
+			isExisting = true;
+			break;
+		}
+	}
+
+	// If not, then add it
+	if (!product) {
+		product = new Product(data);
+		idx = (this._items.push(product) - 1);
+
+		product.on('change', function (key, value) {
+			that.save();
+			that.fire('change', idx, key, value);
+		});
+
+		this.save();
+	}
+
+	this.fire('add', idx, product, isExisting);
+
+    return idx;
+};
+
+
+/**
+ * Returns the carts current items.
+ *
+ * @param {number} idx (Optional) Returns only that item.
+ * @return {array|object}
+ */
+Cart.prototype.items = function get(idx) {
+    return (typeof idx === 'number') ? this._items[idx] : this._items;
+};
+
+
+/**
+ * Returns the carts current settings.
+ *
+ * @param {string} name (Optional) Returns only that setting.
+ * @return {array|string}
+ */
+Cart.prototype.settings = function settings(name) {
+	return (name) ? this._settings[name] : this._settings;
+};
+
+
+/**
+ * Returns the cart discount.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
+Cart.prototype.discount = function discount(config) {
+	var result = parseFloat(this.settings('discount_amount_cart')) || 0;
+
+	if (!result) {
+		result = (parseFloat(this.settings('discount_rate_cart')) || 0) * this.subtotal() / 100;
+	}
+
+	return currency(result, this.settings('currency_code'), config);
+};
+
+
+/**
+ * Returns the cart total without discounts.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
+Cart.prototype.subtotal = function subtotal(config) {
+	var products = this.items(),
+		result = 0,
+		i, len;
+
+	for (i = 0, len = products.length; i < len; i++) {
+		result += products[i].total();
+	}
+
+	return currency(result, this.settings('currency_code'), config);
+};
+
+
+/**
+ * Returns the cart total.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
+Cart.prototype.total = function total(config) {
+    var result = 0;
+
+	result += this.subtotal();
+	result -= this.discount();
+
+	return currency(result, this.settings('currency_code'), config);
+};
+
+
+/**
+ * Remove an item from the cart. This fires a "remove" event.
+ *
+ * @param {number} idx Item index to remove.
+ * @return {boolean}
+ */
+Cart.prototype.remove = function remove(idx) {
+    var item = this._items.splice(idx, 1);
+
+	if (this._items.length === 0) {
+		this.destroy();
+	}
+
+    if (item) {
+		this.save();
+        this.fire('remove', idx, item[0]);
+    }
+
+    return !!item.length;
+};
+
+
+/**
+ * Saves the cart data.
+ */
+Cart.prototype.save = function save() {
+	var items = this.items(),
+		settings = this.settings(),
+		data = [],
+		i, len;
+
+	for (i = 0, len = items.length; i < len; i++) {
+		data.push(items[i].get());
+	}
+
+	Storage.prototype.save.call(this, {
+		items: data,
+		settings: settings
+	});
+};
+
+
+/**
+ * Proxies the checkout event
+ * The assumption is the view triggers this and consumers subscribe to it
+ *
+ * @param {object} The initiating event
+ */
+Cart.prototype.checkout = function checkout(evt) {
+	this.fire('checkout', evt);
+};
+
+
+/**
+ * Destroy the cart data. This fires a "destroy" event.
+ */
+Cart.prototype.destroy = function destroy() {
+	Storage.prototype.destroy.call(this);
+
+    this._items = [];
+	this._settings = { bn: constants.BN };
+
+    this.fire('destroy');
+};
+
+
+
+
+module.exports = Cart;
+
+},{"./constants":11,"./product":13,"./util/currency":15,"./util/mixin":18,"./util/pubsub":19,"./util/storage":20}],10:[function(require,module,exports){
+'use strict';
+
+
+var mixin = require('./util/mixin');
+
+
+var defaults = module.exports = {
+
+    name: 'PPMiniCart',
+
+    parent: (typeof document !== 'undefined') ? document.body : null,
+
+    action: 'https://www.paypal.com/cgi-bin/webscr',
+
+    target: '',
+
+    duration: 30,
+
+    template: '<%var items = cart.items();var settings = cart.settings();var hasItems = !!items.length;%><form method="post" class="<% if (!hasItems) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">	<button type="button" class="minicart-closer">&times;</button>	<ul>		<% for (var i= 0, idx = i + 1, len = items.length; i < len; i++, idx++) { %>		<li class="minicart-item">			<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>			<ul class="minicart-attributes">				<% if (items[i].get("item_number")) { %>				<li>					<%= items[i].get("item_number") %>					<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />				</li>				<% } %>				<% if (items[i].discount()) { %>				<li>					<%= config.strings.discount %> <%= items[i].discount({ format: true }) %>					<input type="hidden" name="discount_amount_<%= idx %>" value="<%= items[i].discount() %>" />				</li>				<% } %>				<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>					<li>						<%= options[j].key %>: <%= options[j].value %>						<input type="hidden" name="on<%= j %>_<%= idx %>" value="<%= options[j].key %>" />						<input type="hidden" name="os<%= j %>_<%= idx %>" value="<%= options[j].value %>" />					</li>				<% } %>			</ul>			<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" type="text" pattern="[0-9]*" value="<%= items[i].get("quantity") %>" autocomplete="off" />			<button type="button" class="minicart-remove" data-minicart-idx="<%= i %>">&times;</button>			<span class="minicart-price"><%= items[i].total({ format: true }) %></span>			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].amount() %>" />		</li>		<% } %>	</ul>	<div>		<div class="minicart-subtotal">			<%= config.strings.subtotal %> <%= cart.total({ format: true, currencyCode: true }) %>		</div>		<% if (hasItems) { %>			<button class="minicart-submit" type="submit" data-minicart-alt="<%= config.strings.buttonAlt %>"><%- config.strings.button %></button>		<% } %>	</div>	<input type="hidden" name="cmd" value="_cart" />	<input type="hidden" name="upload" value="1" />	<% for (var key in settings) { %>		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />	<% } %></form>',
+
+    styles: '@keyframes pop-in {	0% { opacity: 0; transform: scale(0.1); }	60% { opacity: 1; transform: scale(1.2); }	100% { transform: scale(1); }}@-webkit-keyframes pop-in {	0% { opacity: 0; -webkit-transform: scale(0.1); }	60% { opacity: 1; -webkit-transform: scale(1.2); }	100% { -webkit-transform: scale(1); }}@-moz-keyframes pop-in {	0% { opacity: 0; -moz-transform: scale(0.1); }	60% { opacity: 1; -moz-transform: scale(1.2); }	100% { -moz-transform: scale(1); }}.minicart-showing #PPMiniCart {	display: block;	transform: translateZ(0);	-webkit-transform: translateZ(0);	-moz-transform: translateZ(0);	animation: pop-in 0.25s;	-webkit-animation: pop-in 0.25s;	-moz-animation: pop-in 0.25s;}#PPMiniCart {	display: none;	position: fixed;	left: 50%;	top: 75px;}#PPMiniCart form {	position: relative;	width: 400px;	max-height: 400px;	margin-left: -200px;	padding: 10px 10px 40px;	background: #fbfbfb;	border: 1px solid #d7d7d7;	border-radius: 4px;	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);	font: 15px/normal arial, helvetica;	color: #333;}#PPMiniCart ul {	clear: right;	margin: 15px 0;	padding: 10px;	list-style-type: none;	background: #fff;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);}#PPMiniCart .minicart-empty ul {	display: none;}#PPMiniCart .minicart-closer {	float: right;	margin: -12px -10px 0;	padding: 10px;	background: 0;	border: 0;	font-size: 18px;	cursor: pointer;}#PPMiniCart .minicart-item {	position: relative;	padding: 6px 0;}#PPMiniCart .minicart-item + .minicart-item {	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 11px;	left: 0;	width: 185px;	color: #333;	line-height: 10px;	text-decoration: none;}#PPMiniCart .minicart-attributes {	margin: 18px 0 0;	padding: 0;	border: 0;	border-radius: 0;	box-shadow: 0 0 0;	color: #999;	font-size: 12px;	line-height: 22px;}#PPMiniCart .minicart-attributes li {	display: inline;}#PPMiniCart .minicart-attributes li:after {	content: ",";}#PPMiniCart .minicart-attributes li:last-child:after {	content: "";}#PPMiniCart .minicart-quantity {	position: absolute;	top: 5px;	left: 235px;	width: 30px;	height: 18px;	padding: 2px 4px;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);	font-size: 13px;	text-align: right;	transition: border linear 0.2s, box-shadow linear 0.2s;	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;}#PPMiniCart .minicart-quantity:hover {	border-color: #0078C1;}#PPMiniCart .minicart-quantity:focus {	border-color: #0078C1;	outline: 0;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 3px rgba(0, 120, 193, 0.4);}#PPMiniCart .minicart-remove {	position: absolute;	top: 7px;	left: 290px;	width: 18px;	height: 19px;	margin: 0;	padding: 0;	background: #b7b7b7;	border: 1px solid #a3a3a3;	border-radius: 3px;	color: #fff;	font-size: 13px;	opacity: 0.70;	cursor: pointer;}#PPMiniCart .minicart-remove:hover {	opacity: 1;}#PPMiniCart .minicart-price {	position: absolute;	top: 7px;	right: 0;}#PPMiniCart .minicart-subtotal {	position: absolute;	bottom: 17px;	left: 10px;	font-size: 16px;	font-weight: bold;}#PPMiniCart .minicart-submit {	position: absolute;	bottom: 10px;	right: 10px;	min-width: 153px;	height: 33px;	border: 1px solid #ffc727;	border-radius: 5px;	color: #000;	text-shadow: 1px 1px 1px #fff6e9;	cursor: pointer;	background: #ffaa00;	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZjZlOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmFhMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);	background: -moz-linear-gradient(top, #fff6e9 0%, #ffaa00 100%);	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fff6e9), color-stop(100%,#ffaa00));	background: -webkit-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: -o-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: -ms-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: linear-gradient(to bottom, #fff6e9 0%,#ffaa00 100%);}#PPMiniCart .minicart-submit img {	vertical-align: middle;	padding: 4px 0 0 2px;}',
+
+    strings: {
+        button: 'Check Out with <img src="http://minicartjs.com/images/paypal_65x18.png" width="65" height="18" alt="PayPal" />',
+        subtotal: 'Subtotal:',
+        discount: 'Discount:',
+        processing: 'Processing...'
+    }
+
+};
+
+
+/**
+ * Mixes in the user config with the default config.
+ *
+ * @param {object} userConfig Configuration overrides
+ * @return {object}
+ */
+module.exports.load = function load(userConfig) {
+    return mixin(defaults, userConfig);
+};
+
+},{"./util/mixin":18}],11:[function(require,module,exports){
+'use strict';
+
+
+module.exports = {
+
+    COMMANDS: { _cart: true, _xclick: true, _donations: true },
+
+    SETTINGS: /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|discount_amount_cart|discount_rate_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/,
+
+	BN: 'MiniCart_AddToCart_WPS_US',
+
+	KEYUP_TIMEOUT: 500,
+
+	SHOWING_CLASS: 'minicart-showing',
+
+	REMOVE_CLASS: 'minicart-remove',
+
+	CLOSER_CLASS: 'minicart-closer',
+
+	QUANTITY_CLASS: 'minicart-quantity',
+
+	ITEM_CLASS: 'minicart-item',
+
+	ITEM_CHANGED_CLASS: 'minicart-item-changed',
+
+	SUBMIT_CLASS: 'minicart-submit',
+
+	DATA_IDX: 'data-minicart-idx'
+
+};
+
+},{}],12:[function(require,module,exports){
+'use strict';
+
+
+var Cart = require('./cart'),
+	View = require('./view'),
+    config = require('./config'),
+    minicart = {},
+	cartModel,
+	confModel,
+	viewModel;
+
+
+/**
+ * Renders the Mini Cart to the page's DOM.
+ *
+ * @param {object} userConfig Configuration overrides
+ */
+minicart.render = function (userConfig) {
+	confModel = minicart.config = config.load(userConfig);
+	cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
+	viewModel = minicart.view = new View({
+		config: confModel,
+		cart: cartModel
+	});
+
+	cartModel.on('add', viewModel.addItem, viewModel);
+	cartModel.on('change', viewModel.changeItem, viewModel);
+	cartModel.on('remove', viewModel.removeItem, viewModel);
+	cartModel.on('destroy', viewModel.hide, viewModel);
+};
+
+
+/**
+ * Resets the Mini Cart and its view model
+ */
+minicart.reset = function () {
+    cartModel.destroy();
+
+	viewModel.hide();
+	viewModel.redraw();
+};
+
+
+
+
+// Export to either node or the brower window
+if (typeof window === 'undefined') {
+	module.exports = minicart;
+} else {
+	if (!window.paypal) {
+		window.paypal = {};
+	}
+
+	window.paypal.minicart = minicart;
+}
+
+},{"./cart":9,"./config":10,"./view":22}],13:[function(require,module,exports){
+'use strict';
+
+
+var currency = require('./util/currency'),
+	Pubsub = require('./util/pubsub'),
+	mixin = require('./util/mixin');
+
+
+var parser = {
+	quantity: function (value) {
+		value = parseInt(value, 10);
+
+		if (isNaN(value) || !value) {
+			value = 1;
+		}
+
+		return value;
+	},
+	amount: function (value) {
+		return parseFloat(value) || 0;
+	},
+	href: function (value) {
+		if (value) {
+			return value;
+		} else {
+			return (typeof window !== 'undefined') ? window.location.href : null;
+		}
+	}
+};
+
+
+/**
+ * Creates a new product.
+ *
+ * @constructor
+ * @param {object} data Item data
+ */
+function Product(data) {
+	data.quantity = parser.quantity(data.quantity);
+	data.amount = parser.amount(data.amount);
+	data.href = parser.href(data.href);
+
+    this._data = data;
+	this._options = null;
+	this._discount = null;
+	this._amount = null;
+	this._total = null;
+
+	Pubsub.call(this);
+}
+
+
+mixin(Product.prototype, Pubsub.prototype);
+
+
+/**
+ * Gets the product data.
+ *
+ * @param {string} key (Optional) A key to restrict the returned data to.
+ * @return {array|string}
+ */
+Product.prototype.get = function get(key) {
+    return (key) ? this._data[key] : this._data;
+};
+
+
+/**
+ * Sets a value on the product. This is used rather than manually setting the
+ * value so that we can fire a "change" event.
+ *
+ * @param {string} key
+ * @param {string} value
+ */
+Product.prototype.set = function set(key, value) {
+	var setter = parser[key];
+
+	this._data[key] = setter ? setter(value) : value;
+	this._options = null;
+	this._discount = null;
+	this._amount = null;
+	this._total = null;
+
+    this.fire('change', key);
+};
+
+
+/**
+ * Parse and return the options for this product.
+ *
+ * @return {object}
+ */
+Product.prototype.options = function options() {
+	var result, key, value, amount, i, j;
+
+	if (!this._options) {
+		result = [];
+		i = 0;
+
+		while ((key = this.get('on' + i))) {
+			value = this.get('os' + i);
+			amount = 0;
+			j = 0;
+
+			while (typeof this.get('option_select' + j) !== 'undefined') {
+				if (this.get('option_select' + j) === value) {
+					amount = parser.amount(this.get('option_amount' + j));
+					break;
+				}
+
+				j++;
+			}
+
+			result.push({
+				key: key,
+				value: value,
+				amount: amount
+			});
+
+			i++;
+		}
+
+		this._options = result;
+	}
+
+	return this._options;
+};
+
+
+/**
+ * Parse and return the discount for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
+Product.prototype.discount = function discount(config) {
+	var flat, rate, num, limit, result, amount;
+
+	if (!this._discount) {
+		result = 0;
+		num = parseInt(this.get('discount_num'), 10) || 0;
+		limit = Math.max(num, this.get('quantity') - 1);
+
+		if ((flat = parser.amount(this.get('discount_amount')))) {
+			result += flat;
+			result += parser.amount(this.get('discount_amount2') || flat) * limit;
+		} else if ((rate = parser.amount(this.get('discount_rate')))) {
+			amount = this.amount();
+
+			result += rate * amount / 100;
+			result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+		}
+
+		this._discount = result;
+	}
+
+	return currency(this._discount, null, config);
+};
+
+
+/**
+ * Parse and return the total without discounts for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
+Product.prototype.amount = function amount(config) {
+	var result, options, len, i;
+
+	if (!this._amount) {
+		result = this.get('amount');
+		options = this.options();
+
+		for (i = 0, len = options.length; i < len; i++) {
+			result += options[i].amount;
+		}
+
+		this._amount = result;
+	}
+
+	return currency(this._amount, null, config);
+};
+
+
+/**
+ * Parse and return the total for this product.
+ *
+ * @param {object} config (Optional) Currency formatting options.
+ * @return {number|string}
+ */
+Product.prototype.total = function total(config) {
+	var result;
+
+	if (!this._total) {
+		result  = this.get('quantity') * this.amount();
+		result -= this.discount();
+
+		this._total = parser.amount(result);
+	}
+
+	return currency(this._total, null, config);
+};
+
+
+/**
+ * Determine if this product has the same data as another.
+ *
+ * @param {object|Product} data Other product.
+ * @return {boolean}
+ */
+Product.prototype.isEqual = function isEqual(data) {
+	var match = false;
+
+	if (data instanceof Product) {
+		data = data._data;
+	}
+
+	if (this.get('item_name') === data.item_name) {
+		if (this.get('item_number') === data.item_number) {
+			if (this.get('amount') === parser.amount(data.amount)) {
+				var i = 0;
+
+				match = true;
+
+				while (typeof data['os' + i] !== 'undefined') {
+					if (this.get('os' + i) !== data['os' + i]) {
+						match = false;
+						break;
+					}
+
+					i++;
+				}
+			}
+		}
+	}
+
+	return match;
+};
+
+
+/**
+ * Destroys this product. Fires a "destroy" event.
+ */
+Product.prototype.destroy = function destroy() {
+    this._data = [];
+    this.fire('destroy', this);
+};
+
+
+
+
+module.exports = Product;
+
+},{"./util/currency":15,"./util/mixin":18,"./util/pubsub":19}],14:[function(require,module,exports){
+/* jshint quotmark:double */
+
+
+"use strict";
+
+
+
+module.exports.add = function add(el, str) {
+	var re;
+
+	if (!el) { return false; }
+
+	if (el && el.classList && el.classList.add) {
+		el.classList.add(str);
+	} else {
+		re = new RegExp("\\b" + str + "\\b");
+
+		if (!re.test(el.className)) {
+			el.className += " " + str;
+		}
+	}
+};
+
+
+module.exports.remove = function remove(el, str) {
+	var re;
+
+	if (!el) { return false; }
+
+	if (el.classList && el.classList.add) {
+		el.classList.remove(str);
+	} else {
+		re = new RegExp("\\b" + str + "\\b");
+
+		if (re.test(el.className)) {
+			el.className = el.className.replace(re, "");
+		}
+	}
+};
+
+
+module.exports.inject = function inject(el, str) {
+	var style;
+
+	if (!el) { return false; }
+
+	if (str) {
+		style = document.createElement("style");
+		style.type = "text/css";
+
+		if (style.styleSheet) {
+			style.styleSheet.cssText = str;
+		} else {
+			style.appendChild(document.createTextNode(str));
+		}
+
+		el.appendChild(style);
+	}
+};
+
+},{}],15:[function(require,module,exports){
+'use strict';
+
+
+var currencies = {
+    AED: { before: '\u062c' },
+    ANG: { before: '\u0192' },
+    ARS: { before: '$' },
+    AUD: { before: '$' },
+    AWG: { before: '\u0192' },
+    BBD: { before: '$' },
+    BGN: { before: '\u043b\u0432' },
+    BMD: { before: '$' },
+    BND: { before: '$' },
+    BRL: { before: 'R$' },
+    BSD: { before: '$' },
+    CAD: { before: '$' },
+    CHF: { before: '' },
+    CLP: { before: '$' },
+    CNY: { before: '\u00A5' },
+    COP: { before: '$' },
+    CRC: { before: '\u20A1' },
+    CZK: { before: 'Kc' },
+    DKK: { before: 'kr' },
+    DOP: { before: '$' },
+    EEK: { before: 'kr' },
+    EUR: { before: '\u20AC' },
+    GBP: { before: '\u00A3' },
+    GTQ: { before: 'Q' },
+    HKD: { before: '$' },
+    HRK: { before: 'kn' },
+    HUF: { before: 'Ft' },
+    IDR: { before: 'Rp' },
+    ILS: { before: '\u20AA' },
+    INR: { before: 'Rs.' },
+    ISK: { before: 'kr' },
+    JMD: { before: 'J$' },
+    JPY: { before: '\u00A5' },
+    KRW: { before: '\u20A9' },
+    KYD: { before: '$' },
+    LTL: { before: 'Lt' },
+    LVL: { before: 'Ls' },
+    MXN: { before: '$' },
+    MYR: { before: 'RM' },
+    NOK: { before: 'kr' },
+    NZD: { before: '$' },
+    PEN: { before: 'S/' },
+    PHP: { before: 'Php' },
+    PLN: { before: 'z' },
+    QAR: { before: '\ufdfc' },
+    RON: { before: 'lei' },
+    RUB: { before: '\u0440\u0443\u0431' },
+    SAR: { before: '\ufdfc' },
+    SEK: { before: 'kr' },
+    SGD: { before: '$' },
+    THB: { before: '\u0E3F' },
+    TRY: { before: 'TL' },
+    TTD: { before: 'TT$' },
+    TWD: { before: 'NT$' },
+    UAH: { before: '\u20b4' },
+    USD: { before: '$' },
+    UYU: { before: '$U' },
+    VEF: { before: 'Bs' },
+    VND: { before: '\u20ab' },
+    XCD: { before: '$' },
+    ZAR: { before: 'R' }
+};
+
+
+module.exports = function currency(amount, code, config) {
+    var value = currencies[code || 'USD'] || {},
+        before = value.before || '',
+        after = value.after || '',
+        length = value.length || 2,
+		result = amount;
+
+	if (config && config.format) {
+		result = before + result.toFixed(length) + after;
+	}
+
+	if (config && config.currencyCode && code) {
+		result += ' ' + code;
+	}
+
+    return result;
+};
+
+},{}],16:[function(require,module,exports){
+'use strict';
+
+
+module.exports = (function (window, document) {
+
+    /**
+     * Events are added here for easy reference
+     */
+    var cache = [];
+
+    // NOOP for Node
+    if (!document) {
+        return {
+            add: function () {},
+            remove: function () {}
+        };
+        // Non-IE events
+    } else if (document.addEventListener) {
+        return {
+            /**
+             * Add an event to an object and optionally adjust it's scope
+             *
+             * @param obj {HTMLElement} The object to attach the event to
+             * @param type {string} The type of event excluding "on"
+             * @param fn {function} The function
+             * @param scope {object} Object to adjust the scope to (optional)
+             */
+            add: function (obj, type, fn, scope) {
+                scope = scope || obj;
+
+                var wrappedFn = function (e) { fn.call(scope, e); };
+
+                obj.addEventListener(type, wrappedFn, false);
+                cache.push([obj, type, fn, wrappedFn]);
+            },
+
+
+            /**
+             * Remove an event from an object
+             *
+             * @param obj {HTMLElement} The object to remove the event from
+             * @param type {string} The type of event excluding "on"
+             * @param fn {function} The function
+             */
+            remove: function (obj, type, fn) {
+                var wrappedFn, item, len = cache.length, i;
+
+                for (i = 0; i < len; i++) {
+                    item = cache[i];
+
+                    if (item[0] === obj && item[1] === type && item[2] === fn) {
+                        wrappedFn = item[3];
+
+                        if (wrappedFn) {
+                            obj.removeEventListener(type, wrappedFn, false);
+                            delete cache[i];
+                        }
+                    }
+                }
+            }
+        };
+
+        // IE events
+    } else if (document.attachEvent) {
+        return {
+            /**
+             * Add an event to an object and optionally adjust it's scope (IE)
+             *
+             * @param obj {HTMLElement} The object to attach the event to
+             * @param type {string} The type of event excluding "on"
+             * @param fn {function} The function
+             * @param scope {object} Object to adjust the scope to (optional)
+             */
+            add: function (obj, type, fn, scope) {
+                scope = scope || obj;
+
+                var wrappedFn = function () {
+                    var e = window.event;
+                    e.target = e.target || e.srcElement;
+
+                    e.preventDefault = function () {
+                        e.returnValue = false;
+                    };
+
+                    fn.call(scope, e);
+                };
+
+                obj.attachEvent('on' + type, wrappedFn);
+                cache.push([obj, type, fn, wrappedFn]);
+            },
+
+
+            /**
+             * Remove an event from an object (IE)
+             *
+             * @param obj {HTMLElement} The object to remove the event from
+             * @param type {string} The type of event excluding "on"
+             * @param fn {function} The function
+             */
+            remove: function (obj, type, fn) {
+                var wrappedFn, item, len = cache.length, i;
+
+                for (i = 0; i < len; i++) {
+                    item = cache[i];
+
+                    if (item[0] === obj && item[1] === type && item[2] === fn) {
+                        wrappedFn = item[3];
+
+                        if (wrappedFn) {
+                            obj.detachEvent('on' + type, wrappedFn);
+                            delete cache[i];
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+})(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
+},{}],17:[function(require,module,exports){
+'use strict';
+
+
+var forms = module.exports = {
+
+    parse: function parse(form) {
+        var raw = form.elements,
+            data = {},
+            pair, value, i, len;
+
+        for (i = 0, len = raw.length; i < len; i++) {
+            pair = raw[i];
+
+            if ((value = forms.getInputValue(pair))) {
+                data[pair.name] = value;
+            }
+        }
+
+        return data;
+    },
+
+
+    getInputValue: function getInputValue(input) {
+        var tag = input.tagName.toLowerCase();
+
+        if (tag === 'select') {
+            return input.options[input.selectedIndex].value;
+        } else if (tag === 'textarea') {
+            return input.innerText;
+        } else {
+            if (input.type === 'radio') {
+                return (input.checked) ? input.value : null;
+            } else if (input.type === 'checkbox') {
+                return (input.checked) ? input.value : null;
+            } else {
+                return input.value;
+            }
+        }
+    }
+
+};
+},{}],18:[function(require,module,exports){
+'use strict';
+
+
+var mixin = module.exports = function mixin(dest, source) {
+	var value;
+
+	for (var key in source) {
+		value = source[key];
+
+		if (value && value.constructor === Object) {
+			if (!dest[key]) {
+				dest[key] = value;
+			} else {
+				mixin(dest[key] || {}, value);
+			}
+		} else {
+			dest[key] = value;
+		}
+	}
+
+	return dest;
+};
+
+},{}],19:[function(require,module,exports){
+'use strict';
+
+
+function Pubsub() {
+	this._eventCache = {};
+}
+
+
+Pubsub.prototype.on = function on(name, fn, scope) {
+	var cache = this._eventCache[name];
+
+	if (!cache) {
+		cache = this._eventCache[name] = [];
+	}
+
+	cache.push([fn, scope]);
+};
+
+
+Pubsub.prototype.off = function off(name, fn) {
+	var cache = this._eventCache[name],
+		i, len;
+
+	if (cache) {
+		for (i = 0, len = cache.length; i < len; i++) {
+			if (cache[i] === fn) {
+				cache = cache.splice(i, 1);
+			}
+		}
+	}
+};
+
+
+Pubsub.prototype.fire = function on(name) {
+	var cache = this._eventCache[name], i, len, fn, scope;
+
+	if (cache) {
+		for (i = 0, len = cache.length; i < len; i++) {
+			fn = cache[i][0];
+			scope = cache[i][1] || this;
+
+			if (typeof fn === 'function') {
+				fn.apply(scope, Array.prototype.slice.call(arguments, 1));
+			}
+		}
+	}
+};
+
+
+module.exports = Pubsub;
+
+},{}],20:[function(require,module,exports){
+'use strict';
+
+
+(function (window, document) {
+
+	var Storage = module.exports = function Storage(name, duration) {
+		this._name = name;
+		this._duration = duration || 30;
 	};
 
 
-	if (!PAYPAL.apps.MiniCart) {
+	var proto = Storage.prototype;
 
-		/**
-		 * Mini Cart application
-		 */
-		PAYPAL.apps.MiniCart = (function () {
 
-			var minicart = {},
-				isShowing = false,
-				isRendered = false;
+	// HTML5
+	if (window && window.localStorage) {
+		proto.load = function () {
+			var data = localStorage.getItem(this._name),
+				today,
+				expires;
 
+			if (data) {
+				data = JSON.parse(decodeURIComponent(data));
+			}
 
-			/** PRIVATE **/
+			if (data && data.expires) {
+				today = new Date();
+				expires = new Date(data.expires);
 
-			/**
-			 * PayPal form cmd values which are supported
-			 */
-			var SUPPORTED_CMDS = { _cart: true, _xclick: true };
-
-
-			/**
-			 * The form origin that is passed to PayPal
-			 */
-			var BN_VALUE = 'MiniCart_AddToCart_WPS_US';
-
-
-			/**
-			 * Regex filter for cart settings, which appear only once in a cart
-			 */
-			var SETTING_FILTER = /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/;
-
-
-			/**
-			 * Adds the cart's CSS to the page in a <style> element.
-			 * The CSS lives in this file so that it can leverage properties from the config
-			 * and doesn't require an additional download. To override the CSS see the FAQ.
-			 */
-			var _addCSS = function () {
-				var name = config.name,
-					css = [],
-					style, head;
-
-				css.push('#' + name + ' form { position:fixed; float:none; top:-250px; ' + config.displayEdge + ':' + config.edgeDistance + '; width:265px; margin:0; padding:50px 10px 0; min-height:170px; background:#fff url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -125px -60px; border:1px solid #999; border-top:0; font:13px/normal arial, helvetica; color:#333; text-align:left; -moz-border-radius:0 0 8px 8px; -webkit-border-radius:0 0 8px 8px; border-radius:0 0 8px 8px; -moz-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); -webkit-box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); box-shadow:1px 1px 1px rgba(0, 0, 0, 0.1); } ');
-				css.push('#' + name + ' ul { position:relative; overflow-x:hidden; overflow-y:auto; height:130px; margin:0 0 7px; padding:0; list-style-type:none; border-top:1px solid #ccc; border-bottom:1px solid #ccc; } ');
-				css.push('#' + name + ' li { position:relative; margin:-1px 0 0; padding:6px 5px 6px 0; border-top:1px solid #f2f2f2; } ');
-				css.push('#' + name + ' li a { display: block; width: 155px; color:#333; text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } ');
-				css.push('#' + name + ' li a span { display:block; color:#999; font-size:10px; } ');
-				css.push('#' + name + ' li .quantity { position:absolute; top:.5em; right:78px; width:22px; padding:1px; border:1px solid #83a8cc; text-align:right; } ');
-				css.push('#' + name + ' li .price { position:absolute; top:.5em; right:4px; } ');
-				css.push('#' + name + ' li .remove { position:absolute; top:9px; right:60px; width:14px; height:14px; background:url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat -134px -4px; border:0; cursor:pointer; } ');
-				css.push('#' + name + ' p { margin:0; padding:0 0 0 20px; background:url(' + config.assetURL + 'images/minicart_sprite.png) no-repeat; font-size:13px; font-weight:bold; } ');
-				css.push('#' + name + ' p:hover { cursor:pointer; } ');
-				css.push('#' + name + ' p input { float:right; margin:4px 0 0; padding:1px 4px; text-decoration:none; font-weight:normal; color:#333; background:#ffa822 url(' + config.assetURL + 'images/minicart_sprite.png) repeat-x left center; border:1px solid #d5bd98; border-right-color:#935e0d; border-bottom-color:#935e0d; -moz-border-radius:2px; -webkit-border-radius:2px; border-radius:2px; } ');
-				css.push('#' + name + ' p .shipping { display:block; font-size:10px; font-weight:normal; color:#999; } ');
-
-				style = document.createElement('style');
-				style.type = 'text/css';
-
-				if (style.styleSheet) {
-					style.styleSheet.cssText = css.join('');
-				} else {
-					style.appendChild(document.createTextNode(css.join('')));
-				}
-
-				head = document.getElementsByTagName('head')[0];
-				head.appendChild(style);
-			};
-
-
-			/**
-			 * Builds the DOM elements required by the cart
-			 */
-			var _buildDOM = function () {
-				var UI = minicart.UI,
-					cmd, type, bn, parent, version;
-
-				UI.wrapper = document.createElement('div');
-				UI.wrapper.id = config.name;
-
-				cmd = document.createElement('input');
-				cmd.type = 'hidden';
-				cmd.name = 'cmd';
-				cmd.value = '_cart';
-
-				type = cmd.cloneNode(false);
-				type.name = 'upload';
-				type.value = '1';
-
-				bn = cmd.cloneNode(false);
-				bn.name = 'bn';
-				bn.value = BN_VALUE;
-
-				UI.cart = document.createElement('form');
-				UI.cart.method = 'post';
-				UI.cart.action = config.paypalURL;
-
-				if (config.formTarget) {
-					UI.cart.target = config.formTarget;
-				}
-
-				UI.cart.appendChild(cmd);
-				UI.cart.appendChild(type);
-				UI.cart.appendChild(bn);
-				UI.wrapper.appendChild(UI.cart);
-
-				UI.itemList = document.createElement('ul');
-				UI.cart.appendChild(UI.itemList);
-
-				UI.summary = document.createElement('p');
-				UI.cart.appendChild(UI.summary);
-
-				UI.button = document.createElement('input');
-				UI.button.type = 'submit';
-				UI.button.value = config.strings.button;
-				UI.summary.appendChild(UI.button);
-
-				UI.subtotal = document.createElement('span');
-				$.util.setText(UI.subtotal, config.strings.subtotal);
-
-				UI.subtotalAmount = document.createElement('span');
-				$.util.setText(UI.subtotalAmount, '0.00');
-
-				UI.subtotal.appendChild(UI.subtotalAmount);
-				UI.summary.appendChild(UI.subtotal);
-
-				UI.shipping = document.createElement('span');
-				UI.shipping.className = 'shipping';
-				$.util.setText(UI.shipping, config.strings.shipping);
-				UI.summary.appendChild(UI.shipping);
-
-				// Workaround: IE 6 and IE 7/8 in quirks mode do not support position: fixed in CSS
-				if (window.attachEvent && !window.opera) {
-					version = navigator.userAgent.match(/MSIE\s([^;]*)/);
-
-					if (version) {
-						version = parseFloat(version[1]);
-
-						if (version < 7 || (version >= 7 && document.compatMode === 'BackCompat')) {
-							UI.cart.style.position = 'absolute';
-							UI.wrapper.style[config.displayEdge] = '0';
-							UI.wrapper.style.setExpression('top', 'x = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop');
-						}
-					}
-				}
-
-				parent = (typeof config.parent === 'string') ? document.getElementById(config.parent) : config.parent;
-				parent.appendChild(UI.wrapper);
-			};
-
-
-			/**
-			 * Attaches the cart events to it's DOM elements
-			 */
-			var _bindEvents = function () {
-				var ui = minicart.UI,
-					forms, form, i;
-
-				// Look for all "Cart" and "Buy Now" forms on the page and attach events
-				forms = document.getElementsByTagName('form');
-
-				for (i = 0; i < forms.length; i++) {
-					form = forms[i];
-
-					if (form.cmd && SUPPORTED_CMDS[form.cmd.value]) {
-						minicart.bindForm(form);
-					}
-				}
-
-				// Hide the Mini Cart for all non-cart related clicks
-				$.event.add(document, 'click', function (e) {
-					if (isShowing) {
-						var target = e.target,
-							cartEl = ui.cart;
-
-						if (!(/input|button|select|option/i.test(target.tagName))) {
-							while (target.nodeType === 1) {
-								if (target === cartEl) {
-									return;
-								}
-
-								target = target.parentNode;
-							}
-
-							minicart.hide(null);
-						}
-					}
-				});
-
-				// Run the checkout code when submitting the form
-				$.event.add(ui.cart, 'submit', function (e) {
-					_checkout(e);
-				});
-
-				// Show the cart when clicking on the summary
-				$.event.add(ui.summary, 'click', function (e) {
-					var target = e.target;
-
-					if (target !== ui.button) {
-						minicart.toggle(e);
-					}
-				});
-
-				// Redraw the cart if the back/forward cache doesn't re-render
-				$.event.add(window, 'pageshow', function (e) {
-					if (e.persisted) {
-						_redrawCartItems(true);
-						minicart.hide();
-					}
-				});
-			};
-
-
-			/**
-			 * Parses the userConfig (if applicable) and overwrites the default values
-			 */
-			var _parseUserConfig = function (userConfig) {
-				var key;
-
-				// TODO: This should recursively merge the config values
-				for (key in userConfig) {
-					if (typeof config[key] !== undefined) {
-						config[key] = userConfig[key];
-					}
-				}
-			};
-
-
-			/**
-			 * Loads the stored data and builds the cart
-			 */
-			var _parseStorage = function () {
-				var data, length, i;
-
-				if ((data = $.storage.load())) {
-					length = data.length;
-
-					for (i = 0; i < length; i++) {
-						if (_renderProduct(data[i])) {
-							isShowing = true;
-						}
-					}
-				}
-			};
-
-
-			/**
-			 * Data parser used for forms
-			 *
-			 * @param form {HTMLElement} An HTML form
-			 * @return {object}
-			 */
-			var _parseForm = function (form) {
-				var raw = form.elements,
-					data = {},
-					pair, value, i, len;
-
-				for (i = 0, len = raw.length; i < len; i++) {
-					pair = raw[i];
-
-					if ((value = $.util.getInputValue(pair))) {
-						data[pair.name] = value;
-					}
-				}
-
-				return data;
-			};
-
-
-			/**
-			 * Massage's a object's data in preparation for adding it to the user's cart
-			 *
-			 * @param data {object} An object of WPS xclick style data to add to the cart. The format is { product: '', settings: '' }.
-			 * @return {object}
-			 */
-			var _parseData = function (data) {
-				var product = {},
-					settings = {},
-					existing, option_index, key, len, match, i, j;
-
-				// Parse the data into a two categories: product and settings
-				for (key in data) {
-					if (SETTING_FILTER.test(key)) {
-						settings[key] = data[key];
-					} else {
-						product[key] = data[key];
-					}
-				}
-
-				// Check the products to see if this variation already exists
-				// If it does then reuse the same object
-				for (i = 0, len = minicart.products.length; i < len; i++) {
-					existing = minicart.products[i].product;
-
-					// Do the product name and number match
-					if (product.item_name === existing.item_name && product.item_number === existing.item_number) {
-						// Products are a match so far; Now do all of the products options match?
-						match = true;
-						j = 0;
-
-						while (existing['os' + j]) {
-							if (product['os' + j] !== existing['os' + j]) {
-								match = false;
-								break;
-							}
-
-							j++;
-						}
-
-						if (match) {
-							product.offset = existing.offset;
-							break;
-						}
-					}
-				}
-
-				// Normalize the values
-				product.href = product.href || window.location.href;
-				product.quantity = product.quantity || 1;
-				product.amount = product.amount || 0;
-
-				// Add Mini Cart specific settings
-				if (config.resetCartOnSuccess && settings['return'] && settings['return'].indexOf('#') === -1) {
-					settings['return'] += '#' + config.name + '=reset';
-				}
-
-				// Add option amounts to the total amount
-				option_index = (product.option_index) ? product.option_index : 0;
-
-				while (product['os' + option_index]) {
-					i = 0;
-
-					while (typeof product['option_select' + i] !== 'undefined') {
-						if (product['option_select' + i] === product['os' + option_index]) {
-							product.amount = product.amount + parseFloat(product['option_amount' + i]);
-							break;
-						}
-
-						i++;
-					}
-
-					option_index++;
-				}
-
-				return {
-					product: product,
-					settings: settings
-				};
-			};
-
-
-			/**
-			 * Resets the cart and renders the products
-			 */
-			var _redrawCartItems = function (silent) {
-				minicart.products = [];
-				$.util.setText(minicart.UI.itemList, '');
-				$.util.setText(minicart.UI.subtotalAmount, '');
-				minicart.UI.button.value = config.strings.button;
-
-				_parseStorage();
-				minicart.updateSubtotal(silent);
-			};
-
-
-			/**
-			 * Renders the product in the cart
-			 *
-			 * @param data {object} The data for the product
-			 */
-			var _renderProduct = function (data) {
-				var ui = minicart.UI,
-					cartEl = ui.cart,
-					product = new ProductNode(data, minicart.UI.itemList.children.length + 1),
-					offset = data.product.offset,
-					keyupTimer, hiddenInput, key;
-
-				minicart.products[offset] = product;
-
-				// Add hidden settings data to parent form
-				for (key in data.settings) {
-					if (cartEl.elements[key]) {
-						if (cartEl.elements[key].value) {
-							cartEl.elements[key].value = data.settings[key];
-						} else {
-							cartEl.elements[key] = data.settings[key];
-						}
-					} else {
-						hiddenInput = document.createElement('input');
-						hiddenInput.type = 'hidden';
-						hiddenInput.name = key;
-						hiddenInput.value = data.settings[key];
-
-						cartEl.appendChild(hiddenInput);
-					}
-				}
-
-				// if the product has no name or number then don't add it
-				if (product.isPlaceholder) {
-					return false;
-				// otherwise, setup the new element
-				} else {
-					// Click event for "x"
-					$.event.add(product.removeInput, 'click', function () {
-						_removeProduct(product, offset);
-					});
-
-					// Event for changing quantities
-					var currentValue = product.quantityInput.value;
-
-					$.event.add(product.quantityInput, 'keyup', function () {
-						var that = this;
-
-						keyupTimer = setTimeout(function () {
-							var value = parseInt(that.value, 10);
-
-							if (!isNaN(value) && value !== currentValue) {
-								currentValue = value;
-
-								product.setQuantity(value);
-
-								// Delete the product
-								if (!product.getQuantity()) {
-									_removeProduct(product, offset);
-								}
-
-								minicart.updateSubtotal();
-								$.storage.save(minicart.products);
-							}
-						}, 250);
-					});
-
-					// Add the item and fade it in
-					ui.itemList.insertBefore(product.liNode, ui.itemList.firstChild);
-					$.util.animate(product.liNode, 'opacity', { from: 0, to: 1 });
-
-					return true;
-				}
-			};
-
-
-			/**
-			 * Removes a product from the cart
-			 *
-			 * @param product {ProductNode} The product object
-			 * @param offset {Number} The offset for the product in the cart
-			 */
-			var _removeProduct = function (product, offset) {
-				var events = config.events,
-					onRemoveFromCart = events.onRemoveFromCart,
-					afterRemoveFromCart = events.afterRemoveFromCart;
-
-				if (typeof onRemoveFromCart === 'function') {
-					if (onRemoveFromCart.call(minicart, product) === false) {
-						return;
-					}
-				}
-
-				product.setQuantity(0);
-				product.quantityInput.style.display = 'none';
-
-				$.util.animate(product.liNode, 'opacity', { from: 1, to: 0 }, function () {
-					$.util.animate(product.liNode, 'height', { from: 18, to: 0 }, function () {
-						try {
-							product.liNode.parentNode.removeChild(product.liNode);
-						} catch (e) {
-							// fail
-						}
-
-						// regenerate the form element indexes
-						var products = minicart.UI.cart.getElementsByTagName('li'),
-							products_len = products.length,
-							inputs,
-							inputs_len,
-							input,
-							matches,
-							i, j, k = 1;
-
-						for (i = 0 ; i < products_len; i++) {
-							inputs = products[i].getElementsByTagName('input');
-							inputs_len = inputs.length;
-
-							for (j = 0; j < inputs_len; j++) {
-								input = inputs[j];
-								matches = /(.+)_[0-9]+$/.exec(input.name);
-
-								if (matches && matches[1]) {
-									input.name = matches[1] + '_' + k;
-								}
-							}
-
-							k++;
-						}
-
-						if (typeof afterRemoveFromCart === 'function') {
-							afterRemoveFromCart.call(minicart, product);
-						}
-					});
-				});
-
-				minicart.products[offset].product.item_name = '';
-				minicart.products[offset].product.item_number = '';
-
-				minicart.updateSubtotal();
-				$.storage.save(minicart.products, config.cartDuration);
-			};
-
-
-			/**
-			 * Event when the cart form is submitted
-			 *
-			 * @param e {event} The form submission event
-			 */
-			var _checkout = function (e) {
-				var onCheckout = config.events.onCheckout;
-
-				if (typeof onCheckout === 'function') {
-					if (onCheckout.call(minicart, e) === false) {
-						e.preventDefault();
-						return;
-					}
-				}
-
-				minicart.UI.button.value = config.strings.processing;
-			};
-
-
-			/** PUBLIC **/
-
-
-			/**
-			 * Array of ProductNode
-			 */
-			minicart.products = [];
-
-
-			/**
-			 * Container for UI elements
-			 */
-			minicart.UI = {};
-
-
-			/**
-			 * Renders the cart, creates the configuration and loads the data
-			 *
-			 * @param userConfig {object} User settings which override the default configuration
-			 */
-			minicart.render = function (userConfig) {
-				var events, onRender, afterRender, hash, cmd;
-
-				// Overwrite default configuration with user settings
-				_parseUserConfig(userConfig);
-
-				events = config.events;
-				onRender = events.onRender;
-				afterRender = events.afterRender;
-
-				if (typeof onRender === 'function') {
-					if (onRender.call(minicart) === false) {
-						return;
-					}
-				}
-
-				if (!isRendered) {
-					// Render the cart UI
-					_addCSS();
-					_buildDOM();
-					_bindEvents();
-
-					// Check if a transaction was completed
-					// The "return" form param is modified to contain a hash value
-					// with "PPMiniCart=reset". If this is seen then it's assumed
-					// that a transaction was completed and we should reset the cart.
-					hash = location.hash.substring(1);
-
-					if (hash.indexOf(config.name + '=') === 0) {
-						cmd = hash.split('=')[1];
-
-						if (cmd === 'reset') {
-							minicart.reset();
-							location.hash = '';
-						}
-					}
-				}
-
-				// Process any stored data and render it
-				// TODO: _parseStorage shouldn't be so tightly coupled here and one
-				// should be able to redraw without re-parsing the storage
-				_redrawCartItems(true);
-
-				// Trigger the cart to peek on first load if any products were loaded
-				if (!isRendered) {
-					if (isShowing) {
-						setTimeout(function () {
-							minicart.hide(null);
-						}, 500);
-					} else {
-						$.storage.remove();
-					}
-				}
-
-				isRendered = true;
-
-				if (typeof afterRender === 'function') {
-					afterRender.call(minicart);
-				}
-			};
-
-
-			/**
-			 * Binds a form to the Mini Cart
-			 *
-			 * @param form {HTMLElement} The form element to bind
-			 */
-			minicart.bindForm = function (form) {
-				if (form.add) {
-					$.event.add(form, 'submit', function (e) {
-						e.preventDefault(e);
-
-						var data = _parseForm(e.target);
-						minicart.addToCart(data);
-					});
-				} else if (form.display) {
-					$.event.add(form, 'submit', function (e) {
-						e.preventDefault();
-						minicart.show(e);
-					});
-				} else {
-					return false;
-				}
-
-				return true;
-			};
-
-			/**
-			 * Adds a product to the cart
-			 *
-			 * @param data {object} Product object. See _parseData for format
-			 * @return {boolean} True if the product was added, false otherwise
-			 */
-			minicart.addToCart = function (data) {
-				var events = config.events,
-					onAddToCart = events.onAddToCart,
-					afterAddToCart = events.afterAddToCart,
-					success = false,
-					productNode, offset;
-
-				data = _parseData(data);
-				offset = data.product.offset;
-
-				if (typeof onAddToCart === 'function') {
-					if (onAddToCart.call(minicart, data.product) === false) {
-						return;
-					}
-				}
-
-				// Check if the product has already been added; update if so
-				if ((productNode = this.getProductAtOffset(offset))) {
-					productNode.product.quantity += parseInt(data.product.quantity || 1, 10);
-					productNode.setPrice(data.product.amount * productNode.product.quantity);
-					productNode.setQuantity(productNode.product.quantity);
-
-					success = true;
-				// Add a new DOM element for the product
-				} else {
-					data.product.offset = minicart.products.length;
-					success = _renderProduct(data);
-				}
-
-				minicart.updateSubtotal();
-				minicart.show(null);
-
-				$.storage.save(minicart.products, config.cartDuration);
-
-				if (typeof afterAddToCart === 'function') {
-					afterAddToCart.call(minicart, data);
-				}
-
-				return success;
-			};
-
-
-			/**
-			 * Returns a product from the Mini Cart's interal storage
-			 *
-			 * @param offset {number} The offset of the product
-			 * @return {ProductNode}
-			 */
-			minicart.getProductAtOffset = function (offset) {
-				return (typeof offset !== 'undefined' && this.products[offset]);
-			};
-
-
-			/**
-			 * Iterates over each product and calculates the subtotal
-			 *
-			 * @return {number} The subtotal
-			 */
-			minicart.calculateSubtotal = function () {
-				var amount = 0,
-					products = minicart.products,
-					product, item, price, discount, len, i;
-
-				for (i = 0, len = products.length; i < len; i++) {
-					item = products[i];
-
-					if ((product = item.product)) {
-						if (product.quantity && product.amount) {
-							price = product.amount;
-							discount = item.getDiscount();
-
-							amount += parseFloat((price * product.quantity) - discount);
-						}
-					}
-				}
-
-				return amount.toFixed(2);
-			};
-
-
-			/**
-			 * Updates the UI with the current subtotal and currency code
-			 */
-			minicart.updateSubtotal = function (silent) {
-				var ui = minicart.UI,
-					cartEl = ui.cart.elements,
-					subtotalEl = ui.subtotalAmount,
-					subtotal = minicart.calculateSubtotal(),
-					level = 1,
-					currency_code, currency_symbol, hex, len, i;
-
-				// Get the currency
-				currency_code = '';
-				currency_symbol = '';
-
-				if (cartEl.currency_code) {
-					currency_code = cartEl.currency_code.value || cartEl.currency_code;
-				} else {
-					for (i = 0, len = cartEl.length; i < len; i++) {
-						if (cartEl[i].name === 'currency_code') {
-							currency_code = cartEl[i].value || cartEl[i];
-							break;
-						}
-					}
-				}
-
-				// Update the UI
-				$.util.setText(subtotalEl, $.util.formatCurrency(subtotal, currency_code));
-
-				// Yellow fade on update
-				if (!silent) {
-					(function doFade() {
-						hex = level.toString(16);
-						level++;
-
-						subtotalEl.style.backgroundColor = '#ff' + hex;
-
-						if (level >= 15) {
-							subtotalEl.style.backgroundColor = 'transparent';
-
-							// hide the cart if there's no total
-							if (subtotal === '0.00') {
-								minicart.reset();
-							}
-
-							return;
-						}
-
-						setTimeout(doFade, 30);
-					})();
-				}
-			};
-
-
-			/**
-			 * Shows the cart
-			 *
-			 * @param e {event} The triggering event
-			 */
-			minicart.show = function (e) {
-				var from = parseInt(minicart.UI.cart.offsetTop, 10),
-					to = 0,
-					events = config.events,
-					onShow = events.onShow,
-					afterShow = events.afterShow;
-
-				if (e && e.preventDefault) { e.preventDefault(); }
-
-				if (typeof onShow === 'function') {
-					if (onShow.call(minicart, e) === false) {
-						return;
-					}
-				}
-
-				$.util.animate(minicart.UI.cart, 'top', { from: from, to: to }, function () {
-					if (typeof afterShow === 'function') {
-						afterShow.call(minicart, e);
-					}
-				});
-
-				minicart.UI.summary.style.backgroundPosition = '-195px 2px';
-				isShowing = true;
-			};
-
-
-			/**
-			 * Hides the cart off the screen
-			 *
-			 * @param e {event} The triggering event
-			 * @param fully {boolean} Should the cart be fully hidden? Optional. Defaults to false.
-			 */
-			minicart.hide = function (e, fully) {
-				var ui = minicart.UI,
-					cartEl = ui.cart,
-					summaryEl = ui.summary,
-					cartHeight = (cartEl.offsetHeight) ? cartEl.offsetHeight : document.defaultView.getComputedStyle(cartEl, '').getPropertyValue('height'),
-					summaryHeight = (summaryEl.offsetHeight) ? summaryEl.offsetHeight : document.defaultView.getComputedStyle(summaryEl, '').getPropertyValue('height'),
-					from = parseInt(cartEl.offsetTop, 10),
-					events = config.events,
-					onHide = events.onHide,
-					afterHide = events.afterHide,
-					to;
-
-				// make the cart fully hidden
-				if (fully || minicart.products.length === 0 || !config.peekEnabled) {
-					to = cartHeight * -1;
-				// otherwise only show a little teaser portion of it
-				} else {
-					to = (cartHeight - summaryHeight - 8) * -1;
-				}
-
-				if (e && e.preventDefault) { e.preventDefault(); }
-
-				if (typeof onHide === 'function') {
-					if (onHide.call(minicart, e) === false) {
-						return;
-					}
-				}
-
-				$.util.animate(cartEl, 'top', { from: from, to: to }, function () {
-					if (typeof afterHide === 'function') {
-						afterHide.call(minicart, e);
-					}
-				});
-
-				summaryEl.style.backgroundPosition = '-195px -32px';
-				isShowing = false;
-			};
-
-
-			/**
-			 * Toggles the display of the cart
-			 *
-			 * @param e {event} The triggering event
-			 */
-			minicart.toggle = function (e) {
-				if (isShowing) {
-					minicart.hide(e);
-				} else {
-					minicart.show(e);
-				}
-			};
-
-
-			/**
-			 * Resets the cart to it's initial state
-			 */
-			minicart.reset = function () {
-				var ui = minicart.UI,
-					events = config.events,
-					onReset = events.onReset,
-					afterReset = events.afterReset;
-
-				if (typeof onReset === 'function') {
-					if (onReset.call(minicart) === false) {
-						return;
-					}
-				}
-
-				minicart.products = [];
-
-				if (isShowing) {
-					$.util.setText(ui.itemList, '');
-					$.util.setText(ui.subtotalAmount, '');
-					minicart.hide(null, true);
-				}
-
-				$.storage.remove();
-
-				if (typeof afterReset === 'function') {
-					afterReset.call(minicart);
-				}
-			};
-
-
-			// Expose the object as public methods
-			return minicart;
-		})();
-
-
-
-		/**
-		 * An HTMLElement which displays each product
-		 *
-		 * @param data {object} The data for the product
-		 * @param position {number} The product number
-		 */
-		var ProductNode = function (data, position) {
-			this._view(data, position);
-		};
-
-
-		ProductNode.prototype = {
-			/**
-			 * Creates the DOM nodes and adds the product content
-			 *
-			 * @param data {object} The data for the product
-			 * @param position {number} The product number
-			 */
-			_view: function (data, position) {
-				var name, price, quantity, discount, options, hiddenInput, key;
-
-				this.product = data.product;
-				this.settings = data.settings;
-
-				this.liNode = document.createElement('li');
-				this.nameNode = document.createElement('a');
-				this.metaNode = document.createElement('span');
-				this.discountNode = document.createElement('span');
-				this.discountInput = document.createElement('input');
-				this.priceNode = document.createElement('span');
-				this.quantityInput = document.createElement('input');
-				this.removeInput = document.createElement('input');
-
-				// Don't add blank products
-				if (!this.product || (!this.product.item_name && !this.product.item_number)) {
-					this.isPlaceholder = true;
+				if (today > expires) {
+					this.remove();
 					return;
 				}
-
-				// Name
-				if (this.product.item_name) {
-					name = this.product.item_name;
-				}
-
-				$.util.setText(this.nameNode, name);
-				this.nameNode.href = this.product.href;
-				this.nameNode.appendChild(this.metaNode);
-
-				// Meta info
-				if (this.product.item_number) {
-					$.util.setText(this.metaNode, this.product.item_number, null, '<br>');
-				}
-
-				// Options
-				options = this.getOptions();
-
-				for (key in options) {
-					$.util.setText(this.metaNode, key + ': ' + options[key], this.metaNode.innerHTML, '<br>');
-				}
-
-				// Discount
-				discount = this.getDiscount();
-
-				if (discount >= 0) {
-					this.discountInput.type = 'hidden';
-					this.discountInput.name = 'discount_amount_' + position;
-					this.discountInput.value = discount;
-
-					this.metaNode.appendChild(this.discountInput);
-				}
-
-				// Price
-				price = this.getPrice();
-				this.priceNode.className = 'price';
-
-				// Quantity
-				quantity = this.getQuantity();
-
-				this.quantityInput.name = 'quantity_' + position;
-				this.quantityInput.className = 'quantity';
-				this.quantityInput.setAttribute('autocomplete', 'off');
-
-				this.setQuantity(quantity);
-
-				// Remove button
-				this.removeInput.type = 'button';
-				this.removeInput.className = 'remove';
-
-				// Build out the DOM
-				this.liNode.appendChild(this.nameNode);
-				this.liNode.appendChild(this.quantityInput);
-
-				if (discount) {
-					this.liNode.appendChild(this.discountInput);
-				}
-
-				this.liNode.appendChild(this.removeInput);
-				this.liNode.appendChild(this.priceNode);
-
-				// Add in hidden product data
-				for (key in this.product) {
-					if (key !== 'quantity' && key.indexOf('discount_') === -1) {
-						hiddenInput = document.createElement('input');
-						hiddenInput.type = 'hidden';
-						hiddenInput.name = key + '_' + position;
-						hiddenInput.value = this.product[key];
-
-						this.liNode.appendChild(hiddenInput);
-					}
-				}
-			},
-
-
-			/**
-			 * Calculates the discount for a product
-			 *
-			 * @return {Object} An object with the discount amount or percentage
-			 */
-			getDiscount: function () {
-				var discount = 0,
-					discountNum = this.product.discount_num || -1,
-					quantity;
-
-				// Discounts: Amount-based
-				if (this.product.discount_amount >= 0) {
-					// Discount amount for the first item
-					discount = parseFloat(this.product.discount_amount);
-
-					// Discount amount for each additional item
-					if (this.product.discount_amount2) {
-						quantity = this.getQuantity();
-
-						if (quantity > 1) {
-							discount += Math.min(quantity - 1, discountNum) * parseFloat(this.product.discount_amount2);
-						}
-					}
-
-				// Discounts: Percentage-based
-				} else if (this.product.discount_rate >= 0) {
-					// Discount amount on the first item
-					discount = this.product.amount * parseFloat(this.product.discount_rate) / 100;
-
-					// Discount amount for each additional item
-					if (this.product.discount_rate2) {
-						quantity = this.getQuantity();
-
-						if (quantity > 1) {
-							discount += Math.min(quantity - 1, discountNum) * this.product.amount * parseFloat(this.product.discount_amount2) / 100;
-						}
-					}
-				}
-
-				return discount && discount.toFixed(2);
-			},
-
-
-			/**
-			 * Returns an object of options for the product
-			 *
-			 * @return {Object}
-			 */
-			getOptions: function () {
-				var options = {},
-					i = 0;
-
-				while (typeof this.product['on' + i] !== 'undefined') {
-					options[this.product['on' + i]] = this.product['os' + i];
-					i++;
-				}
-
-				return options;
-			},
-
-
-			/**
-			 * Utility function to set the quantity of this product
-			 *
-			 * @param value {number} The new value
-			 */
-			setQuantity: function (value) {
-				var discount;
-
-				value = parseInt(value, 10);
-				this.product.quantity = value;
-
-				if (this.quantityInput.value !== value) {
-					this.quantityInput.value = value;
-
-					if ((discount = this.getDiscount())) {
-						this.discountInput.value = discount;
-
-						/**
-						 * Append the discount node if it doesn't already exist
-						 *
-						 * @author Ethan Schroeder <ethan.schroeder@gmail.com>
-						 */
-						if (!this.discountNode.innerHTML) {
-							this.metaNode.appendChild(this.discountNode);
-						}
-
-						$.util.setText(this.discountNode, this.discountNode.innerHTML + config.strings.discount + $.util.formatCurrency(discount, this.settings.currency_code));
-					}
-				}
-
-				this.setPrice(this.product.amount * value);
-			},
-
-
-			/**
-			 * Utility function to get the quantity of this product
-			 *
-			 * @return {number}
-			 */
-			getQuantity: function () {
-				return (typeof this.product.quantity !== undefined) ? this.product.quantity : 1;
-			},
-
-
-			/**
-			 * Utility function to set the price of this product
-			 *
-			 * @param value {number} The new value
-			 */
-			setPrice: function (value) {
-				value = parseFloat(value, 10);
-
-				$.util.setText(this.priceNode, $.util.formatCurrency(value.toFixed(2), this.settings.currency_code));
-			},
-
-
-			/**
-			 * Utility function to get the price of this product
-			 *
-			 * @return {number}
-			 */
-			getPrice: function () {
-				return (this.product.amount * this.getQuantity()).toFixed(2);
 			}
+
+			return data && data.value;
 		};
 
+		proto.save = function (data) {
+			var expires = new Date(),
+				wrapped;
 
+			expires.setTime(expires.getTime() + this._duration * 24 * 60 * 60 * 1000);
 
-		/** UTILITY **/
+			wrapped = {
+				value: data,
+				expires: expires.toGMTString()
+			};
 
-		var $ = {};
-
-		$.storage = (function () {
-			var name = config.name;
-
-			// Use HTML5 client side storage
-			if (window.localStorage) {
-				return {
-
-					/**
-					 * Loads the saved data
-					 *
-					 * @return {object}
-					 */
-					load: function () {
-						var data = localStorage.getItem(name),
-							todayDate, expiresDate;
-
-						if (data) {
-							data = JSON.parse(decodeURIComponent(data));
-						}
-
-						if (data && data.expires) {
-							todayDate = new Date();
-							expiresDate = new Date(data.expires);
-
-							if (todayDate > expiresDate) {
-								$.storage.remove();
-								return;
-							}
-						}
-
-						// A little bit of backwards compatibility for the moment
-						if (data && data.value) {
-							return data.value;
-						} else {
-							return data;
-						}
-					},
-
-
-					/**
-					 * Saves the data
-					 *
-					 * @param items {object} The list of items to save
-					 * @param duration {Number} The number of days to keep the data
-					 */
-					save: function (items, duration) {
-						var date = new Date(),
-							data = [],
-							wrappedData, item, len, i;
-
-						if (items) {
-							for (i = 0, len = items.length; i < len; i++) {
-								item = items[i];
-								data.push({
-									product: item.product,
-									settings: item.settings
-								});
-							}
-
-							date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-							wrappedData = {
-								value: data,
-								expires: date.toGMTString()
-							};
-
-							localStorage.setItem(name, encodeURIComponent(JSON.stringify(wrappedData)));
-						}
-					},
-
-
-					/**
-					 * Removes the saved data
-					 */
-					remove: function () {
-						localStorage.removeItem(name);
-					}
-				};
-
-			// Otherwise use cookie based storage
-			} else {
-				return {
-
-					/**
-					 * Loads the saved data
-					 *
-					 * @return {object}
-					 */
-					load: function () {
-						var key = name + '=',
-							data, cookies, cookie, value, i;
-
-						try {
-							cookies = document.cookie.split(';');
-
-							for (i = 0; i < cookies.length; i++) {
-								cookie = cookies[i];
-
-								while (cookie.charAt(0) === ' ') {
-									cookie = cookie.substring(1, cookie.length);
-								}
-
-								if (cookie.indexOf(key) === 0) {
-									value = cookie.substring(key.length, cookie.length);
-									data = JSON.parse(decodeURIComponent(value));
-								}
-							}
-						} catch (e) {}
-
-						return data;
-					},
-
-
-					/**
-					 * Saves the data
-					 *
-					 * @param items {object} The list of items to save
-					 * @param duration {Number} The number of days to keep the data
-					 */
-					save: function (items, duration) {
-						var date = new Date(),
-							data = [],
-							item, len, i;
-
-						if (items) {
-							for (i = 0, len = items.length; i < len; i++) {
-								item = items[i];
-								data.push({
-									product: item.product,
-									settings: item.settings
-								});
-							}
-
-							date.setTime(date.getTime() + duration * 24 * 60 * 60 * 1000);
-							document.cookie = config.name + '=' + encodeURIComponent(JSON.stringify(data)) + '; expires=' + date.toGMTString() + '; path=' + config.cookiePath;
-						}
-					},
-
-
-					/**
-					 * Removes the saved data
-					 */
-					remove: function () {
-						this.save(null, -1);
-					}
-				};
-			}
-		})();
-
-
-		$.event = (function () {
-			/**
-			 * Events are added here for easy reference
-			 */
-			var cache = [];
-
-			// Non-IE events
-			if (document.addEventListener) {
-				return {
-					/**
-					 * Add an event to an object and optionally adjust it's scope
-					 *
-					 * @param obj {HTMLElement} The object to attach the event to
-					 * @param type {string} The type of event excluding "on"
-					 * @param fn {function} The function
-					 * @param scope {object} Object to adjust the scope to (optional)
-					 */
-					add: function (obj, type, fn, scope) {
-						scope = scope || obj;
-
-						var wrappedFn = function (e) { fn.call(scope, e); };
-
-						obj.addEventListener(type, wrappedFn, false);
-						cache.push([obj, type, fn, wrappedFn]);
-					},
-
-
-					/**
-					 * Remove an event from an object
-					 *
-					 * @param obj {HTMLElement} The object to remove the event from
-					 * @param type {string} The type of event excluding "on"
-					 * @param fn {function} The function
-					 */
-					remove: function (obj, type, fn) {
-						var wrappedFn, item, len = cache.length, i;
-
-						for (i = 0; i < len; i++) {
-							item = cache[i];
-
-							if (item[0] === obj && item[1] === type && item[2] === fn) {
-								wrappedFn = item[3];
-
-								if (wrappedFn) {
-									obj.removeEventListener(type, wrappedFn, false);
-									delete cache[i];
-								}
-							}
-						}
-					}
-				};
-
-			// IE events
-			} else if (document.attachEvent) {
-				return {
-					/**
-					 * Add an event to an object and optionally adjust it's scope (IE)
-					 *
-					 * @param obj {HTMLElement} The object to attach the event to
-					 * @param type {string} The type of event excluding "on"
-					 * @param fn {function} The function
-					 * @param scope {object} Object to adjust the scope to (optional)
-					 */
-					add: function (obj, type, fn, scope) {
-						scope = scope || obj;
-
-						var wrappedFn = function () {
-							var e = window.event;
-							e.target = e.target || e.srcElement;
-
-							e.preventDefault = function () {
-								e.returnValue = false;
-							};
-
-							fn.call(scope, e);
-						};
-
-						obj.attachEvent('on' + type, wrappedFn);
-						cache.push([obj, type, fn, wrappedFn]);
-					},
-
-
-					/**
-					 * Remove an event from an object (IE)
-					 *
-					 * @param obj {HTMLElement} The object to remove the event from
-					 * @param type {string} The type of event excluding "on"
-					 * @param fn {function} The function
-					 */
-					remove: function (obj, type, fn) {
-						var wrappedFn, item, len = cache.length, i;
-
-						for (i = 0; i < len; i++) {
-							item = cache[i];
-
-							if (item[0] === obj && item[1] === type && item[2] === fn) {
-								wrappedFn = item[3];
-
-								if (wrappedFn) {
-									obj.detachEvent('on' + type, wrappedFn);
-									delete cache[i];
-								}
-							}
-						}
-					}
-				};
-			}
-		})();
-
-
-		$.util = {
-			/**
-			 * Animation method for elements
-			 *
-			 * @param el {HTMLElement} The element to animate
-			 * @param prop {string} Name of the property to change
-			 * @param config {object} Properties of the animation
-			 * @param callback {function} Callback function after the animation is complete
-			 */
-			animate: function (el, prop, config, callback) {
-				config = config || {};
-				config.from = config.from || 0;
-				config.to = config.to || 0;
-				config.duration = config.duration || 10;
-				config.unit = (/top|bottom|left|right|width|height/.test(prop)) ? 'px' : '';
-
-				var step = (config.to - config.from) / 20,
-					current = config.from;
-
-				(function doAnimate() {
-					el.style[prop] = current + config.unit;
-					current += step;
-
-					if ((step > 0 && current > config.to) || (step < 0 && current < config.to) || step === 0) {
-						el.style[prop] = config.to + config.unit;
-
-						if (typeof callback === 'function') {
-							callback();
-						}
-
-						return;
-					}
-
-					setTimeout(doAnimate, config.duration);
-				})();
-			},
-
-
-			/**
-			 * Convenience method to return the value of any type of form input
-			 *
-			 * @param input {HTMLElement} The element who's value is returned
-			 */
-			getInputValue: function (input) {
-				var tag = input.tagName.toLowerCase();
-
-				if (tag === 'select') {
-					return input.options[input.selectedIndex].value;
-				} else if (tag === 'textarea') {
-					return input.innerText;
-				} else {
-					if (input.type === 'radio') {
-						return (input.checked) ? input.value : null;
-					} else if (input.type === 'checkbox') {
-						return (input.checked) ? input.value : null;
-					} else {
-						return input.value;
-					}
-				}
-			},
-
-
-			/**
-			 * Convenient method to set the innerText of an element
-			 *
-			 * @param node {HTMLElement} The element
-			 * @param contetn {String} The content to escape
-			 * @param after {String} The content before
-			 * @param after {String} The content afterwards
-			 */
-			setText: function (node, content, before, after) {
-				var str = before || '';
-				str += content = content.replace('<', '&lt;').replace('>', '&gt;');
-				str += (after || '');
-
-				node.innerHTML = str;
-			},
-
-
-			/**
-			 * Formats a float into a currency
-			 *
-			 * @param amount {float} The currency amount
-			 * @param code {string} The three letter currency code
-			 */
-			formatCurrency: function (amount, code) {
-				// TODO: The supported currency patterns need to be refined and
-				// should support values for before, after, decimal, and separator.
-				var currencies = {
-						AED: { before: '\u062c' },
-						ANG: { before: '\u0192' },
-						ARS: { before: '$' },
-						AUD: { before: '$' },
-						AWG: { before: '\u0192' },
-						BBD: { before: '$' },
-						BGN: { before: '\u043b\u0432' },
-						BMD: { before: '$' },
-						BND: { before: '$' },
-						BRL: { before: 'R$' },
-						BSD: { before: '$' },
-						CAD: { before: '$' },
-						CHF: { before: '' },
-						CLP: { before: '$' },
-						CNY: { before: '\u00A5' },
-						COP: { before: '$' },
-						CRC: { before: '\u20A1' },
-						CZK: { before: 'Kc' },
-						DKK: { before: 'kr' },
-						DOP: { before: '$' },
-						EEK: { before: 'kr' },
-						EUR: { before: '\u20AC' },
-						GBP: { before: '\u00A3' },
-						GTQ: { before: 'Q' },
-						HKD: { before: '$' },
-						HRK: { before: 'kn' },
-						HUF: { before: 'Ft' },
-						IDR: { before: 'Rp' },
-						ILS: { before: '\u20AA' },
-						INR: { before: 'Rs.' },
-						ISK: { before: 'kr' },
-						JMD: { before: 'J$' },
-						JPY: { before: '\u00A5' },
-						KRW: { before: '\u20A9' },
-						KYD: { before: '$' },
-						LTL: { before: 'Lt' },
-						LVL: { before: 'Ls' },
-						MXN: { before: '$' },
-						MYR: { before: 'RM' },
-						NOK: { before: 'kr' },
-						NZD: { before: '$' },
-						PEN: { before: 'S/' },
-						PHP: { before: 'Php' },
-						PLN: { before: 'z' },
-						QAR: { before: '\ufdfc' },
-						RON: { before: 'lei' },
-						RUB: { before: '\u0440\u0443\u0431' },
-						SAR: { before: '\ufdfc' },
-						SEK: { before: 'kr' },
-						SGD: { before: '$' },
-						THB: { before: '\u0E3F' },
-						TRY: { before: 'TL' },
-						TTD: { before: 'TT$' },
-						TWD: { before: 'NT$' },
-						UAH: { before: '\u20b4' },
-						USD: { before: '$' },
-						UYU: { before: '$U' },
-						VEF: { before: 'Bs' },
-						VND: { before: '\u20ab' },
-						XCD: { before: '$' },
-						ZAR: { before: 'R' }
-					},
-					currency = currencies[code] || {},
-					before = currency.before || '',
-					after = currency.after || '';
-
-				return before + amount + after;
-			}
+			localStorage.setItem(this._name, encodeURIComponent(JSON.stringify(wrapped)));
 		};
+
+		proto.destroy = function () {
+			localStorage.removeItem(this._name);
+		};
+
+	// Non-HTML5 compatible
+	} else {
+		proto.load = function () {};
+		proto.save = function () {};
+		proto.destroy = function () {};
 
 	}
 
-})();
-
-/*
-    json2.js
-    2012-10-08
-
-    Public Domain.
-
-    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-
-    See http://www.JSON.org/js.html
+})(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
 
-    This code should be minified before deployment.
-    See http://javascript.crockford.com/jsmin.html
-
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
+},{}],21:[function(require,module,exports){
+'use strict';
 
 
-    This file creates a global JSON object containing two methods: stringify
-    and parse.
-
-        JSON.stringify(value, replacer, space)
-            value       any JavaScript value, usually an object or array.
-
-            replacer    an optional parameter that determines how object
-                        values are stringified for objects. It can be a
-                        function or an array of strings.
-
-            space       an optional parameter that specifies the indentation
-                        of nested structures. If it is omitted, the text will
-                        be packed without extra whitespace. If it is a number,
-                        it will specify the number of spaces to indent at each
-                        level. If it is a string (such as '\t' or '&nbsp;'),
-                        it contains the characters used to indent at each level.
-
-            This method produces a JSON text from a JavaScript value.
-
-            When an object value is found, if the object contains a toJSON
-            method, its toJSON method will be called and the result will be
-            stringified. A toJSON method does not serialize: it returns the
-            value represented by the name/value pair that should be serialized,
-            or undefined if nothing should be serialized. The toJSON method
-            will be passed the key associated with the value, and this will be
-            bound to the value
-
-            For example, this would serialize Dates as ISO strings.
-
-                Date.prototype.toJSON = function (key) {
-                    function f(n) {
-                        // Format integers to have at least two digits.
-                        return n < 10 ? '0' + n : n;
-                    }
-
-                    return this.getUTCFullYear()   + '-' +
-                         f(this.getUTCMonth() + 1) + '-' +
-                         f(this.getUTCDate())      + 'T' +
-                         f(this.getUTCHours())     + ':' +
-                         f(this.getUTCMinutes())   + ':' +
-                         f(this.getUTCSeconds())   + 'Z';
-                };
-
-            You can provide an optional replacer method. It will be passed the
-            key and value of each member, with this bound to the containing
-            object. The value that is returned from your method will be
-            serialized. If your method returns undefined, then the member will
-            be excluded from the serialization.
-
-            If the replacer parameter is an array of strings, then it will be
-            used to select the members to be serialized. It filters the results
-            such that only members with keys listed in the replacer array are
-            stringified.
-
-            Values that do not have JSON representations, such as undefined or
-            functions, will not be serialized. Such values in objects will be
-            dropped; in arrays they will be replaced with null. You can use
-            a replacer function to replace those with JSON values.
-            JSON.stringify(undefined) returns undefined.
-
-            The optional space parameter produces a stringification of the
-            value that is filled with line breaks and indentation to make it
-            easier to read.
-
-            If the space parameter is a non-empty string, then that string will
-            be used for indentation. If the space parameter is a number, then
-            the indentation will be that many spaces.
-
-            Example:
-
-            text = JSON.stringify(['e', {pluribus: 'unum'}]);
-            // text is '["e",{"pluribus":"unum"}]'
+var ejs = require('ejs');
 
 
-            text = JSON.stringify(['e', {pluribus: 'unum'}], null, '\t');
-            // text is '[\n\t"e",\n\t{\n\t\t"pluribus": "unum"\n\t}\n]'
-
-            text = JSON.stringify([new Date()], function (key, value) {
-                return this[key] instanceof Date ?
-                    'Date(' + this[key] + ')' : value;
-            });
-            // text is '["Date(---current time---)"]'
+module.exports = function template(str, data) {
+    return ejs.render(str, data);
+};
 
 
-        JSON.parse(text, reviver)
-            This method parses a JSON text to produce an object or array.
-            It can throw a SyntaxError exception.
-
-            The optional reviver parameter is a function that can filter and
-            transform the results. It receives each of the keys and values,
-            and its return value is used instead of the original value.
-            If it returns what it received, then the structure is not modified.
-            If it returns undefined then the member is deleted.
-
-            Example:
-
-            // Parse the text. Values that look like ISO date strings will
-            // be converted to Date objects.
-
-            myData = JSON.parse(text, function (key, value) {
-                var a;
-                if (typeof value === 'string') {
-                    a =
-/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
-                    if (a) {
-                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
-                            +a[5], +a[6]));
-                    }
-                }
-                return value;
-            });
-
-            myData = JSON.parse('["Date(09/09/2001)"]', function (key, value) {
-                var d;
-                if (typeof value === 'string' &&
-                        value.slice(0, 5) === 'Date(' &&
-                        value.slice(-1) === ')') {
-                    d = new Date(value.slice(5, -1));
-                    if (d) {
-                        return d;
-                    }
-                }
-                return value;
-            });
-
-
-    This is a reference implementation. You are free to copy, modify, or
-    redistribute.
-*/
-
-/*jslint evil: true, regexp: true */
-
-/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
-    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
-    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
-    lastIndex, length, parse, prototype, push, replace, slice, stringify,
-    test, toJSON, toString, valueOf
-*/
-
-
-// Create a JSON object only if one does not already exist. We create the
-// methods in a closure to avoid creating global variables.
-
-if (typeof JSON !== 'object') {
-    JSON = {};
+// Workaround for IE 8's lack of support
+if (!String.prototype.trim) {
+	String.prototype.trim = function () {
+		return this.replace(/^\s+|\s+$/g, '');
+	};
 }
 
-(function () {
-    'use strict';
-
-    function f(n) {
-        // Format integers to have at least two digits.
-        return n < 10 ? '0' + n : n;
-    }
-
-    if (typeof Date.prototype.toJSON !== 'function') {
-
-        Date.prototype.toJSON = function (key) {
-
-            return isFinite(this.valueOf())
-                ? this.getUTCFullYear()     + '-' +
-                    f(this.getUTCMonth() + 1) + '-' +
-                    f(this.getUTCDate())      + 'T' +
-                    f(this.getUTCHours())     + ':' +
-                    f(this.getUTCMinutes())   + ':' +
-                    f(this.getUTCSeconds())   + 'Z'
-                : null;
-        };
-
-        String.prototype.toJSON      =
-            Number.prototype.toJSON  =
-            Boolean.prototype.toJSON = function (key) {
-                return this.valueOf();
-            };
-    }
-
-    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        gap,
-        indent,
-        meta = {    // table of character substitutions
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '"' : '\\"',
-            '\\': '\\\\'
-        },
-        rep;
-
-
-    function quote(string) {
-
-// If the string contains no control characters, no quote characters, and no
-// backslash characters, then we can safely slap some quotes around it.
-// Otherwise we must also replace the offending characters with safe escape
-// sequences.
-
-        escapable.lastIndex = 0;
-        return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
-            var c = meta[a];
-            return typeof c === 'string'
-                ? c
-                : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-        }) + '"' : '"' + string + '"';
-    }
-
-
-    function str(key, holder) {
-
-// Produce a string from holder[key].
-
-        var i,          // The loop counter.
-            k,          // The member key.
-            v,          // The member value.
-            length,
-            mind = gap,
-            partial,
-            value = holder[key];
-
-// If the value has a toJSON method, call it to obtain a replacement value.
-
-        if (value && typeof value === 'object' &&
-                typeof value.toJSON === 'function') {
-            value = value.toJSON(key);
-        }
-
-// If we were called with a replacer function, then call the replacer to
-// obtain a replacement value.
-
-        if (typeof rep === 'function') {
-            value = rep.call(holder, key, value);
-        }
-
-// What happens next depends on the value's type.
-
-        switch (typeof value) {
-        case 'string':
-            return quote(value);
-
-        case 'number':
-
-// JSON numbers must be finite. Encode non-finite numbers as null.
-
-            return isFinite(value) ? String(value) : 'null';
-
-        case 'boolean':
-        case 'null':
-
-// If the value is a boolean or null, convert it to a string. Note:
-// typeof null does not produce 'null'. The case is included here in
-// the remote chance that this gets fixed someday.
-
-            return String(value);
-
-// If the type is 'object', we might be dealing with an object or an array or
-// null.
-
-        case 'object':
-
-// Due to a specification blunder in ECMAScript, typeof null is 'object',
-// so watch out for that case.
-
-            if (!value) {
-                return 'null';
-            }
-
-// Make an array to hold the partial results of stringifying this object value.
-
-            gap += indent;
-            partial = [];
-
-// Is the value an array?
-
-            if (Object.prototype.toString.apply(value) === '[object Array]') {
-
-// The value is an array. Stringify every element. Use null as a placeholder
-// for non-JSON values.
-
-                length = value.length;
-                for (i = 0; i < length; i += 1) {
-                    partial[i] = str(i, value) || 'null';
-                }
-
-// Join all of the elements together, separated with commas, and wrap them in
-// brackets.
-
-                v = partial.length === 0
-                    ? '[]'
-                    : gap
-                    ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
-                    : '[' + partial.join(',') + ']';
-                gap = mind;
-                return v;
-            }
-
-// If the replacer is an array, use it to select the members to be stringified.
-
-            if (rep && typeof rep === 'object') {
-                length = rep.length;
-                for (i = 0; i < length; i += 1) {
-                    if (typeof rep[i] === 'string') {
-                        k = rep[i];
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            } else {
-
-// Otherwise, iterate through all of the keys in the object.
-
-                for (k in value) {
-                    if (Object.prototype.hasOwnProperty.call(value, k)) {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            }
-
-// Join all of the member texts together, separated with commas,
-// and wrap them in braces.
-
-            v = partial.length === 0
-                ? '{}'
-                : gap
-                ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
-                : '{' + partial.join(',') + '}';
-            gap = mind;
-            return v;
-        }
-    }
-
-// If the JSON object does not yet have a stringify method, give it one.
-
-    if (typeof JSON.stringify !== 'function') {
-        JSON.stringify = function (value, replacer, space) {
-
-// The stringify method takes a value and an optional replacer, and an optional
-// space parameter, and returns a JSON text. The replacer can be a function
-// that can replace values, or an array of strings that will select the keys.
-// A default replacer method can be provided. Use of the space parameter can
-// produce text that is more easily readable.
-
-            var i;
-            gap = '';
-            indent = '';
-
-// If the space parameter is a number, make an indent string containing that
-// many spaces.
-
-            if (typeof space === 'number') {
-                for (i = 0; i < space; i += 1) {
-                    indent += ' ';
-                }
-
-// If the space parameter is a string, it will be used as the indent string.
-
-            } else if (typeof space === 'string') {
-                indent = space;
-            }
-
-// If there is a replacer, it must be a function or an array.
-// Otherwise, throw an error.
-
-            rep = replacer;
-            if (replacer && typeof replacer !== 'function' &&
-                    (typeof replacer !== 'object' ||
-                    typeof replacer.length !== 'number')) {
-                throw new Error('JSON.stringify');
-            }
-
-// Make a fake root object containing our value under the key of ''.
-// Return the result of stringifying the value.
-
-            return str('', {'': value});
-        };
-    }
-
-
-// If the JSON object does not yet have a parse method, give it one.
-
-    if (typeof JSON.parse !== 'function') {
-        JSON.parse = function (text, reviver) {
-
-// The parse method takes a text and an optional reviver function, and returns
-// a JavaScript value if the text is a valid JSON text.
-
-            var j;
-
-            function walk(holder, key) {
-
-// The walk method is used to recursively walk the resulting structure so
-// that modifications can be made.
-
-                var k, v, value = holder[key];
-                if (value && typeof value === 'object') {
-                    for (k in value) {
-                        if (Object.prototype.hasOwnProperty.call(value, k)) {
-                            v = walk(value, k);
-                            if (v !== undefined) {
-                                value[k] = v;
-                            } else {
-                                delete value[k];
-                            }
-                        }
-                    }
-                }
-                return reviver.call(holder, key, value);
-            }
-
-
-// Parsing happens in four stages. In the first stage, we replace certain
-// Unicode characters with escape sequences. JavaScript handles many characters
-// incorrectly, either silently deleting them, or treating them as line endings.
-
-            text = String(text);
-            cx.lastIndex = 0;
-            if (cx.test(text)) {
-                text = text.replace(cx, function (a) {
-                    return '\\u' +
-                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-                });
-            }
-
-// In the second stage, we run the text against regular expressions that look
-// for non-JSON patterns. We are especially concerned with '()' and 'new'
-// because they can cause invocation, and '=' because it can cause mutation.
-// But just to be safe, we want to reject all unexpected forms.
-
-// We split the second stage into 4 regexp operations in order to work around
-// crippling inefficiencies in IE's and Safari's regexp engines. First we
-// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
-// replace all simple value tokens with ']' characters. Third, we delete all
-// open brackets that follow a colon or comma or that begin the text. Finally,
-// we look to see that the remaining characters are only whitespace or ']' or
-// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
-
-            if (/^[\],:{}\s]*$/
-                    .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-                        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
-
-// In the third stage we use the eval function to compile the text into a
-// JavaScript structure. The '{' operator is subject to a syntactic ambiguity
-// in JavaScript: it can begin a block or an object literal. We wrap the text
-// in parens to eliminate the ambiguity.
-
-                j = eval('(' + text + ')');
-
-// In the optional fourth stage, we recursively walk the new structure, passing
-// each name/value pair to a reviver function for possible transformation.
-
-                return typeof reviver === 'function'
-                    ? walk({'': j}, '')
-                    : j;
-            }
-
-// If the text is not JSON parseable, then a SyntaxError is thrown.
-
-            throw new SyntaxError('JSON.parse');
-        };
-    }
-}());
+},{"ejs":6}],22:[function(require,module,exports){
+'use strict';
+
+
+var config = require('./config'),
+	events = require('./util/events'),
+	template = require('./util/template'),
+	forms = require('./util/forms'),
+	css = require('./util/css'),
+	viewevents = require('./viewevents'),
+	constants = require('./constants');
+
+
+
+/**
+ * Creates a view model.
+ *
+ * @constructor
+ * @param {object} model
+ */
+function View(model) {
+	var wrapper;
+
+	this.el = wrapper = document.createElement('div');
+	this.model = model;
+	this.isShowing = false;
+	this.redraw();
+
+	// HTML
+	wrapper.id = config.name;
+	config.parent.appendChild(wrapper);
+
+	// CSS
+	css.inject(document.getElementsByTagName('head')[0], config.styles);
+
+	// JavaScript
+	events.add(document, ('ontouchstart' in window) ? 'touchstart' : 'click', viewevents.click, this);
+	events.add(document, 'keyup', viewevents.keyup, this);
+	events.add(document, 'readystatechange', viewevents.readystatechange, this);
+	events.add(window, 'pageshow', viewevents.pageshow, this);
+}
+
+
+/**
+ * Tells the view to redraw
+ */
+View.prototype.redraw = function redraw() {
+	this.el.innerHTML = template(config.template, this.model);
+};
+
+
+/**
+ * Tells the view to show
+ */
+View.prototype.show = function show() {
+	if (!this.isShowing) {
+		css.add(document.body, constants.SHOWING_CLASS);
+		this.isShowing = true;
+	}
+};
+
+
+/**
+ * Tells the view to hide
+ */
+View.prototype.hide = function hide() {
+	if (this.isShowing) {
+		css.remove(document.body, constants.SHOWING_CLASS);
+		this.isShowing = false;
+	}
+};
+
+
+/**
+ * Toggles the visibility of the view
+ */
+View.prototype.toggle = function toggle() {
+	this[this.isShowing ? 'hide' : 'show']();
+};
+
+
+/**
+ * Binds cart submit events to a form.
+ *
+ * @param {HTMLElement} form
+ * @return {booealn}
+ */
+View.prototype.bind = function bind(form) {
+	var that = this;
+
+	if (!constants.COMMANDS[form.cmd.value]) {
+		return false;
+	}
+
+	if (form.display) {
+		events.add(form, 'submit', function (e) {
+			e.preventDefault();
+			that.show();
+		});
+	} else {
+		events.add(form, 'submit', function (e) {
+			e.preventDefault(e);
+			that.model.cart.add(forms.parse(form));
+		});
+	}
+
+	return true;
+};
+
+
+/**
+ * Adds an item to the view.
+ *
+ * @param {number} idx
+ * @param {object} data
+ */
+View.prototype.addItem = function addItem(idx, data) {
+	this.redraw();
+	this.show();
+
+	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
+};
+
+
+/**
+ * Changes an item in the view.
+ *
+ * @param {number} idx
+ * @param {object} data
+ */
+View.prototype.changeItem = function changeItem(idx, data) {
+	this.redraw();
+	this.show();
+
+	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
+};
+
+
+/**
+ * Removes an item from the view.
+ *
+ * @param {number} idx
+ */
+View.prototype.removeItem = function removeItem(idx) {
+	this.redraw();
+};
+
+
+
+
+module.exports = View;
+
+},{"./config":10,"./constants":11,"./util/css":14,"./util/events":16,"./util/forms":17,"./util/template":21,"./viewevents":23}],23:[function(require,module,exports){
+'use strict';
+
+
+var constants = require('./constants'),
+	events = require('./util/events');
+
+
+
+var viewevents = module.exports = {
+
+	click: function (evt) {
+		var target = evt.target,
+			className = target.className;
+
+		if (this.isShowing) {
+			// Cart checkout button
+			if (className === constants.SUBMIT_CLASS) {
+				this.model.cart.checkout(evt);
+			// Cart close button
+			} else if (className === constants.CLOSER_CLASS) {
+				this.hide();
+			// Product remove button
+			} else if (className === constants.REMOVE_CLASS) {
+				this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
+			// Product quantity input
+			} else if (className === constants.QUANTITY_CLASS) {
+				target[target.setSelectionRange ? 'setSelectionRange' : 'select'](0, 999);
+			// Outside the cart
+			} else if (!(/input|button|select|option/i.test(target.tagName))) {
+				while (target.nodeType === 1) {
+					if (target === this.el) {
+						return;
+					}
+
+					target = target.parentNode;
+				}
+
+				this.hide();
+			}
+		}
+	},
+
+
+	keyup: function (evt) {
+		var that = this,
+			target = evt.target,
+			timer;
+
+		if (target.className === constants.QUANTITY_CLASS) {
+			timer = setTimeout(function () {
+				var idx = parseInt(target.getAttribute(constants.DATA_IDX), 10),
+					cart = that.model.cart,
+					product = cart.items(idx),
+					quantity = parseInt(target.value, 10);
+
+				if (product) {
+					if (quantity > 0) {
+						product.set('quantity', quantity);
+					} else if (quantity === 0) {
+						cart.remove(idx);
+					}
+				}
+			}, constants.KEYUP_TIMEOUT);
+		}
+	},
+
+
+	readystatechange: function () {
+		if (/interactive|complete/.test(document.readyState)) {
+			var forms, form, i, len;
+
+			// Bind to page's forms
+			forms = document.getElementsByTagName('form');
+
+			for (i = 0, len = forms.length; i < len; i++) {
+				form = forms[i];
+
+				if (form.cmd && constants.COMMANDS[form.cmd.value]) {
+					this.bind(form);
+				}
+			}
+
+			// Once run this once
+			events.remove(document, 'readystatechange', viewevents.readystatechange);
+		}
+	},
+
+
+	pageshow: function (evt) {
+		if (evt.persisted) {
+			this.redraw();
+			this.hide();
+		}
+	}
+
+};
+
+},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+;
