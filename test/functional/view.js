@@ -409,8 +409,6 @@ describe('View', function () {
 		cart = document.getElementById(config.name);
 		form = cart.getElementsByTagName('form')[0];
 
-		console.log(form.elements);
-
 		assert(form.elements.on0_1.value === 'Size');
 		assert(form.elements.os0_1.value === 'Large');
 	});
@@ -446,5 +444,23 @@ describe('View', function () {
 
 		assert(!button);
 	});
+
+
+	it('should have a valid data store', function () {
+		var data;
+
+		assert(!localStorage[config.name]);
+
+		minicart.cart.add(mockData[0]);
+
+		data = JSON.parse(decodeURIComponent(localStorage[config.name]));
+
+		assert(typeof data === 'object');
+		assert(data.expires);
+		assert(data.value);
+		assert(data.value.items);
+		assert(data.value.settings);
+	});
+
 
 });
