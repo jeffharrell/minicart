@@ -424,4 +424,27 @@ describe('View', function () {
 	});
 
 
+	it('should not have a checkout button with items', function () {
+		var cart, button;
+
+		minicart.cart.add(mockData[0]);
+
+		cart = document.getElementById(config.name);
+		button = cart.getElementsByClassName('minicart-submit')[0];
+
+		assert(!!button);
+	});
+
+
+	it('should not have a checkout button without items', function () {
+		var cart, button;
+
+		minicart.view.show();
+
+		cart = document.getElementById(config.name);
+		button = cart.getElementsByClassName('minicart-submit')[0];
+
+		assert(!button);
+	});
+
 });
