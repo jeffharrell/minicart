@@ -2,8 +2,6 @@
 
 // TODO:
 // - Doc updates
-// - "fixed" positioning
-// - Button to image
 
 
 var Cart = require('./cart'),
