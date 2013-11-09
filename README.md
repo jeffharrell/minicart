@@ -64,6 +64,17 @@ An object of localizable text strings used:
 
 
 
+## Event callback examples
+
+Examples of how you can use the event callbacks:
+
+* [Preventing checkout until terms are accepted](http://www.minicartjs.com/examples/terms.html)
+* [Requiring a minimum quantity to checkout](http://www.minicartjs.com/examples/minquantity.html)
+* [Only allowing a fixed quantity per item](http://www.minicartjs.com/examples/fixedquantity.html)
+* [Ensuring an option is selected](http://www.minicartjs.com/examples/notempty.html)
+
+
+
 ## Localization
 
 Localization and adaption are supported in the Mini Cart using the configuration strings object. For example, if we wanted the cart to appear in French we would need to pass our configuration like this:

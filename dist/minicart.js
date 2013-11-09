@@ -1828,9 +1828,10 @@ Cart.prototype.save = function save() {
 /**
  * Proxies the checkout event
  * The assumption is the view triggers this and consumers subscribe to it
+ *
+ * @param {object} The initiating event
  */
 Cart.prototype.checkout = function checkout(evt) {
-	console.log('hello');
 	this.fire('checkout', evt);
 };
 
@@ -2997,5 +2998,5 @@ module.exports = {
 
 };
 
-},{"./constants":11}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11}]},{},[9,10,11,14,12,13,15,16,17,18,19,20,21,22,23])
 ;

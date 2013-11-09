@@ -3,7 +3,6 @@
 // TODO:
 // - Doc updates
 // - "fixed" positioning
-// - Update examples
 // - Button to image
 
 
