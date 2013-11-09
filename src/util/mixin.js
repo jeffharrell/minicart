@@ -8,7 +8,11 @@ var mixin = module.exports = function mixin(dest, source) {
 		value = source[key];
 
 		if (value && value.constructor === Object) {
-			mixin(dest[key], value);
+			if (!dest[key]) {
+				dest[key] = value;
+			} else {
+				mixin(dest[key] || {}, value);
+			}
 		} else {
 			dest[key] = value;
 		}

@@ -56,7 +56,7 @@ mixin(Cart.prototype, Storage.prototype);
 Cart.prototype.add = function add(data) {
     var that = this,
 		items = this.items(),
-        product, idx, key, len, i;
+        product, isExisting, idx, key, len, i;
 
 	// Prune cart settings data from the product
 	for (key in data) {
@@ -72,6 +72,7 @@ Cart.prototype.add = function add(data) {
 			product = items[i];
 			product.set('quantity', product.get('quantity') + (parseInt(data.quantity, 10) || 1));
 			idx = i;
+			isExisting = true;
 			break;
 		}
 	}
@@ -87,8 +88,9 @@ Cart.prototype.add = function add(data) {
 		});
 
 		this.save();
-		this.fire('add', idx, data);
 	}
+
+	this.fire('add', idx, product, isExisting);
 
     return idx;
 };

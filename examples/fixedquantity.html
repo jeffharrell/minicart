@@ -24,14 +24,12 @@
 
 	<script src="../dist/minicart.js"></script>
 	<script>
-		paypal.minicart.render({
-			events: {
-				onAddToCart: function (data) {
-					// If the product is already in the cart then cancel the addToCart method
-					if (this.getProductAtOffset(data.offset)) {
-						return false;
-					}
-				}
+		paypal.minicart.render();
+
+		paypal.minicart.cart.on('add', function (idx, data, isExisting) {
+			if (isExisting) {
+				data.set('quantity', 1);
+				alert('Sorry, you can only have one of those.');
 			}
 		});
 	</script>

@@ -75,16 +75,16 @@ describe('Cart Model', function () {
 
 
     it('add() fires an event', function (done) {
-        var product = { item_name: 'Item 3', amount: 3.00 },
+        var data = { item_name: 'Item 3', amount: 3.00 },
             len = cart.items().length;
 
-        cart.on('add', function (idx, data) {
+        cart.on('add', function (idx, product) {
             assert.equal(len, idx);
-            assert.equal(data, product);
+            assert.equal(product._data, data);
             done();
         });
 
-        cart.add(product);
+        cart.add(data);
     });
 
 
