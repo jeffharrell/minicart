@@ -39,7 +39,7 @@ The minicart has an advanced JavaScript API which provides you the power to cust
 ### General
 
 `paypal.minicart.render(config)`  
-Renders the minicart to the page. Config is optional and has the following options:
+Renders the minicart to the page. Config is optional and can have the following properties:
 
  * `parent` - HTMLElement the minicart should render to.
  * `target` - HTML target property for the checkout form. 
