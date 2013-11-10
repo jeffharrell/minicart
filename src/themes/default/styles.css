@@ -80,6 +80,7 @@
 #PPMiniCart .minicart-item {
 	position: relative;
 	padding: 6px 0;
+	min-height: 25px;
 }
 
 #PPMiniCart .minicart-item + .minicart-item {
@@ -101,7 +102,7 @@
 	padding: 0;
 	border: 0;
 	border-radius: 0;
-	box-shadow: 0 0 0;
+	box-shadow: none;
 	color: #999;
 	font-size: 12px;
 	line-height: 22px;
