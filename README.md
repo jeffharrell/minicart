@@ -180,7 +180,7 @@ Custom themes can also be created and bundle into the JavaScript file. To create
 2. Create a directory under `src/themes`, e.g. `myTheme`
 3. Create an `index.html` file for your template and `styles.css` for the CSS
 4. Run `grunt build --theme=myTheme` to generate the JavaScript
-5. Include `dist/minicart.myTheme.js` in your page to see your custom themed minicart
+5. Include `dist/minicart.myTheme.js` in your page to see your custom minicart
 
 If you're new to the building a theme it's probably a good idea to copy the default one and start there.
 
