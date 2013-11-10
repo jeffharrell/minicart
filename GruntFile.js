@@ -7,6 +7,11 @@ module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 
+		jshint: {
+			options: grunt.file.readJSON('.jshintrc'),
+			all: ['src/**/*.js', 'test/**/*.js']
+		},
+
 		browserify: {
 			all: {
 				files: {
@@ -15,14 +20,9 @@ module.exports = function (grunt) {
 			}
 		},
 
-		jshint: {
-			options: grunt.file.readJSON('.jshintrc'),
-			all: ['src/**/*.js', 'test/**/*.js']
-		},
-
 		uglify: {
 			options: {
-				banner: '/*!\n * <%= pkg.name %>\n *\n * <%= pkg.description %>\n *\n * @version <%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n * @author <%= pkg.author.name %> <<%= pkg.author.url %>>\n * @url <%= pkg.homepage %> \n * @license <%= pkg.licenses[0].type %> <<%= pkg.licenses[0].url %>>\n */\n'
+				banner: '/*!\n * <%= pkg.name %>\n *\n * <%= pkg.description %>\n *\n * @version <%= pkg.version %>\n * @author <%= pkg.author.name %> <<%= pkg.author.url %>>\n * @url <%= pkg.homepage %> \n * @license <%= pkg.licenses[0].type %> <<%= pkg.licenses[0].url %>>\n */\n'
 			},
 			all: {
 				files: {
@@ -51,30 +51,6 @@ module.exports = function (grunt) {
 				},
 				src: ['test/unit/**/*.js']
 			}
-		},
-
-		replace: {
-			default: {
-				src: ['dist/minicart.js'],
-				overwrite: true,
-				options: {
-					processTemplates: false
-				},
-				replacements: [
-					{
-						from: '$TEMPLATE$',
-						to: function (word) {
-							return grunt.file.read('src/themes/default/index.html').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
-						}
-					},
-					{
-						from: '$STYLES$',
-						to: function (word) {
-							return grunt.file.read('src/themes/default/styles.css').replace(/(^\s+|\s+$)/g, '').replace(/(\r\n|\n|\r)/g, '');
-						}
-					}
-				]
-			}
 		}
 	});
 
@@ -84,11 +60,12 @@ module.exports = function (grunt) {
 	grunt.task.loadNpmTasks('grunt-mocha');
 	grunt.task.loadNpmTasks('grunt-mocha-test');
 	grunt.task.loadNpmTasks('grunt-browserify');
-	grunt.task.loadNpmTasks('grunt-text-replace');
+	grunt.task.loadTasks('./tasks');
+
 
 	// Tasks
 	grunt.registerTask('lint',  ['jshint']);
 	grunt.registerTask('test',  ['lint', 'build', 'mochaTest', 'mocha']);
-	grunt.registerTask('build', ['browserify', 'replace', 'uglify']);
+	grunt.registerTask('build', ['browserify', 'themify', 'uglify']);
 
 };

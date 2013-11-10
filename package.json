@@ -43,7 +43,6 @@
     "grunt-mocha": "~0.4.1",
     "grunt-mocha-test": "~0.7.0",
     "browserify": "~2.35.0",
-    "grunt-browserify": "~1.2.11",
-    "grunt-text-replace": "~0.3.8"
+    "grunt-browserify": "~1.2.11"
   }
 }
