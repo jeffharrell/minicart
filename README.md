@@ -70,7 +70,7 @@ Binds a HTMLFormElement's submit event to the minicart. Useful for forms which m
 ### Cart
 
 `paypal.minicart.cart.add(data)`  
-Adds an item to the cart. Fires the `add` event. Example: 
+Adds an item to the cart. Fires the `add` event. Example data object: 
 
     { "business": "user@example.com", "item_name": "Product", "amount": 5.00, "currency_code": "USD" }
 
@@ -97,10 +97,10 @@ Destroys the cart data and resets it back to it's default state. Fires the `dest
 
 `paypal.minicart.cart.on(event, fn, scope)`  
 Subscribe to cart events. Events include:  
- * `add` - Fired when an item is added. `function (idx, product, isExisting)`  
- * `remove` - Fired when an item is removed. `function (idx, product)`  
- * `checkout` - Fired on checkout. `function (evt)`  
- * `destroy` - Fired when the cart is destroyed. `function ()`  
+ * `add` - Fired when an item is added. *function (idx, product, isExisting)*  
+ * `remove` - Fired when an item is removed. *function (idx, product)*  
+ * `checkout` - Fired on checkout. *function (evt)*  
+ * `destroy` - Fired when the cart is destroyed. *function ()*  
 
 `paypal.minicart.cart.off(event, fn)`  
 Unsubscribe from cart events.
@@ -109,10 +109,10 @@ Unsubscribe from cart events.
 ### Products
 
 `product.get(key)`  
-Returns an object of data for the product. If a key is passed then only that value is returned.
+Returns a properties object for the product. If a key is passed then only that value is returned.
 
 `product.set(key, value)`  
-Sets a value for the product. Fires a `change` event.
+Sets a property for the product. Fires a `change` event.
 
 `product.options()`  
 Returns the options.
@@ -134,8 +134,8 @@ Destroys the product. Fires the `destroy` event.
 
 `product.on(event, fn, scope)`  
 Subscribe to cart events. Events include:  
- * `change` - Fired when a value is changed. `function (key)`  
- * `destroy` - Fired when the product is destroyed. `function ()`  
+ * `change` - Fired when a value is changed. *function (key)*  
+ * `destroy` - Fired when the product is destroyed. *function ()*  
 
 `product.off(event, fn)`  
 Unsubscribe from product events.
@@ -143,7 +143,7 @@ Unsubscribe from product events.
 
 ## API Examples
 
-Examples of how you can use the advanced API:
+Examples of how you can use the API:
 
 * [Preventing checkout until terms are accepted](https://github.com/jeffharrell/minicart/blob/master/examples/terms.html)
 * [Requiring a minimum quantity to checkout](https://github.com/jeffharrell/minicart/blob/master/examples/minquantity.html)
@@ -154,7 +154,7 @@ Examples of how you can use the advanced API:
 
 ## Localization
 
-Localization is supported in the minicart using the `strings` configuration object. For example, if you wanted the cart to appear in French:
+Localization is supported using the `strings` configuration object. Example:
 
     <script> 
         paypal.minicart.render({
@@ -176,20 +176,20 @@ The currency symbol will be automatically updated based on the `currency_code` s
 ### Is the minicart free? How is it licensed?
 Yes, it’s free and licensed under the [MIT License](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE).
 
-### What browsers does the minicart support?
+### Which browsers are supported?
 The minicart supports Chrome, Safari, Firefox, and Internet Explorer 8+.
 
-### I made a change and want to integrate it back. Do you accept pull requests?
+### I made a change and want to contribute it. Do you accept pull requests?
 Yes, absolutely. Please submit a pull request on Github.
 
-### Help! I found a bug. I have an issue!
+### Help! I found a bug!
 Please log the issue on the [minicart’s issue tracker](https://github.com/jeffharrell/MiniCart/issues) including a link or sample code that reproduces it.
 
 ### The minicart isn’t appearing the same as on this page. Why?
-This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). To check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
+This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). You can check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
 
 ### I installed the minicart, but my website still redirects to PayPal. Why?
-The minicart doesn’t yet work with what PayPal’s call their “hosted” or “encrypted” buttons which is why this is most likely happening. To fix your buttons, you’ll need to log into paypal.com and do the following steps:
+The minicart doesn’t work with PayPal's “hosted” buttons which is why this is most likely happening. To fix your buttons, log into paypal.com and do the following steps:
 
 1. Create a button on PayPal’s website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
 2. Once you’ve created the button click Remove code protection before copying your button’s code.
@@ -197,14 +197,8 @@ The minicart doesn’t yet work with what PayPal’s call their “hosted” or 
 ### The minicart isn’t emptying after a transaction is completed. Why?
 Your buttons need a `return` URL parameter for PayPal to redirect back to. On this page make sure to call `paypapl.minicart.reset();`.
 
-### The minicart isn’t appearing the same as on this page. Why?
-This can occur if your page is being rendered in the browser’s [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). To check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
-
 ### Does the minicart work with frames?
 Frames are not officially supported, but you may be able to get some mileage with the `target` configuration setting.
-
-### Is non-JavaScript supported?
-Sort of. If JavaScript isn't enabled the minicart will not work and the page will fall back to using the standard PayPal HTML buttons. 
 
 ### Are previous versions of the minicart available?
 All previous versions are [tagged on Github](https://github.com/jeffharrell/MiniCart/tags).
