@@ -177,8 +177,12 @@ The HTML template and CSS can be overridden using the `config` object. Example:
 Custom themes can also be created and bundle into the JavaScript file. To create a theme you'll need to have [grunt](https://github.com/gruntjs/grunt-cli) and follow these steps:
 
 1. Fork or clone this repo
-2. Edit the files under `src/themes/default`
-3. Run `grunt build` to generate the custom version of `dist/minicart.min.js`
+2. Create a directory under `src/themes`, e.g. `myTheme`
+3. Create an `index.html` file for your template and `styles.css` for the CSS
+4. Run `grunt build --theme=myTheme` to generate the JavaScript
+5. Include `dist/minicart.myTheme.js` in your page to see your custom themed minicart
+
+If you're new to the building a theme it's probably a good idea to copy the default one and start there.
 
 
 
