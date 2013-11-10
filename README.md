@@ -9,8 +9,9 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 1. [Setup](#basic-setup)
 2. [Advanced API](#advanced-api)
 3. [API Examples](#api-examples)
-4. [Localization](#localization)
-5. [FAQ](#faq)
+4. [Customization](#customization)
+5. [Localization](#localization)
+6. [FAQ](#faq)
 
 
 
@@ -151,21 +152,51 @@ Examples of how you can use the API:
 * [Ensuring an option is selected](https://github.com/jeffharrell/minicart/blob/master/examples/notempty.html)
 
 
+## Customization
+
+The minicart's HTML template and CSS can be fully customized using two different approaches: configuration and custom themes. In both approaches, all functionality from the [API](#advanced-api) is available using [Embedded JavaScript Template](https://github.com/visionmedia/ejs) syntax.
+
+
+### Configuration
+
+The HTML template and CSS can be overridden using the `config` object. Example:
+
+    var myTemplate = '' +
+    	'<div>' +
+    	'<%= config.strings.subtotal %> ' +
+    	'<%= cart.total({ format: true, currencyCode: true }) %>' +
+    	'</div>';
+
+    paypal.minicart.render({
+        template: myTemplate
+    });
+
+
+### Custom Themes
+
+Custom themes can also be created and bundle into the JavaScript file. To create a theme you'll need to have [grunt](https://github.com/gruntjs/grunt-cli) and follow these steps:
+
+1. Fork or clone this repo
+2. Create a directory under `src/themes`, e.g. `myTheme`
+3. Create a `index.html` file for your theme's template and `styles.css` for the CSS
+
+
+If you're new to the building a theme it's probably a good idea to copy the default one and start there.
+
+
 
 ## Localization
 
-Localization is supported using the `strings` configuration object. Example:
+Localization is supported using the `strings` object. Example:
 
-    <script> 
-        paypal.minicart.render({
-            strings: {
-                button: "Caisse",  
-                buttonAlt: "Total:",
-                discount: "Réduction:"
-                processing: "Traitement"
-            }
-        });
-    </script>
+    paypal.minicart.render({
+		strings: {
+			button: "Caisse",  
+			buttonAlt: "Total:",
+			discount: "Réduction:"
+			processing: "Traitement"
+		}
+	});
 
 The currency symbol will be automatically updated based on the `currency_code` setting of your button.
 
