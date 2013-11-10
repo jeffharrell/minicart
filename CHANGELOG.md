@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 3.0
+## 3.0.0
 
 * New design
 * New API
@@ -12,3 +12,10 @@
 * Dropped support for Internet Explorer 6 and 7
 * Integration changes (see README)
 * Bug fixes
+
+
+## 3.0.1
+
+* Support for build time custom themes
+* Documentation on customizing the UI
+* Minor UI updates for iOS devices
