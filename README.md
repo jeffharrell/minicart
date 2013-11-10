@@ -41,9 +41,9 @@ The minicart has an advanced JavaScript API which provides you the power to cust
 `paypal.minicart.render(config)`  
 Renders the minicart to the page. Config is optional and has the following options:
 
- * `parent` - HTMLElement the minicart should render to. Default `document.body`.
- * `target` - HTML target property for the checkout form. Default `null`.
- * `action` - PayPal URL (if you are accessing sandbox or another version of the PayPal website). Default `'https://www.paypal.com/cgi-bin/webscr'`.
+ * `parent` - HTMLElement the minicart should render to.
+ * `target` - HTML target property for the checkout form. 
+ * `action` - PayPal URL (if you are accessing sandbox or another version of the PayPal website).
  * `template` - HTML template for rendering. See [customization](#customization) for details.
  * `styles` - CSS styles for rendering. See [customization](#customization) for details.
  * `strings` - An object of text strings: `button`, `buttonAlt`, `subtotal` and `discount`. 
