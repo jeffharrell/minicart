@@ -6,7 +6,7 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 
 
 
-1. [Setup](#interested-lets-get-you-setup)
+1. [Setup](#basic-setup)
 2. [Advanced API](#advanced-api)
 3. [API Examples](#api-examples)
 4. [Localization](#localization)
@@ -14,7 +14,7 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 
 
 
-## Interested? Let's get you setup
+## Basic Setup
 
 1. Start with a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
 2. Download the latest [minicart.js](https://raw.github.com/jeffharrell/MiniCart/master/dist/minicart.min.js)
