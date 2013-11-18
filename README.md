@@ -20,10 +20,12 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 1. Create a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
 2. Include the following snippet of JavaScript code into your HTML file, ideally before the closing &lt;/body&gt; tag:
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.1/minicart.min.js"></script>
-    <script>
-        paypal.minicart.render();
-    </script>
+```html
+<script src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.1/minicart.min.js"></script>
+<script>
+    paypal.minicart.render();
+</script>
+```
 
 It’s that simple! Now the minicart will appear when a user views or adds a product to their cart.
 
