@@ -238,6 +238,16 @@ Product.prototype.isEqual = function isEqual(data) {
 
 
 /**
+ * Determine if this product is valid.
+ *
+ * @return {boolean}
+ */
+Product.prototype.isValid = function isValid() {
+	return (this.get('item_name') && this.get('amount'));
+};
+
+
+/**
  * Destroys this product. Fires a "destroy" event.
  */
 Product.prototype.destroy = function destroy() {

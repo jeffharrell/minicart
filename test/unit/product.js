@@ -217,6 +217,19 @@ describe('Product Model', function () {
 	});
 
 
+	it('isValid() validates correctly', function () {
+		var item1 = new Product({
+			item_name: 'Foo',
+			amount: 1.23
+		});
+
+		var item2 = new Product({});
+
+		assert(item1.isValid());
+		assert(!item2.isValid());
+	});
+
+
     it('destroy() empties data', function () {
         item.destroy();
 

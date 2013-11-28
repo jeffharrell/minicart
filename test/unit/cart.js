@@ -61,6 +61,13 @@ describe('Cart Model', function () {
     });
 
 
+	it('add() does not add invalid products', function () {
+		var idx = cart.add({});
+
+		assert.strictEqual(idx, false);
+	});
+
+
 	it('add() for the same product only increments the quantity', function () {
 		var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },
 			idx = cart.add(product);

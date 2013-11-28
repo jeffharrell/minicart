@@ -56,7 +56,9 @@ mixin(Cart.prototype, Storage.prototype);
 Cart.prototype.add = function add(data) {
     var that = this,
 		items = this.items(),
-        product, isExisting, idx, key, len, i;
+		idx = false,
+		isExisting = false,
+        product, key, len, i;
 
 	// Prune cart settings data from the product
 	for (key in data) {
@@ -77,20 +79,25 @@ Cart.prototype.add = function add(data) {
 		}
 	}
 
-	// If not, then add it
+	// If not, then try to add it
 	if (!product) {
 		product = new Product(data);
-		idx = (this._items.push(product) - 1);
 
-		product.on('change', function (key, value) {
-			that.save();
-			that.fire('change', idx, key, value);
-		});
+		if (product.isValid()) {
+			idx = (this._items.push(product) - 1);
 
-		this.save();
+			product.on('change', function (key, value) {
+				that.save();
+				that.fire('change', idx, key, value);
+			});
+
+			this.save();
+		}
 	}
 
-	this.fire('add', idx, product, isExisting);
+	if (product) {
+		this.fire('add', idx, product, isExisting);
+	}
 
     return idx;
 };
