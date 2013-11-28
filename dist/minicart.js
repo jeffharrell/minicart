@@ -1669,7 +1669,9 @@ mixin(Cart.prototype, Storage.prototype);
 Cart.prototype.add = function add(data) {
     var that = this,
 		items = this.items(),
-        product, isExisting, idx, key, len, i;
+		idx = false,
+		isExisting = false,
+        product, key, len, i;
 
 	// Prune cart settings data from the product
 	for (key in data) {
@@ -1690,20 +1692,25 @@ Cart.prototype.add = function add(data) {
 		}
 	}
 
-	// If not, then add it
+	// If not, then try to add it
 	if (!product) {
 		product = new Product(data);
-		idx = (this._items.push(product) - 1);
 
-		product.on('change', function (key, value) {
-			that.save();
-			that.fire('change', idx, key, value);
-		});
+		if (product.isValid()) {
+			idx = (this._items.push(product) - 1);
 
-		this.save();
+			product.on('change', function (key, value) {
+				that.save();
+				that.fire('change', idx, key, value);
+			});
+
+			this.save();
+		}
 	}
 
-	this.fire('add', idx, product, isExisting);
+	if (product) {
+		this.fire('add', idx, product, isExisting);
+	}
 
     return idx;
 };
@@ -2226,6 +2233,16 @@ Product.prototype.isEqual = function isEqual(data) {
 
 
 /**
+ * Determine if this product is valid.
+ *
+ * @return {boolean}
+ */
+Product.prototype.isValid = function isValid() {
+	return (this.get('item_name') && this.amount() > 0);
+};
+
+
+/**
  * Destroys this product. Fires a "destroy" event.
  */
 Product.prototype.destroy = function destroy() {
@@ -2737,7 +2754,6 @@ function View(model) {
 	this.el = wrapper = document.createElement('div');
 	this.model = model;
 	this.isShowing = false;
-	this.redraw();
 
 	// HTML
 	wrapper.id = config.name;
@@ -2874,6 +2890,9 @@ var constants = require('./constants'),
 
 
 
+
+
+
 var viewevents = module.exports = {
 
 	click: function (evt) {
@@ -2948,7 +2967,10 @@ var viewevents = module.exports = {
 				}
 			}
 
-			// Once run this once
+			// Do the initial render when the buttons are ready
+			this.redraw();
+
+			// Only run this once
 			events.remove(document, 'readystatechange', viewevents.readystatechange);
 		}
 	},
@@ -2963,5 +2985,5 @@ var viewevents = module.exports = {
 
 };
 
-},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,15,13,14,16,17,18,19,20,21,22,23])
 ;
