@@ -243,7 +243,7 @@ Product.prototype.isEqual = function isEqual(data) {
  * @return {boolean}
  */
 Product.prototype.isValid = function isValid() {
-	return (this.get('item_name') && this.get('amount'));
+	return (this.get('item_name') && this.amount() > 0);
 };
 
 

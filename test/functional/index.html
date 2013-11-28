@@ -135,9 +135,9 @@
 	<script src="minicart.js"></script>
 	<script src="view.js"></script>
 	<script>
-		//if (navigator.userAgent.indexOf("PhantomJS") < 0) {
-		//	mocha.run();
-		//}
+		if (~window.location.search.indexOf('test=true')) {
+			mocha.run();
+		}
 	</script>
 </body>
 </html>
