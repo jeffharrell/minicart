@@ -23,7 +23,6 @@ function View(model) {
 	this.el = wrapper = document.createElement('div');
 	this.model = model;
 	this.isShowing = false;
-	this.redraw();
 
 	// HTML
 	wrapper.id = config.name;

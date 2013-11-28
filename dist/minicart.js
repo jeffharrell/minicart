@@ -2737,7 +2737,6 @@ function View(model) {
 	this.el = wrapper = document.createElement('div');
 	this.model = model;
 	this.isShowing = false;
-	this.redraw();
 
 	// HTML
 	wrapper.id = config.name;
@@ -2874,6 +2873,9 @@ var constants = require('./constants'),
 
 
 
+
+
+
 var viewevents = module.exports = {
 
 	click: function (evt) {
@@ -2948,7 +2950,10 @@ var viewevents = module.exports = {
 				}
 			}
 
-			// Once run this once
+			// Do the initial render when the buttons are ready
+			this.redraw();
+
+			// Only run this once
 			events.remove(document, 'readystatechange', viewevents.readystatechange);
 		}
 	},
@@ -2963,5 +2968,5 @@ var viewevents = module.exports = {
 
 };
 
-},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,16,14,17,15,18,20,21,22,23,19])
 ;

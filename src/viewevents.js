@@ -6,6 +6,9 @@ var constants = require('./constants'),
 
 
 
+
+
+
 var viewevents = module.exports = {
 
 	click: function (evt) {
@@ -80,7 +83,10 @@ var viewevents = module.exports = {
 				}
 			}
 
-			// Once run this once
+			// Do the initial render when the buttons are ready
+			this.redraw();
+
+			// Only run this once
 			events.remove(document, 'readystatechange', viewevents.readystatechange);
 		}
 	},
