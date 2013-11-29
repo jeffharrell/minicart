@@ -138,7 +138,10 @@ Cart.prototype.discount = function discount(config) {
 		result = (parseFloat(this.settings('discount_rate_cart')) || 0) * this.subtotal() / 100;
 	}
 
-	return currency(result, this.settings('currency_code'), config);
+	config = config || {};
+	config.currency = this.settings('currency_code');
+
+	return currency(result, config);
 };
 
 
@@ -157,7 +160,10 @@ Cart.prototype.subtotal = function subtotal(config) {
 		result += products[i].total();
 	}
 
-	return currency(result, this.settings('currency_code'), config);
+	config = config || {};
+	config.currency = this.settings('currency_code');
+
+	return currency(result, config);
 };
 
 
@@ -173,7 +179,10 @@ Cart.prototype.total = function total(config) {
 	result += this.subtotal();
 	result -= this.discount();
 
-	return currency(result, this.settings('currency_code'), config);
+	config = config || {};
+	config.currency = this.settings('currency_code');
+
+	return currency(result, config);
 };
 
 

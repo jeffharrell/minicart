@@ -10,7 +10,8 @@ var cartData = [
 	{ item_name: 'Test item 2', amount: 2.00, quantity: 2 },
 	{ item_name: 'Test item 3', amount: 3, item_number: '123ABC' },
 	{ item_name: 'Test item 4', amount: 100.00, discount_amount: 99.00 },
-	{ item_name: 'Test item 5', amount: 0.00, on0: 'Size', os0: 'Large', option_select0: 'Large', option_amount0: 50.00 }
+	{ item_name: 'Test item 5', amount: 0.00, on0: 'Size', os0: 'Large', option_select0: 'Large', option_amount0: 50.00 },
+	{ item_name: 'Test item 6', amount: 1.00, discount_amount: 0.50, currency_code: 'EUR' }
 ];
 
 
@@ -364,6 +365,12 @@ describe('View', function () {
 	});
 
 
+	it('should display item amounts with the correct currency', function () {
+		minicart.cart.add(mockData[5]);
+		assert(getItem(0).amount === '€0.50');
+	});
+
+
 	it('should have item amount data', function () {
 		var cart, form;
 
@@ -379,6 +386,12 @@ describe('View', function () {
 	it('should display discounts', function () {
 		minicart.cart.add(mockData[3]);
 		assert(getItem(0).options[0] === 'Discount: $99.00');
+	});
+
+
+	it('should display discounts with correct currency', function () {
+		minicart.cart.add(mockData[5]);
+		assert(getItem(0).options[0] === 'Discount: €0.50');
 	});
 
 
@@ -418,11 +431,18 @@ describe('View', function () {
 		minicart.cart.add(mockData[0]);
 		minicart.cart.add(mockData[1]);
 
-		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: $5.00');
+		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: $5.00 USD');
 	});
 
 
-	it('should not have a checkout button with items', function () {
+	it('should display a subtotal with correct currency', function () {
+		minicart.cart.add(mockData[5]);
+
+		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: €0.50 EUR');
+	});
+
+
+	it('should have a checkout button with items', function () {
 		var cart, button;
 
 		minicart.cart.add(mockData[0]);

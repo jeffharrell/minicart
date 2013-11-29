@@ -143,7 +143,7 @@ describe('Cart Model', function () {
 
     it('total() returns the formatted cart product total', function () {
         assert.strictEqual(cart.total({ format: true }), '$3.34');
-		assert.strictEqual(cart.total({ format: true, currencyCode: true }), '$3.34 USD');
+		assert.strictEqual(cart.total({ format: true, showCode: true }), '$3.34 USD');
     });
 
 

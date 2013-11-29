@@ -2,6 +2,8 @@
 var items = cart.items();
 var settings = cart.settings();
 var hasItems = !!items.length;
+var priceFormat = { format: true, currency: cart.settings("currency_code") };
+var totalFormat = { format: true, showCode: true };
 %>
 <form method="post" class="<% if (!hasItems) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">
 	<button type="button" class="minicart-closer">&times;</button>
@@ -18,7 +20,7 @@ var hasItems = !!items.length;
 				<% } %>
 				<% if (items[i].discount()) { %>
 				<li>
-					<%= config.strings.discount %> <%= items[i].discount({ format: true }) %>
+					<%= config.strings.discount %> <%= items[i].discount(priceFormat) %>
 					<input type="hidden" name="discount_amount_<%= idx %>" value="<%= items[i].discount() %>" />
 				</li>
 				<% } %>
@@ -32,7 +34,7 @@ var hasItems = !!items.length;
 			</ul>
 			<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" type="text" pattern="[0-9]*" value="<%= items[i].get("quantity") %>" autocomplete="off" />
 			<button type="button" class="minicart-remove" data-minicart-idx="<%= i %>">&times;</button>
-			<span class="minicart-price"><%= items[i].total({ format: true }) %></span>
+			<span class="minicart-price"><%= items[i].total(priceFormat) %></span>
 			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />
 			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].amount() %>" />
 		</li>
@@ -40,7 +42,7 @@ var hasItems = !!items.length;
 	</ul>
 	<div>
 		<div class="minicart-subtotal">
-			<%= config.strings.subtotal %> <%= cart.total({ format: true, currencyCode: true }) %>
+			<%= config.strings.subtotal %> <%= cart.total(totalFormat) %>
 		</div>
 		<% if (hasItems) { %>
 			<button class="minicart-submit" type="submit" data-minicart-alt="<%= config.strings.buttonAlt %>"><%- config.strings.button %></button>

@@ -125,6 +125,15 @@ describe('Product Model', function () {
 	});
 
 
+	it('discount() should honor currency code', function () {
+		item.set('discount_amount', 1.00);
+		item.set('discount_amount2', 0.50);
+		item.set('quantity', 3);
+
+		assert.strictEqual(item.discount({ format: true, currency: 'EUR' }), '€2.00');
+	});
+
+
 	it('amount() returns an individual product amount', function () {
 		assert.strictEqual(item.amount(), 1.23);
 
@@ -137,6 +146,11 @@ describe('Product Model', function () {
 		item.set('option_amount0', 123.00);
 
 		assert.strictEqual(item.amount(), 124.23);
+	});
+
+
+	it('amount() should honor currency codes', function () {
+		assert.strictEqual(item.amount({ format: true, currency: 'EUR'}), '€1.23');
 	});
 
 
@@ -178,6 +192,11 @@ describe('Product Model', function () {
 
         assert.strictEqual(item1.total({ format: true }), '$1.23');
     });
+
+
+	it('total() should honor currency codes', function () {
+		assert.strictEqual(item.total({ format: true, currency: 'EUR' }), '€1.23');
+	});
 
 
 	it('isEqual() correctly identifies similar products', function () {

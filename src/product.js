@@ -153,7 +153,7 @@ Product.prototype.discount = function discount(config) {
 		this._discount = result;
 	}
 
-	return currency(this._discount, null, config);
+	return currency(this._discount, config);
 };
 
 
@@ -177,7 +177,7 @@ Product.prototype.amount = function amount(config) {
 		this._amount = result;
 	}
 
-	return currency(this._amount, null, config);
+	return currency(this._amount, config);
 };
 
 
@@ -197,7 +197,7 @@ Product.prototype.total = function total(config) {
 		this._total = parser.amount(result);
 	}
 
-	return currency(this._total, null, config);
+	return currency(this._total, config);
 };
 
 

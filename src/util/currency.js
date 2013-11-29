@@ -66,8 +66,9 @@ var currencies = {
 };
 
 
-module.exports = function currency(amount, code, config) {
-    var value = currencies[code || 'USD'] || {},
+module.exports = function currency(amount, config) {
+    var code = config && config.currency || 'USD',
+		value = currencies[code],
         before = value.before || '',
         after = value.after || '',
         length = value.length || 2,
@@ -77,7 +78,7 @@ module.exports = function currency(amount, code, config) {
 		result = before + result.toFixed(length) + after;
 	}
 
-	if (config && config.currencyCode && code) {
+	if (config && config.showCode) {
 		result += ' ' + code;
 	}
 
