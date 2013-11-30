@@ -1,0 +1,9 @@
+/*!
+ * <%= pkg.name %>
+ * <%= pkg.description %>
+ *
+ * @version <%= pkg.version %>
+ * @author <%= pkg.author.name %> <<%= pkg.author.url %>>
+ * @url <%= pkg.homepage %>
+ * @license <%= pkg.licenses[0].type %> <<%= pkg.licenses[0].url %>>
+ */

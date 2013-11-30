@@ -21,12 +21,20 @@ module.exports = function (grunt) {
 		},
 
 		uglify: {
-			options: {
-				banner: '/*!\n * <%= pkg.name %>\n *\n * <%= pkg.description %>\n *\n * @version <%= pkg.version %>\n * @author <%= pkg.author.name %> <<%= pkg.author.url %>>\n * @url <%= pkg.homepage %> \n * @license <%= pkg.licenses[0].type %> <<%= pkg.licenses[0].url %>>\n */\n'
-			},
 			all: {
 				files: {
 					'dist/minicart.min.js': ['dist/minicart.js']
+				}
+			}
+		},
+
+		usebanner: {
+			all: {
+				options: {
+					banner: grunt.file.read('.banner')
+				},
+				files: {
+					src: [ 'dist/**/*.js' ]
 				}
 			}
 		},
@@ -57,6 +65,7 @@ module.exports = function (grunt) {
 	// Dependencies
 	grunt.task.loadNpmTasks('grunt-contrib-jshint');
 	grunt.task.loadNpmTasks('grunt-contrib-uglify');
+	grunt.task.loadNpmTasks('grunt-banner');
 	grunt.task.loadNpmTasks('grunt-mocha');
 	grunt.task.loadNpmTasks('grunt-mocha-test');
 	grunt.task.loadNpmTasks('grunt-browserify');
@@ -66,6 +75,6 @@ module.exports = function (grunt) {
 	// Tasks
 	grunt.registerTask('lint',  ['jshint']);
 	grunt.registerTask('test',  ['lint', 'build', 'mochaTest', 'mocha']);
-	grunt.registerTask('build', ['browserify', 'themify', 'uglify']);
+	grunt.registerTask('build', ['browserify', 'themify', 'uglify', 'usebanner']);
 
 };
