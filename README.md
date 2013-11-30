@@ -1,8 +1,10 @@
-# minicart.js
+# Minicart.js
+
+[![Build Status](https://travis-ci.org/jeffharrell/minicart.png?branch=master,3.0-alpha)](https://travis-ci.org/jeffharrell/minicart)
 
 The minicart is a great way to improve your PayPal shopping cart integration. One simple change and your users will be able to manage their shopping cart directly from your website. Additional APIs provide you the power to customize the behavior to your needs.
 
-[![Build Status](https://travis-ci.org/jeffharrell/minicart.png?branch=master,3.0-alpha)](https://travis-ci.org/jeffharrell/minicart)
+
 
 
 
@@ -173,15 +175,20 @@ The HTML template and CSS can be overridden using the `config` object. Example:
 
 ### Custom Themes
 
-Custom themes can also be created and bundle into the JavaScript file. To create a theme you'll need to have [grunt](https://github.com/gruntjs/grunt-cli) and follow these steps:
+Custom themes can be created and bundled into your own custom version of the minicart.js file. 
 
-1. Fork or clone this repo
-2. Create a directory under `src/themes`, e.g. `myTheme`
-3. Create an `index.html` file for your template and `styles.css` for the CSS
-4. Run `grunt build --theme=myTheme` to generate the JavaScript
-5. Include `dist/minicart.myTheme.js` in your page to see your custom minicart
+Before creating a custom theme you'll need to have [node.js](http://nodejs.org/) installed. Once install is complete, open a terminal window and run `npm install -g grunt-cli` to install Grunt.
 
-If you're new to the building a theme it's probably a good idea to copy the default one and start there.
+To create a theme follow these steps:
+
+1. [Fork and clone this repo](https://github.com/jeffharrell/minicart/fork) so you can make your own changes. If you're not sure what this means you can find out more on [Github's Help](https://help.github.com/articles/fork-a-repo).
+2. In your new fork, create a  directory under `src/themes` with your theme name. For example, let's create `src/themes/myAwesomeTheme`.
+3. Next add an HTML index file for your template, e.g. `src/themes/myAwesomeTheme/index.html`. The templates use [Embedded JavaScript Template](https://github.com/visionmedia/ejs) syntax for logic.
+4. Finally, add your theme CSS styles into `src/themes/myAwesomeTheme/styles.css`
+5. With all that behind you it's now time to generate your custom minicart JavaScript file. In a terminal window run `grunt build --theme=myAwesomeTheme`. This will output a bundled JavaScript file complete with the minicart and your new theme at `dist/minicart.myAwesomeTheme.js`. 
+6. Include this file into your HTML page instead of the normal JavaScript file and you'll see your new theme.
+
+If you're new to the building a theme it's a good idea to copy the one at `src/themes/default` and start there.
 
 
 
