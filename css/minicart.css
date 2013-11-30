@@ -73,6 +73,10 @@ footer {
     padding: 1em 0;
 }
 
+a img {
+    border: 0;
+}
+
 #wrapper {
     width: 760px;
     margin: 0 auto;
