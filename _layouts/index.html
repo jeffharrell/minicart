@@ -5,8 +5,8 @@
     <title>Minicart.js - The minicart is a great way to improve your PayPal shopping cart integration</title>
     <meta name="keywords" content="paypal, mini cart, minicart, add to cart, paypal cart, integration, javascript" />
     <meta name="description" content="The Mini Cart is a cool new way to improve your integration with the PayPal Shopping Cart." />
-    <link rel="stylesheet" type="text/css" href="css/minicart.css" />
-    <link rel="stylesheet" type="text/css" href="css/code.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.path }}/css/minicart.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.path }}/css/code.css" />
     <link rel="alternate" type="application/atom+xml"  href="https://github.com/jeffharrell/MiniCart/commits/master.atom" title="PayPal Mini Cart RSS Feed" />
     <!--[if lte IE 8]>
     <script>(function(){if(!/*@cc_on!@*/0)return;var e = "abbr,article,aside,audio,bb,canvas,datagrid,datalist,details,dialog,eventsource,figure,footer,header,hgroup,main,mark,menu,meter,nav,output,progress,section,time,video".split(',');for(var i=0;i<e.length;i++){document.createElement(e[i])}})();</script>
@@ -105,35 +105,29 @@
         </div>
 
     </section>
-    <section id="readme"></section>
-    <footer id="footer">Copyright © Jeff Harrell. All rights reserved.</footer>
+    <section id="readme">
+        {{ content }}
+    </section>
+    <footer id="footer">Copyright &copy; Jeff Harrell. All rights reserved.</footer>
 </div>
 
-<script src="js/lib/jquery.js"></script>
-<script src="dist/minicart.min.js"></script>
+<script src="{{ site.path }}/js/lib/jquery.js"></script>
+<script src="{{ site.path }}/dist/minicart.min.js"></script>
 <script>
-    // README.md
-    var request = $.ajax({
-        url: 'https://api.github.com/repos/jeffharrell/minicart/contents/README.md',
-        headers: { 'Accept': 'application/vnd.github.v3.html+json' }
+    // Reorder content from README
+    var $body = $(document.body),
+        $header = $('#header'),
+        $readme = $('#readme');
+
+    $readme.children().each(function () {
+        if (this.tagName === 'H2') {
+            return false;
+        } else {
+            $header.append(this);
+        }
     });
 
-    request.done(function (result) {
-        var $body = $(document.body),
-            $header = $('#header'),
-            $readme = $('#readme');
-
-        $readme.html(result);
-        $readme.find('div').find('article').children().each(function () {
-            if (this.tagName === 'H2') {
-                return false;
-            } else {
-                $header.append(this);
-            }
-        });
-
-        $body.removeClass('loading');
-    });
+    $body.removeClass('loading');
 
     // Mini Cart
     paypal.minicart.render({
