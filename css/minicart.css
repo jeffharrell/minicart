@@ -1,17 +1,15 @@
 body {
     margin: 0;
     padding: 0;
-    color: #333;
     background: #fff;
-    border-top: 12px solid #32689A;
-    font: 80%/normal Arial, Helvetica, sans-serif;
+    color: #333;
+    font: 100%/normal "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-
 
 h1 {
     margin: 1em 0;
-    color: #c88039;
-    font-size: 2.25em;
+    font-size: 2.75em;
+    font-weight: normal;
 }
 
 h2 {
@@ -22,7 +20,6 @@ h2 {
 h3 {
     margin: 2em 0 0;
     padding: 0 0 0.25em;
-    border-bottom: 1px solid #ccc;
     font-size: 1.2em;
 }
 
@@ -50,24 +47,6 @@ ol li {
     margin: 0 0 0.5em;
 }
 
-code {
-    font: 1.1em "Courier New", Courier, monospace;
-}
-
-p code {
-    font-weight: bold;
-}
-
-pre code {
-    margin: 2em 0;
-    display: block;
-    background-color: #fafafa;
-    color: #000;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-left: 0;
-    border-right: 0;
-}
 
 footer {
     padding: 1em 0;
@@ -77,13 +56,37 @@ a img {
     border: 0;
 }
 
+a:hover {
+    text-decoration: none;
+}
+
 #wrapper {
-    width: 760px;
     margin: 0 auto;
 }
 
+#header, #example, #readme, #footer {
+    padding: 40px;
+}
+
+#header, #example {
+    background: #32689A;
+    color: #fff;
+}
+
+#header a, #example a {
+    color: #fff;
+}
+
+#header ol {
+    margin: 3em 0 1em 4em;
+}
+
+#header img {
+    display: none;
+}
+
 #example {
-    margin: 2em 0;
+    margin-top: -60px;
 }
 
 #example ul {
@@ -96,7 +99,6 @@ a img {
     float: left;
     width: 21%;
     padding: 0 10px 0 15px;
-    border-right: 1px dotted #ccc;
 }
 
 #example form strong {
@@ -111,15 +113,17 @@ a img {
 
 #example fieldset {
     position: relative;
-    height: 11em;
+    height: 8.5em;
     margin: 0;
-    padding: 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.2);
     border: 0;
+    border-right: 8px;
 }
 
 #example fieldset .button {
     position: absolute;
-    bottom: 0;
+    bottom: 10px;
 }
 
 #example .container {
@@ -127,22 +131,11 @@ a img {
     display: block;
     width: 100%;
     padding: 10px 0;
-    background-color: #f3f9fe;
-    border: 1px solid #ccc;
-    border-width: 1px 0;
-}
-
-#example .notice {
-    margin: 1em 0 4em;
-    padding: 3px;
-    background-color: #ffc;
-    font-size: 0.9em;
 }
 
 #footer {
     margin-top: 50px;
     padding-top: 10px;
-    color: #999;
     text-align: center;
 }
 

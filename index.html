@@ -6,6 +6,7 @@
     <meta name="keywords" content="paypal, mini cart, minicart, add to cart, paypal cart, integration, javascript" />
     <meta name="description" content="The Mini Cart is a cool new way to improve your integration with the PayPal Shopping Cart." />
     <link rel="stylesheet" type="text/css" href="css/minicart.css" />
+    <link rel="stylesheet" type="text/css" href="css/code.css" />
     <link rel="alternate" type="application/atom+xml"  href="https://github.com/jeffharrell/MiniCart/commits/master.atom" title="PayPal Mini Cart RSS Feed" />
     <!--[if lte IE 8]>
     <script>(function(){if(!/*@cc_on!@*/0)return;var e = "abbr,article,aside,audio,bb,canvas,datagrid,datalist,details,dialog,eventsource,figure,footer,header,hgroup,main,mark,menu,meter,nav,output,progress,section,time,video".split(',');for(var i=0;i<e.length;i++){document.createElement(e[i])}})();</script>
@@ -13,11 +14,12 @@
 </head>
 <body class="loading">
 <div id="wrapper">
+    <header id="header"></header>
     <section id="example">
         <p>Try it out with the example below.</p>
 
         <div class="container">
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+            <form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">
                 <fieldset>
                     <input type="hidden" name="cmd" value="_cart" />
                     <input type="hidden" name="add" value="1" />
@@ -37,7 +39,7 @@
                 </fieldset>
             </form>
 
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+            <form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">
                 <fieldset>
                     <input type="hidden" name="cmd" value="_cart" />
                     <input type="hidden" name="add" value="1" />
@@ -58,7 +60,7 @@
                 </fieldset>
             </form>
 
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+            <form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">
                 <fieldset>
                     <input type="hidden" name="cmd" value="_cart" />
                     <input type="hidden" name="add" value="1" />
@@ -92,7 +94,7 @@
                 </fieldset>
             </form>
 
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" class="last">
+            <form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post" class="last">
                 <fieldset>
                     <input type="hidden" name="business" value="example@minicartjs.com" />
                     <input type="hidden" name="cmd" value="_cart" />
@@ -102,10 +104,6 @@
             </form>
         </div>
 
-        <p class="notice">
-            <strong>Note:</strong>
-            Proceeding to checkout will cause you to leave this website and take you to the live PayPal.com website.
-        </p>
     </section>
     <section id="readme"></section>
     <footer id="footer">Copyright © Jeff Harrell. All rights reserved.</footer>
@@ -122,16 +120,25 @@
 
     request.done(function (result) {
         var $body = $(document.body),
-            $readme = $('#readme'),
-            $example = $('#example');
+            $header = $('#header'),
+            $readme = $('#readme');
 
         $readme.html(result);
-        $example.insertBefore($readme.find('ol')[0]);
+        $readme.find('div').find('article').children().each(function () {
+            if (this.tagName === 'H2') {
+                return false;
+            } else {
+                $header.append(this);
+            }
+        });
+
         $body.removeClass('loading');
     });
 
     // Mini Cart
-    paypal.minicart.render();
+    paypal.minicart.render({
+        action: 'https://sandbox.paypal.com/cgi-bin/webscr'
+    });
 
     // Page tracking
     var _gaq = [
