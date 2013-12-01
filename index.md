@@ -9,7 +9,7 @@ layout: index
 The minicart is a great way to improve your PayPal shopping cart integration. One simple change and your users will be able to manage their shopping cart directly from your website. Additional APIs provide you the power to customize the behavior to your needs.
 
 
-1. [Setup](#basic-setup)
+1. [Basic Setup](#basic-setup)
 2. [Advanced API](#advanced-api)
 3. [API Examples](#api-examples)
 4. [Customization](#customization)
@@ -41,7 +41,7 @@ The minicart has an advanced JavaScript API which provides you the power to cust
 
 ### General
 
-`paypal.minicart.render(config)`
+`paypal.minicart.render(config)`  
 Renders the minicart to the page. Config is optional and can have the following properties:
 
  * `parent` - HTMLElement the minicart should render to.
@@ -51,96 +51,96 @@ Renders the minicart to the page. Config is optional and can have the following 
  * `styles` - CSS styles for rendering. See [customization](#customization) for details.
  * `strings` - An object of text strings: `button`, `buttonAlt`, `subtotal` and `discount`.
 
-`paypal.minicart.reset()`
+`paypal.minicart.reset()`  
 Resets the minicart back to it's default state.
 
 
 ### View
 
-`paypal.minicart.show()`
+`paypal.minicart.show()`  
 Triggers the minicart to show by adding a "minicart-showing" CSS class to the page.
 
-`paypal.minicart.hide()`
+`paypal.minicart.hide()`  
 Triggers the minicart to hide by removing the "minicart-showing" CSS class on the page.
 
-`paypal.minicart.toggle()`
+`paypal.minicart.toggle()`  
 Toggles the visibility of the minicart.
 
-`paypal.minicart.view.bind(form)`
+`paypal.minicart.view.bind(form)`  
 Binds a HTMLFormElement's submit event to the minicart. Useful for forms which may have been added to the page after the initial load.
 
 
 ### Cart
 
-`paypal.minicart.cart.add(data)`
-Adds an item to the cart. Fires the `add` event. Example data object:
+`paypal.minicart.cart.add(data)`  
+Adds an item to the cart. Fires the *add* event. Example data object:
 
     { "business": "user@example.com", "item_name": "Product", "amount": 5.00, "currency_code": "USD" }
 
-`paypal.minicart.cart.remove(idx)`
-Removes an item from the cart by index. Fires the `remove` event.
+`paypal.minicart.cart.remove(idx)`  
+Removes an item from the cart by index. Fires the *remove* event.
 
-`paypal.minicart.cart.items(idx)`
+`paypal.minicart.cart.items(idx)`  
 Returns an array of items from the cart. If an index is passed then only that item is returned.
 
-`paypal.minicart.cart.settings(key)`
+`paypal.minicart.cart.settings(key)`  
 Returns an object of global cart settings. If a key is passed then only that value is returned.
 
-`paypal.minicart.cart.discount(config)`
-Calculates the cart discount amount. `config` can be used for formatting.
+`paypal.minicart.cart.discount(config)`  
+Calculates the cart discount amount. *config* can be used for formatting.
 
-`paypal.minicart.cart.subtotal(config)`
-Calculates the cart total minus discounts. `config` can be used for formatting.
+`paypal.minicart.cart.subtotal(config)`  
+Calculates the cart total minus discounts. *config* can be used for formatting.
 
-`paypal.minicart.cart.total(config)`
-Calculates the cart total. `config` can be used for formatting.
+`paypal.minicart.cart.total(config)`  
+Calculates the cart total. *config* can be used for formatting.
 
-`paypal.minicart.cart.destroy()`
-Destroys the cart data and resets it back to it's default state. Fires the `destroy` event.
+`paypal.minicart.cart.destroy()`  
+Destroys the cart data and resets it back to it's default state. Fires the *destroy* event.
 
-`paypal.minicart.cart.on(event, fn, scope)`
-Subscribe to cart events. Events include:
- * `add` - Fired when an item is added. *function (idx, product, isExisting)*
- * `remove` - Fired when an item is removed. *function (idx, product)*
- * `checkout` - Fired on checkout. *function (evt)*
- * `destroy` - Fired when the cart is destroyed. *function ()*
+`paypal.minicart.cart.on(event, fn, scope)`  
+Subscribe to cart events. Events include:  
+ * `add` - Fired when an item is added. *function (idx, product, isExisting)*  
+ * `remove` - Fired when an item is removed. *function (idx, product)*  
+ * `checkout` - Fired on checkout. *function (evt)*  
+ * `destroy` - Fired when the cart is destroyed. *function ()*  
 
-`paypal.minicart.cart.off(event, fn)`
+`paypal.minicart.cart.off(event, fn)`  
 Unsubscribe from cart events.
 
 
 ### Products
 
-`product.get(key)`
+`product.get(key)`  
 Returns a properties object for the product. If a key is passed then only that value is returned.
 
-`product.set(key, value)`
-Sets a property for the product. Fires a `change` event.
+`product.set(key, value)`  
+Sets a property for the product. Fires a *change* event.
 
-`product.options()`
+`product.options()`  
 Returns the options.
 
-`product.discount(config)`
-Calculates the product discount. `config` can be used for formatting.
+`product.discount(config)`  
+Calculates the product discount. *config* can be used for formatting.
 
-`product.amount(config)`
-Calculates the product amount discounts. `config` can be used for formatting.
+`product.amount(config)`  
+Calculates the product amount discounts. *config* can be used for formatting.
 
-`product.total(config)`
-Calculates the product total. `config` can be used for formatting.
+`product.total(config)`  
+Calculates the product total. *config* can be used for formatting.
 
-`product.isEqual(product2)`
+`product.isEqual(product2)`  
 Determines if the current product is the same as another.
 
-`product.destroy()`
-Destroys the product. Fires the `destroy` event.
+`product.destroy()`  
+Destroys the product. Fires the *destroy* event.
 
-`product.on(event, fn, scope)`
-Subscribe to cart events. Events include:
- * `change` - Fired when a value is changed. *function (key)*
- * `destroy` - Fired when the product is destroyed. *function ()*
+`product.on(event, fn, scope)`  
+Subscribe to cart events. Events include:  
+ * `change` - Fired when a value is changed. *function (key)*  
+ * `destroy` - Fired when the product is destroyed. *function ()*  
 
-`product.off(event, fn)`
+`product.off(event, fn)`  
 Unsubscribe from product events.
 
 
@@ -161,7 +161,7 @@ The minicart's HTML template and CSS can be fully customized using two different
 
 ### Configuration
 
-The HTML template and CSS can be overridden using the `config` object. Example:
+The HTML template and CSS can be overridden using the *config* object. Example:
 
     var myTemplate = '' +
     	'<div>' +
@@ -195,7 +195,7 @@ If you're new to the building a theme it's a good idea to copy the one at `src/t
 
 ## Localization
 
-Localization is supported using the `strings` object. Example:
+Localization is supported using the *strings* object. Example:
 
     paypal.minicart.render({
 		strings: {
@@ -206,7 +206,7 @@ Localization is supported using the `strings` object. Example:
 		}
 	});
 
-The currency symbol will be automatically updated based on the `currency_code` setting of your button.
+The currency symbol will be automatically updated based on the *currency_code* setting of your button.
 
 
 
@@ -235,10 +235,10 @@ The minicart doesn't work with PayPal's hosted buttons which is why this is most
 2. Once you've created the button click Remove code protection before copying your button's code.
 
 ### The minicart isn't emptying after a transaction is completed. Why?
-Your buttons need a `return` URL parameter for PayPal to redirect back to. On this page make sure to call `paypapl.minicart.reset();`.
+Your buttons need a *return* URL parameter for PayPal to redirect back to. On this page make sure to call `paypapl.minicart.reset();`.
 
 ### Does the minicart work with frames?
-Frames are not officially supported, but you may be able to get some mileage with the `target` configuration setting.
+Frames are not officially supported, but you may be able to get some mileage with the *target* configuration setting.
 
 ### Are previous versions of the minicart available?
 All previous versions are [tagged on Github](https://github.com/jeffharrell/MiniCart/tags).

@@ -112,6 +112,7 @@
 </div>
 
 <script src="{{ site.path }}/js/lib/jquery.js"></script>
+<script src="{{ site.path }}/js/lib/jquery.scrollTo.js"></script>
 <script src="{{ site.path }}/dist/minicart.min.js"></script>
 <script>
     // Reorder content from README
@@ -125,6 +126,20 @@
         } else {
             $header.append(this);
         }
+    });
+    
+    // I can't get Jekyll to do this properly (yet...)
+    var toc = $header.find('ol > li a').click(function (e) {
+        e.preventDefault();
+        
+        var str = $(this).text();
+        
+        $readme.find(':header').each(function () {
+           if ($(this).text() === str) {
+               $.scrollTo(this, 500);
+               return false;
+           }
+        });
     });
 
     $body.removeClass('loading');
