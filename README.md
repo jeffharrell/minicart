@@ -231,7 +231,7 @@ The minicart doesn't work with PayPal's hosted buttons which is why this is most
 2. Once you've created the button click Remove code protection before copying your button's code.
 
 ### The minicart isn't emptying after a transaction is completed. Why?
-Your buttons need a *return* URL parameter for PayPal to redirect back to. On this page make sure to call `paypapl.minicart.reset();`.
+Your buttons need a *return* URL parameter for PayPal to redirect back to. On this page make sure to call `paypal.minicart.reset();`.
 
 ### Does the minicart work with frames?
 Frames are not officially supported, but you may be able to get some mileage with the *target* configuration setting.
