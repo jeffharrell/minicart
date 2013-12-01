@@ -118,7 +118,7 @@ a:hover {
     padding: 10px;
     background: #5a85ad;
     border: 0;
-    border-r: 8px;
+    border-radius: 8px;
 }
 
 #example fieldset .button {
