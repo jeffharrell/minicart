@@ -24,16 +24,20 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 1. Create a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
 2. Include the following snippet into your HTML before the closing &lt;/body&gt; tag:
 
-        <script src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.3/minicart.min.js"></script>
-        <script>
-            paypal.minicart.render();
-        </script>
+    ```html
+    <script src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.3/minicart.min.js"></script>
+    <script>
+        paypal.minicart.render();
+    </script>
+    ```
 
 3. On your return page include:
 
-        <script>
-            paypal.minicart.reset();
-        </script>
+    ```html
+    <script>
+        paypal.minicart.reset();
+    </script>
+    ```
 
 It's that simple! Now the minicart will appear when a user views or adds a product to their cart.
 
@@ -168,16 +172,13 @@ The minicart HTML template and CSS can be fully customized using two different a
 
 The HTML template and CSS can be overridden using the *config* object.
 
-    var myTemplate = '' +
-        '<div>' +
-        '<%= config.strings.subtotal %> ' +
-        '<%= cart.total({ format: true, currencyCode: true }) %>' +
-        '</div>';
+```js
+var myTemplate = "<div><%= config.strings.subtotal %> <%= cart.total({ format: true, showCode: true }) %></div>";
 
-    paypal.minicart.render({
-        template: myTemplate
-    });
-
+paypal.minicart.render({
+    template: myTemplate
+});
+```
 
 ### Custom Themes
 
@@ -202,14 +203,16 @@ If you're new to the building a theme it's a good idea to copy the one at `src/t
 
 Localization is supported using the *strings* object. 
 
-    paypal.minicart.render({
-        strings: {
-            button: "Caisse",
-            buttonAlt: "Total:",
-            discount: "Reduction:"
-            processing: "Traitement"
-        }
-    });
+```js
+paypal.minicart.render({
+    strings: {
+        button: "Caisse",
+        buttonAlt: "Total:",
+        discount: "Reduction:"
+        processing: "Traitement"
+    }
+});
+```
 
 The currency symbol will be automatically updated based on the *currency_code* setting of your button.
 
