@@ -1,8 +1,3 @@
----
-layout: index
----
-
-
 # Minicart.js
 
 [![Build Status](https://travis-ci.org/jeffharrell/minicart.png?branch=master)](https://travis-ci.org/jeffharrell/minicart)
