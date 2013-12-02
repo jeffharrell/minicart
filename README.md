@@ -17,12 +17,20 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 ## Basic Setup
 
 1. Create a PayPal [Add to Cart Button](https://www.paypal.com/cgi-bin/webscr?cmd=p/xcl/web-accept-to-sc-button-outside)
-2. Include the following snippet of JavaScript code into your HTML file, ideally before the closing &lt;/body&gt; tag:
+2. Include the following snippet into your HTML before the closing &lt;/body&gt; tag:
 
 ```html
 <script src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.3/minicart.min.js"></script>
 <script>
     paypal.minicart.render();
+</script>
+```
+
+3. On your return page include:
+
+```html
+<script>
+    paypal.minicart.reset();
 </script>
 ```
 
@@ -32,7 +40,7 @@ It's that simple! Now the minicart will appear when a user views or adds a produ
 
 ## Advanced API
 
-The minicart has an advanced JavaScript API which provides you the power to customize the behavior to your needs.
+The minicart has a JavaScript API for advanced users to customize the behavior.
 
 
 ### General
@@ -48,22 +56,22 @@ Renders the minicart to the page. Config is optional and can have the following 
  * `strings` - An object of text strings: `button`, `buttonAlt`, `subtotal` and `discount`.
 
 `paypal.minicart.reset()`  
-Resets the minicart back to it's default state.
+Resets the minicart back to its default state.
 
 
 ### View
 
 `paypal.minicart.show()`  
-Triggers the minicart to show by adding a "minicart-showing" CSS class to the page.
+Triggers the minicart to show by adding a "minicart-showing" CSS class to the document.
 
 `paypal.minicart.hide()`  
-Triggers the minicart to hide by removing the "minicart-showing" CSS class on the page.
+Triggers the minicart to hide by removing the "minicart-showing" CSS class on the document.
 
 `paypal.minicart.toggle()`  
 Toggles the visibility of the minicart.
 
 `paypal.minicart.view.bind(form)`  
-Binds a HTMLFormElement's submit event to the minicart. Useful for forms which may have been added to the page after the initial load.
+Binds an HTMLFormElement's submit event to the minicart. Useful for forms which may have been added to the page after the initial load.
 
 
 ### Cart
@@ -92,7 +100,7 @@ Calculates the cart total minus discounts. *config* can be used for formatting.
 Calculates the cart total. *config* can be used for formatting.
 
 `paypal.minicart.cart.destroy()`  
-Destroys the cart data and resets it back to it's default state. Fires the *destroy* event.
+Destroys the cart data and resets it back to the default state. Fires the *destroy* event.
 
 `paypal.minicart.cart.on(event, fn, scope)`  
 Subscribe to cart events. Events include:  
@@ -152,12 +160,12 @@ Examples of how you can use the API:
 
 ## Customization
 
-The minicart's HTML template and CSS can be fully customized using two different approaches: configuration and custom themes. In both approaches, all functionality from the [API](#advanced-api) is available using [Embedded JavaScript Template](https://github.com/visionmedia/ejs) syntax.
+The minicart HTML template and CSS can be fully customized using two different approaches: configuration and custom themes. In both approaches, all functionality from the [API](#advanced-api) is available using [Embedded JavaScript Template](https://github.com/visionmedia/ejs) syntax.
 
 
 ### Configuration
 
-The HTML template and CSS can be overridden using the *config* object. Example:
+The HTML template and CSS can be overridden using the *config* object.
 
     var myTemplate = '' +
     	'<div>' +
@@ -180,10 +188,10 @@ To create a theme follow these steps:
 
 1. [Fork and clone this repo](https://github.com/jeffharrell/minicart/fork) so you can make your own changes. If you're not sure what this means you can find out more on [Github's Help](https://help.github.com/articles/fork-a-repo).
 2. In your new fork, create a  directory under `src/themes` with your theme name. For example, let's create `src/themes/myAwesomeTheme`.
-3. Next add an HTML index file for your template, e.g. `src/themes/myAwesomeTheme/index.html`. The templates use [Embedded JavaScript Template](https://github.com/visionmedia/ejs) syntax for logic.
-4. Finally, add your theme CSS styles into `src/themes/myAwesomeTheme/styles.css`
+3. Next add your HTML template into `src/themes/myAwesomeTheme/index.html`. The templates use [Embedded JavaScript Template](https://github.com/visionmedia/ejs) syntax for logic.
+4. Finally add your CSS styles into `src/themes/myAwesomeTheme/styles.css`.
 5. With all that behind you it's now time to generate your custom minicart JavaScript file. In a terminal window run `grunt build --theme=myAwesomeTheme`. This will output a bundled JavaScript file complete with the minicart and your new theme at `dist/minicart.myAwesomeTheme.js`.
-6. Include this file into your HTML page instead of the normal JavaScript file and you'll see your new theme.
+6. Include this file into your HTML page instead of the normal JavaScript file and you'll see your new theme!
 
 If you're new to the building a theme it's a good idea to copy the one at `src/themes/default` and start there.
 
@@ -191,7 +199,7 @@ If you're new to the building a theme it's a good idea to copy the one at `src/t
 
 ## Localization
 
-Localization is supported using the *strings* object. Example:
+Localization is supported using the *strings* object. 
 
     paypal.minicart.render({
 		strings: {
@@ -216,25 +224,27 @@ Yes, it's free and licensed under the [MIT License](https://github.com/jeffharre
 The minicart supports Chrome, Safari, Firefox, and Internet Explorer 8+.
 
 ### I made a change and want to contribute it. Do you accept pull requests?
-Yes, absolutely. Please submit a pull request on Github.
+Yes, absolutely! Please submit a pull request on Github.
 
-### Help! I found a bug!
-Please log the issue on the [minicart's issue tracker](https://github.com/jeffharrell/MiniCart/issues) including a link or sample code that reproduces it.
+### Help, I found a bug!
+Please submit the issue on the [issue tracker](https://github.com/jeffharrell/MiniCart/issues) including a link or sample code to reproduce it.
 
 ### The minicart isn't appearing the same as on this page. Why?
-This can occur if your page is being rendered in the browser's [Quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). You can check for this issue, validate and correct your HTML markup using the [W3C Markup Validator](http://validator.w3.org/).
+This can occur if your page is being rendered in [quirks mode](http://en.wikipedia.org/wiki/Quirks_mode). You can check for this issue, validate and correct your HTML using the [W3C Markup Validator](http://validator.w3.org/).
 
 ### I installed the minicart, but my website still redirects to PayPal. Why?
-The minicart doesn't work with PayPal's hosted buttons which is why this is most likely happening. To fix your buttons log into paypal.com and:
+The minicart doesn't work with PayPal's hosted buttons. To fix your buttons go to paypal.com and:
 
-1. Create a button on PayPal's website and uncheck the Save button at PayPal checkbox under Step 2: Track inventory, profit & loss.
-2. Once you've created the button click Remove code protection before copying your button's code.
+1. Create a button on PayPal's website and uncheck the *Save button at PayPal* checkbox under *Step 2: Track inventory, profit & loss*.
+2. Once you've created the button click *Remove code protection* before copying your button code.
+
+If this isn't the case then you may have a JavaScript error on the page. Open the browser debugger console and see if there are any errors.
 
 ### The minicart isn't emptying after a transaction is completed. Why?
-Your buttons need a *return* URL parameter for PayPal to redirect back to. On this page make sure to call `paypal.minicart.reset();`.
+Your buttons need to contain a *return* parameter with a URL for PayPal to redirect back to on completion. On this page make sure to call `paypal.minicart.reset();`.
 
 ### Does the minicart work with frames?
-Frames are not officially supported, but you may be able to get some mileage with the *target* configuration setting.
+Frames are not officially supported. You may be able to get some mileage with the *target* configuration setting.
 
 ### Are previous versions of the minicart available?
 All previous versions are [tagged on Github](https://github.com/jeffharrell/MiniCart/tags).
