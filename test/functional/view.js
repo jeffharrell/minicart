@@ -438,7 +438,7 @@ describe('View', function () {
 	it('should display a subtotal with correct currency', function () {
 		minicart.cart.add(mockData[5]);
 
-		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: €0.50 EUR');
+		assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: €0.50');
 	});
 
 
