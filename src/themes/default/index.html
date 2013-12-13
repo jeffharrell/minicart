@@ -41,12 +41,14 @@ var totalFormat = { format: true, showCode: true };
 		<% } %>
 	</ul>
 	<div>
-		<div class="minicart-subtotal">
-			<%= config.strings.subtotal %> <%= cart.total(totalFormat) %>
-		</div>
-		<% if (hasItems) { %>
+        <% if (hasItems) { %>
+            <div class="minicart-subtotal">
+                <%= config.strings.subtotal %> <%= cart.total(totalFormat) %>
+            </div>
 			<button class="minicart-submit" type="submit" data-minicart-alt="<%= config.strings.buttonAlt %>"><%- config.strings.button %></button>
-		<% } %>
+		<% } else { %>
+            <p class="minicart-empty-text"><%= config.strings.empty %></p>
+        <% } %>
 	</div>
 	<input type="hidden" name="cmd" value="_cart" />
 	<input type="hidden" name="upload" value="1" />

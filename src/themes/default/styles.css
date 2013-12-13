@@ -50,6 +50,12 @@
 	color: #333;
 }
 
+#PPMiniCart form.minicart-empty {
+    padding-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 #PPMiniCart ul {
 	clear: right;
 	margin: 15px 0;

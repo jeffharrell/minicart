@@ -1056,7 +1056,6 @@ process.chdir = function (dir) {
 
 var utils = require('./utils')
   , path = require('path')
-  , basename = path.basename
   , dirname = path.dirname
   , extname = path.extname
   , join = path.join
@@ -1156,21 +1155,22 @@ var parse = exports.parse = function(str, options){
     , close = options.close || exports.close || '%>'
     , filename = options.filename
     , compileDebug = options.compileDebug !== false
-    , buf = [];
+    , buf = "";
 
-  buf.push('var buf = [];');
-  if (false !== options._with) buf.push('\nwith (locals || {}) { (function(){ ');
-  buf.push('\n buf.push(\'');
+  buf += 'var buf = [];';
+  if (false !== options._with) buf += '\nwith (locals || {}) { (function(){ ';
+  buf += '\n buf.push(\'';
 
   var lineno = 1;
 
   var consumeEOL = false;
   for (var i = 0, len = str.length; i < len; ++i) {
+    var stri = str[i];
     if (str.slice(i, open.length + i) == open) {
       i += open.length
   
       var prefix, postfix, line = (compileDebug ? '__stack.lineno=' : '') + lineno;
-      switch (str.substr(i, 1)) {
+      switch (str[i]) {
         case '=':
           prefix = "', escape((" + line + ', ';
           postfix = ")), '";
@@ -1203,7 +1203,7 @@ var parse = exports.parse = function(str, options){
         var path = resolveInclude(name, filename);
         include = read(path, 'utf8');
         include = exports.parse(include, { filename: path, _with: false, open: open, close: close, compileDebug: compileDebug });
-        buf.push("' + (function(){" + include + "})() + '");
+        buf += "' + (function(){" + include + "})() + '";
         js = '';
       }
 
@@ -1211,32 +1211,33 @@ var parse = exports.parse = function(str, options){
       if (js.substr(0, 1) == ':') js = filtered(js);
       if (js) {
         if (js.lastIndexOf('//') > js.lastIndexOf('\n')) js += '\n';
-        buf.push(prefix, js, postfix);
+        buf += prefix;
+        buf += js;
+        buf += postfix;
       }
       i += end - start + close.length - 1;
 
-    } else if (str.substr(i, 1) == "\\") {
-      buf.push("\\\\");
-    } else if (str.substr(i, 1) == "'") {
-      buf.push("\\'");
-    } else if (str.substr(i, 1) == "\r") {
+    } else if (stri == "\\") {
+      buf += "\\\\";
+    } else if (stri == "'") {
+      buf += "\\'";
+    } else if (stri == "\r") {
       // ignore
-    } else if (str.substr(i, 1) == "\n") {
+    } else if (stri == "\n") {
       if (consumeEOL) {
         consumeEOL = false;
       } else {
-        buf.push("\\n");
+        buf += "\\n";
         lineno++;
       }
     } else {
-      buf.push(str.substr(i, 1));
+      buf += stri;
     }
   }
 
-  if (false !== options._with) buf.push("'); })();\n} \nreturn buf.join('');")
-  else buf.push("');\nreturn buf.join('');");
-
-  return buf.join('');
+  if (false !== options._with) buf += "'); })();\n} \nreturn buf.join('');";
+  else buf += "');\nreturn buf.join('');";
+  return buf;
 };
 
 /**
@@ -1278,7 +1279,7 @@ var compile = exports.compile = function(str, options){
   if (client) str = 'escape = escape || ' + escape.toString() + ';\n' + str;
 
   try {
-    var fn = new Function('locals, filters, escape', str);
+    var fn = new Function('locals, filters, escape, rethrow', str);
   } catch (err) {
     if ('SyntaxError' == err.name) {
       err.message += options.filename
@@ -1291,7 +1292,7 @@ var compile = exports.compile = function(str, options){
   if (client) return fn;
 
   return function(locals){
-    return fn.call(this, locals, filters, escape);
+    return fn.call(this, locals, filters, escape, rethrow);
   }
 };
 
@@ -1387,9 +1388,12 @@ exports.__express = exports.renderFile;
  */
 
 if (require.extensions) {
-  require.extensions['.ejs'] = function(module, filename) {
-    source = require('fs').readFileSync(filename, 'utf-8');
-    module._compile(compile(source, {}), filename);
+  require.extensions['.ejs'] = function (module, filename) {
+    filename = filename || module.filename;
+    var options = { filename: filename, client: true }
+      , template = fs.readFileSync(filename).toString()
+      , fn = compile(template, options);
+    module._compile('module.exports = ' + fn.toString() + ';', filename);
   };
 } else if (require.registerExtension) {
   require.registerExtension('.ejs', function(src) {
@@ -1398,7 +1402,6 @@ if (require.extensions) {
 }
 
 },{"./filters":7,"./utils":8,"fs":2,"path":3}],7:[function(require,module,exports){
-
 /*!
  * EJS - Filters
  * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
@@ -1519,9 +1522,13 @@ exports.join = function(obj, str){
  * Truncate `str` to `len`.
  */
 
-exports.truncate = function(str, len){
+exports.truncate = function(str, len, append){
   str = String(str);
-  return str.substr(0, len);
+  if (str.length > len) {
+    str = str.slice(0, len);
+    if (append) str += append;
+  }
+  return str;
 };
 
 /**
@@ -1596,6 +1603,7 @@ exports.get = function(obj, prop){
 exports.json = function(obj){
   return JSON.stringify(obj);
 };
+
 },{}],8:[function(require,module,exports){
 
 /*!
@@ -1614,12 +1622,14 @@ exports.json = function(obj){
 
 exports.escape = function(html){
   return String(html)
-    .replace(/&(?!\w+;)/g, '&amp;')
+    .replace(/&(?!#?[a-zA-Z0-9]+;)/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/'/g, '&#39;')
     .replace(/"/g, '&quot;');
 };
  
+
 },{}],9:[function(require,module,exports){
 'use strict';
 
@@ -1898,15 +1908,16 @@ var defaults = module.exports = {
 
     duration: 30,
 
-    template: '<%var items = cart.items();var settings = cart.settings();var hasItems = !!items.length;var priceFormat = { format: true, currency: cart.settings("currency_code") };var totalFormat = { format: true, showCode: true };%><form method="post" class="<% if (!hasItems) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">	<button type="button" class="minicart-closer">&times;</button>	<ul>		<% for (var i= 0, idx = i + 1, len = items.length; i < len; i++, idx++) { %>		<li class="minicart-item">			<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>			<ul class="minicart-attributes">				<% if (items[i].get("item_number")) { %>				<li>					<%= items[i].get("item_number") %>					<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />				</li>				<% } %>				<% if (items[i].discount()) { %>				<li>					<%= config.strings.discount %> <%= items[i].discount(priceFormat) %>					<input type="hidden" name="discount_amount_<%= idx %>" value="<%= items[i].discount() %>" />				</li>				<% } %>				<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>					<li>						<%= options[j].key %>: <%= options[j].value %>						<input type="hidden" name="on<%= j %>_<%= idx %>" value="<%= options[j].key %>" />						<input type="hidden" name="os<%= j %>_<%= idx %>" value="<%= options[j].value %>" />					</li>				<% } %>			</ul>			<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" type="text" pattern="[0-9]*" value="<%= items[i].get("quantity") %>" autocomplete="off" />			<button type="button" class="minicart-remove" data-minicart-idx="<%= i %>">&times;</button>			<span class="minicart-price"><%= items[i].total(priceFormat) %></span>			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].amount() %>" />		</li>		<% } %>	</ul>	<div>		<div class="minicart-subtotal">			<%= config.strings.subtotal %> <%= cart.total(totalFormat) %>		</div>		<% if (hasItems) { %>			<button class="minicart-submit" type="submit" data-minicart-alt="<%= config.strings.buttonAlt %>"><%- config.strings.button %></button>		<% } %>	</div>	<input type="hidden" name="cmd" value="_cart" />	<input type="hidden" name="upload" value="1" />	<% for (var key in settings) { %>		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />	<% } %></form>',
+    template: '<%var items = cart.items();var settings = cart.settings();var hasItems = !!items.length;var priceFormat = { format: true, currency: cart.settings("currency_code") };var totalFormat = { format: true, showCode: true };%><form method="post" class="<% if (!hasItems) { %>minicart-empty<% } %>" action="<%= config.action %>" target="<%= config.target %>">	<button type="button" class="minicart-closer">&times;</button>	<ul>		<% for (var i= 0, idx = i + 1, len = items.length; i < len; i++, idx++) { %>		<li class="minicart-item">			<a class="minicart-name" href="<%= items[i].get("href") %>"><%= items[i].get("item_name") %></a>			<ul class="minicart-attributes">				<% if (items[i].get("item_number")) { %>				<li>					<%= items[i].get("item_number") %>					<input type="hidden" name="item_number_<%= idx %>" value="<%= items[i].get("item_number") %>" />				</li>				<% } %>				<% if (items[i].discount()) { %>				<li>					<%= config.strings.discount %> <%= items[i].discount(priceFormat) %>					<input type="hidden" name="discount_amount_<%= idx %>" value="<%= items[i].discount() %>" />				</li>				<% } %>				<% for (var options = items[i].options(), j = 0, len2 = options.length; j < len2; j++) { %>					<li>						<%= options[j].key %>: <%= options[j].value %>						<input type="hidden" name="on<%= j %>_<%= idx %>" value="<%= options[j].key %>" />						<input type="hidden" name="os<%= j %>_<%= idx %>" value="<%= options[j].value %>" />					</li>				<% } %>			</ul>			<input class="minicart-quantity" data-minicart-idx="<%= i %>" name="quantity_<%= idx %>" type="text" pattern="[0-9]*" value="<%= items[i].get("quantity") %>" autocomplete="off" />			<button type="button" class="minicart-remove" data-minicart-idx="<%= i %>">&times;</button>			<span class="minicart-price"><%= items[i].total(priceFormat) %></span>			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].amount() %>" />		</li>		<% } %>	</ul>	<div>        <% if (hasItems) { %>            <div class="minicart-subtotal">                <%= config.strings.subtotal %> <%= cart.total(totalFormat) %>            </div>			<button class="minicart-submit" type="submit" data-minicart-alt="<%= config.strings.buttonAlt %>"><%- config.strings.button %></button>		<% } else { %>            <p class="minicart-empty-text"><%= config.strings.empty %></p>        <% } %>	</div>	<input type="hidden" name="cmd" value="_cart" />	<input type="hidden" name="upload" value="1" />	<% for (var key in settings) { %>		<input type="hidden" name="<%= key %>" value="<%= settings[key] %>" />	<% } %></form>',
 
-    styles: '@keyframes pop-in {	0% { opacity: 0; transform: scale(0.1); }	60% { opacity: 1; transform: scale(1.2); }	100% { transform: scale(1); }}@-webkit-keyframes pop-in {	0% { opacity: 0; -webkit-transform: scale(0.1); }	60% { opacity: 1; -webkit-transform: scale(1.2); }	100% { -webkit-transform: scale(1); }}@-moz-keyframes pop-in {	0% { opacity: 0; -moz-transform: scale(0.1); }	60% { opacity: 1; -moz-transform: scale(1.2); }	100% { -moz-transform: scale(1); }}.minicart-showing #PPMiniCart {	display: block;	transform: translateZ(0);	-webkit-transform: translateZ(0);	-moz-transform: translateZ(0);	animation: pop-in 0.25s;	-webkit-animation: pop-in 0.25s;	-moz-animation: pop-in 0.25s;}#PPMiniCart {	display: none;	position: fixed;	left: 50%;	top: 75px;}#PPMiniCart form {	position: relative;	width: 400px;	max-height: 400px;	margin-left: -200px;	padding: 10px 10px 40px;	background: #fbfbfb;	border: 1px solid #d7d7d7;	border-radius: 4px;	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);	font: 15px/normal arial, helvetica;	color: #333;}#PPMiniCart ul {	clear: right;	margin: 15px 0;	padding: 10px;	list-style-type: none;	background: #fff;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);}#PPMiniCart .minicart-empty ul {	display: none;}#PPMiniCart .minicart-closer {	float: right;	margin: -12px -10px 0;	padding: 10px;	background: 0;	border: 0;	font-size: 18px;	cursor: pointer;}#PPMiniCart .minicart-item {	position: relative;	padding: 6px 0;	min-height: 25px;}#PPMiniCart .minicart-item + .minicart-item {	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 11px;	left: 0;	width: 185px;	color: #333;	line-height: 10px;	text-decoration: none;}#PPMiniCart .minicart-attributes {	margin: 18px 0 0;	padding: 0;	border: 0;	border-radius: 0;	box-shadow: none;	color: #999;	font-size: 12px;	line-height: 22px;}#PPMiniCart .minicart-attributes li {	display: inline;}#PPMiniCart .minicart-attributes li:after {	content: ",";}#PPMiniCart .minicart-attributes li:last-child:after {	content: "";}#PPMiniCart .minicart-quantity {	position: absolute;	top: 5px;	left: 235px;	width: 30px;	height: 18px;	padding: 2px 4px;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);	font-size: 13px;	text-align: right;	transition: border linear 0.2s, box-shadow linear 0.2s;	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;}#PPMiniCart .minicart-quantity:hover {	border-color: #0078C1;}#PPMiniCart .minicart-quantity:focus {	border-color: #0078C1;	outline: 0;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 3px rgba(0, 120, 193, 0.4);}#PPMiniCart .minicart-remove {	position: absolute;	top: 7px;	left: 290px;	width: 18px;	height: 19px;	margin: 0;	padding: 0;	background: #b7b7b7;	border: 1px solid #a3a3a3;	border-radius: 3px;	color: #fff;	font-size: 13px;	opacity: 0.70;	cursor: pointer;}#PPMiniCart .minicart-remove:hover {	opacity: 1;}#PPMiniCart .minicart-price {	position: absolute;	top: 7px;	right: 0;}#PPMiniCart .minicart-subtotal {	position: absolute;	bottom: 17px;	left: 10px;	font-size: 16px;	font-weight: bold;}#PPMiniCart .minicart-submit {	position: absolute;	bottom: 10px;	right: 10px;	min-width: 153px;	height: 33px;	border: 1px solid #ffc727;	border-radius: 5px;	color: #000;	text-shadow: 1px 1px 1px #fff6e9;	cursor: pointer;	background: #ffaa00;	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZjZlOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmFhMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);	background: -moz-linear-gradient(top, #fff6e9 0%, #ffaa00 100%);	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fff6e9), color-stop(100%,#ffaa00));	background: -webkit-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: -o-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: -ms-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: linear-gradient(to bottom, #fff6e9 0%,#ffaa00 100%);}#PPMiniCart .minicart-submit img {	vertical-align: middle;	padding: 4px 0 0 2px;}',
+    styles: '@keyframes pop-in {	0% { opacity: 0; transform: scale(0.1); }	60% { opacity: 1; transform: scale(1.2); }	100% { transform: scale(1); }}@-webkit-keyframes pop-in {	0% { opacity: 0; -webkit-transform: scale(0.1); }	60% { opacity: 1; -webkit-transform: scale(1.2); }	100% { -webkit-transform: scale(1); }}@-moz-keyframes pop-in {	0% { opacity: 0; -moz-transform: scale(0.1); }	60% { opacity: 1; -moz-transform: scale(1.2); }	100% { -moz-transform: scale(1); }}.minicart-showing #PPMiniCart {	display: block;	transform: translateZ(0);	-webkit-transform: translateZ(0);	-moz-transform: translateZ(0);	animation: pop-in 0.25s;	-webkit-animation: pop-in 0.25s;	-moz-animation: pop-in 0.25s;}#PPMiniCart {	display: none;	position: fixed;	left: 50%;	top: 75px;}#PPMiniCart form {	position: relative;	width: 400px;	max-height: 400px;	margin-left: -200px;	padding: 10px 10px 40px;	background: #fbfbfb;	border: 1px solid #d7d7d7;	border-radius: 4px;	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);	font: 15px/normal arial, helvetica;	color: #333;}#PPMiniCart form.minicart-empty {    padding-bottom: 10px;    font-size: 16px;    font-weight: bold;}#PPMiniCart ul {	clear: right;	margin: 15px 0;	padding: 10px;	list-style-type: none;	background: #fff;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);}#PPMiniCart .minicart-empty ul {	display: none;}#PPMiniCart .minicart-closer {	float: right;	margin: -12px -10px 0;	padding: 10px;	background: 0;	border: 0;	font-size: 18px;	cursor: pointer;}#PPMiniCart .minicart-item {	position: relative;	padding: 6px 0;	min-height: 25px;}#PPMiniCart .minicart-item + .minicart-item {	border-top: 1px solid #f2f2f2;}#PPMiniCart .minicart-item a {	position: absolute;	top: 11px;	left: 0;	width: 185px;	color: #333;	line-height: 10px;	text-decoration: none;}#PPMiniCart .minicart-attributes {	margin: 18px 0 0;	padding: 0;	border: 0;	border-radius: 0;	box-shadow: none;	color: #999;	font-size: 12px;	line-height: 22px;}#PPMiniCart .minicart-attributes li {	display: inline;}#PPMiniCart .minicart-attributes li:after {	content: ",";}#PPMiniCart .minicart-attributes li:last-child:after {	content: "";}#PPMiniCart .minicart-quantity {	position: absolute;	top: 5px;	left: 235px;	width: 30px;	height: 18px;	padding: 2px 4px;	border: 1px solid #ccc;	border-radius: 4px;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);	font-size: 13px;	text-align: right;	transition: border linear 0.2s, box-shadow linear 0.2s;	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;}#PPMiniCart .minicart-quantity:hover {	border-color: #0078C1;}#PPMiniCart .minicart-quantity:focus {	border-color: #0078C1;	outline: 0;	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 3px rgba(0, 120, 193, 0.4);}#PPMiniCart .minicart-remove {	position: absolute;	top: 7px;	left: 290px;	width: 18px;	height: 19px;	margin: 0;	padding: 0;	background: #b7b7b7;	border: 1px solid #a3a3a3;	border-radius: 3px;	color: #fff;	font-size: 13px;	opacity: 0.70;	cursor: pointer;}#PPMiniCart .minicart-remove:hover {	opacity: 1;}#PPMiniCart .minicart-price {	position: absolute;	top: 7px;	right: 0;}#PPMiniCart .minicart-subtotal {	position: absolute;	bottom: 17px;	left: 10px;	font-size: 16px;	font-weight: bold;}#PPMiniCart .minicart-submit {	position: absolute;	bottom: 10px;	right: 10px;	min-width: 153px;	height: 33px;	border: 1px solid #ffc727;	border-radius: 5px;	color: #000;	text-shadow: 1px 1px 1px #fff6e9;	cursor: pointer;	background: #ffaa00;	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZjZlOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmFhMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);	background: -moz-linear-gradient(top, #fff6e9 0%, #ffaa00 100%);	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fff6e9), color-stop(100%,#ffaa00));	background: -webkit-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: -o-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: -ms-linear-gradient(top, #fff6e9 0%,#ffaa00 100%);	background: linear-gradient(to bottom, #fff6e9 0%,#ffaa00 100%);}#PPMiniCart .minicart-submit img {	vertical-align: middle;	padding: 4px 0 0 2px;}',
 
     strings: {
         button: 'Check Out with <img src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.1/paypal_65x18.png" width="65" height="18" alt="PayPal" />',
         subtotal: 'Subtotal:',
         discount: 'Discount:',
-        processing: 'Processing...'
+        processing: 'Processing...',
+        empty: 'Your shopping cart is empty'
     }
 
 };
