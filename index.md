@@ -66,13 +66,13 @@ Resets the minicart back to its default state.
 
 ### View
 
-`paypal.minicart.show()`  
+`paypal.minicart.view.show()`  
 Triggers the minicart to show by adding a "minicart-showing" CSS class to the document.
 
-`paypal.minicart.hide()`  
+`paypal.minicart.view.hide()`  
 Triggers the minicart to hide by removing the "minicart-showing" CSS class on the document.
 
-`paypal.minicart.toggle()`  
+`paypal.minicart.view.toggle()`  
 Toggles the visibility of the minicart.
 
 `paypal.minicart.view.bind(form)`  
