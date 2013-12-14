@@ -13,11 +13,11 @@
     <script>(function(){if(!/*@cc_on!@*/0)return;var e = "abbr,article,aside,audio,bb,canvas,datagrid,datalist,details,dialog,eventsource,figure,footer,header,hgroup,main,mark,menu,meter,nav,output,progress,section,time,video".split(',');for(var i=0;i<e.length;i++){document.createElement(e[i])}})();</script>
     <![endif]-->
 </head>
-<body>
-<div id="wrapper">
-    <header id="header"></header>
-    <section id="example">
-        <p>Try it out with the example below.</p>
+    <body>
+    <div id="wrapper">
+        <header id="header"></header>
+        <section id="example">
+            <p>Try it out with the example below.</p>
 
         <div class="container">
             <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
@@ -111,55 +111,63 @@
     <footer id="footer">Copyright &copy; Jeff Harrell. All rights reserved.</footer>
 </div>
 
-<script src="{{ site.path }}/js/lib/jquery.js"></script>
-<script src="{{ site.path }}/js/lib/jquery.scrollTo.js"></script>
-<script src="{{ site.path }}/dist/minicart.min.js"></script>
-<script>
-    // Reorder content from README
-    var $body = $(document.body),
-        $header = $('#header'),
-        $readme = $('#readme');
-
-    $readme.children().each(function () {
-        if (this.tagName === 'H2') {
-            return false;
-        } else {
-            $header.append(this);
-        }
-    });
-    
-    // I can't get Jekyll to do this properly (yet...)
-    var toc = $header.find('ol > li a').click(function (e) {
-        e.preventDefault();
-        
-        var str = $(this).text();
-        
-        $readme.find(':header').each(function () {
-           if ($(this).text() === str) {
-               $.scrollTo(this, 500);
-               return false;
-           }
+    <script src="{{ site.path }}/js/lib/jquery.js"></script>
+    <script src="{{ site.path }}/js/lib/jquery.scrollTo.js"></script>
+    <script src="{{ site.path }}/dist/minicart.min.js"></script>
+    <script>
+        // Mini Cart
+        paypal.minicart.render({
+            action: 'https://www.sandbox.paypal.com/cgi-bin/webscr'
         });
-    });
 
-    // Mini Cart
-    paypal.minicart.render({
-        action: 'https://www.sandbox.paypal.com/cgi-bin/webscr'
-    });
+        if (~window.location.search.indexOf('reset=true')) {
+            paypal.minicart.reset();
+        }
+    </script>
 
-    // Page tracking
-    var _gaq = [
-        ['_setAccount', 'UA-2544686-8'],
-        ['_trackPageview']
-    ];
+    <script>
+        // Reorder content from README
+        var $body = $(document.body),
+            $header = $('#header'),
+            $readme = $('#readme');
 
-    (function() {
-        var ga = document.createElement('script');
-        ga.type = 'text/javascript';
-        ga.async = true;
-        ga.src = 'http://www.google-analytics.com/ga.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
-    })();
-</script>
+        $readme.children().each(function () {
+            if (this.tagName === 'H2') {
+                return false;
+            } else {
+                $header.append(this);
+            }
+        });
+
+        // I can't get Jekyll to do this properly (yet...)
+        var toc = $header.find('ol > li a').click(function (e) {
+            e.preventDefault();
+
+            var str = $(this).text();
+
+            $readme.find(':header').each(function () {
+               if ($(this).text() === str) {
+                   $.scrollTo(this, 500);
+                   return false;
+               }
+            });
+        });
+    </script>
+
+    <script>
+        // Page tracking
+        var _gaq = [
+            ['_setAccount', 'UA-2544686-8'],
+            ['_trackPageview']
+        ];
+
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = 'http://www.google-analytics.com/ga.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+        })();
+    </script>
 </body>
 </html>
