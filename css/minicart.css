@@ -97,8 +97,7 @@ a:hover {
 
 #example form {
     float: left;
-    width: 21%;
-    padding: 0 10px 0 15px;
+    padding: 10px 10px 10px 15px;
 }
 
 #example form strong {
@@ -113,7 +112,8 @@ a:hover {
 
 #example fieldset {
     position: relative;
-    height: 8.5em;
+    min-width: 9em;
+    height: 9em;
     margin: 0;
     padding: 10px;
     background: #5a85ad;
@@ -141,4 +141,15 @@ a:hover {
 
 .loading * {
     display: none !important;
+}
+
+
+
+@media only screen and (max-width : 568px) {
+
+    #example .container {
+        height: 10.5em;
+        overflow: hidden;
+    }
+
 }

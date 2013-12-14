@@ -13,7 +13,7 @@
     <script>(function(){if(!/*@cc_on!@*/0)return;var e = "abbr,article,aside,audio,bb,canvas,datagrid,datalist,details,dialog,eventsource,figure,footer,header,hgroup,main,mark,menu,meter,nav,output,progress,section,time,video".split(',');for(var i=0;i<e.length;i++){document.createElement(e[i])}})();</script>
     <![endif]-->
 </head>
-<body class="loading">
+<body>
 <div id="wrapper">
     <header id="header"></header>
     <section id="example">
@@ -34,7 +34,7 @@
                     <strong>Unicorn</strong>
                     <ul>
                         <li>Price $2.00</li>
-                        <li>Discounted! $1.00</li>
+                        <li>Discounted $1.00</li>
                     </ul>
                     <input type="submit" name="submit" value="Add to cart" class="button" />
                 </fieldset>
@@ -54,7 +54,7 @@
                     <input type="hidden" name="cancel_return" value="http://www.minicartjs.com/?cancel" />
                     <strong>Rainbow</strong>
                     <ul>
-                        <li>Item Number ROYGBIV</li>
+                        <li>#ROYGBIV</li>
                         <li>Price $2.00</li>
                     </ul>
                     <input type="submit" name="submit" value="Add to cart" class="button" />
@@ -75,7 +75,6 @@
                     <ul>
                         <li>
                             <label>
-                                Type
                                 <select name="os0">
                                     <option value="Stripes">Stripes $3.00</option>
                                     <option value="Spots">Spots $4.00</option>
@@ -142,8 +141,6 @@
            }
         });
     });
-
-    $body.removeClass('loading');
 
     // Mini Cart
     paypal.minicart.render({
