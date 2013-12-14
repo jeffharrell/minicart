@@ -148,7 +148,7 @@ a:hover {
 @media only screen and (max-width : 568px) {
 
     #header, #example, #readme, #footer {
-        padding: 20px;
+        padding: 10px;
     }
 
     #example .container {
