@@ -20,7 +20,8 @@
     "url": "https://github.com/jeffharrell/minicart"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "coverage": "istanbul cover _mocha -- test/unit/*.js"
   },
   "licenses": [
     {
@@ -44,6 +45,7 @@
     "grunt-mocha-test": "~0.7.0",
     "browserify": "~2.35.0",
     "grunt-browserify": "~1.2.11",
-    "grunt-banner": "~0.2.0"
+    "grunt-banner": "~0.2.0",
+    "istanbul": "~0.2.0"
   }
 }
