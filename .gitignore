@@ -1,4 +1,5 @@
 node_modules
+coverage
 _site
 src-cov/
 .DS_Store
