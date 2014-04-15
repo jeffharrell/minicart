@@ -1007,7 +1007,8 @@ process.nextTick = (function () {
     if (canPost) {
         var queue = [];
         window.addEventListener('message', function (ev) {
-            if (ev.source === window && ev.data === 'process-tick') {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
                 ev.stopPropagation();
                 if (queue.length > 0) {
                     var fn = queue.shift();
@@ -1635,11 +1636,11 @@ exports.escape = function(html){
 
 
 var Product = require('./product'),
-	Pubsub = require('./util/pubsub'),
-	Storage = require('./util/storage'),
+    Pubsub = require('./util/pubsub'),
+    Storage = require('./util/storage'),
     constants = require('./constants'),
     currency = require('./util/currency'),
-	mixin = require('./util/mixin');
+    mixin = require('./util/mixin');
 
 
 
@@ -1653,25 +1654,25 @@ var Product = require('./product'),
 function Cart(name, duration) {
     var data, items, settings, len, i;
 
-	this._items = [];
-	this._settings = { bn: constants.BN };
+    this._items = [];
+    this._settings = { bn: constants.BN };
 
-	Pubsub.call(this);
-	Storage.call(this, name, duration);
+    Pubsub.call(this);
+    Storage.call(this, name, duration);
 
-	if ((data = this.load())) {
-		items = data.items;
-		settings = data.settings;
+    if ((data = this.load())) {
+        items = data.items;
+        settings = data.settings;
 
-		if (settings) {
-			this._settings = settings;
-		}
+        if (settings) {
+            this._settings = settings;
+        }
 
-		if (items) {
-			for (i = 0, len = items.length; i < len; i++) {
-				this.add(items[i]);
-			}
-		}
+        if (items) {
+            for (i = 0, len = items.length; i < len; i++) {
+                this.add(items[i]);
+            }
+        }
     }
 }
 
@@ -1688,49 +1689,49 @@ mixin(Cart.prototype, Storage.prototype);
  */
 Cart.prototype.add = function add(data) {
     var that = this,
-		items = this.items(),
-		idx = false,
-		isExisting = false,
+        items = this.items(),
+        idx = false,
+        isExisting = false,
         product, key, len, i;
 
-	// Prune cart settings data from the product
-	for (key in data) {
-		if (constants.SETTINGS.test(key)) {
-			this._settings[key] = data[key];
-			delete data[key];
-		}
-	}
+    // Prune cart settings data from the product
+    for (key in data) {
+        if (constants.SETTINGS.test(key)) {
+            this._settings[key] = data[key];
+            delete data[key];
+        }
+    }
 
-	// Look to see if the same product has already been added
-	for (i = 0, len = items.length; i < len; i++) {
-		if (items[i].isEqual(data)) {
-			product = items[i];
-			product.set('quantity', product.get('quantity') + (parseInt(data.quantity, 10) || 1));
-			idx = i;
-			isExisting = true;
-			break;
-		}
-	}
+    // Look to see if the same product has already been added
+    for (i = 0, len = items.length; i < len; i++) {
+        if (items[i].isEqual(data)) {
+            product = items[i];
+            product.set('quantity', product.get('quantity') + (parseInt(data.quantity, 10) || 1));
+            idx = i;
+            isExisting = true;
+            break;
+        }
+    }
 
-	// If not, then try to add it
-	if (!product) {
-		product = new Product(data);
+    // If not, then try to add it
+    if (!product) {
+        product = new Product(data);
 
-		if (product.isValid()) {
-			idx = (this._items.push(product) - 1);
+        if (product.isValid()) {
+            idx = (this._items.push(product) - 1);
 
-			product.on('change', function (key, value) {
-				that.save();
-				that.fire('change', idx, key, value);
-			});
+            product.on('change', function (key, value) {
+                that.save();
+                that.fire('change', idx, key, value);
+            });
 
-			this.save();
-		}
-	}
+            this.save();
+        }
+    }
 
-	if (product) {
-		this.fire('add', idx, product, isExisting);
-	}
+    if (product) {
+        this.fire('add', idx, product, isExisting);
+    }
 
     return idx;
 };
@@ -1754,7 +1755,7 @@ Cart.prototype.items = function get(idx) {
  * @return {array|string}
  */
 Cart.prototype.settings = function settings(name) {
-	return (name) ? this._settings[name] : this._settings;
+    return (name) ? this._settings[name] : this._settings;
 };
 
 
@@ -1765,16 +1766,16 @@ Cart.prototype.settings = function settings(name) {
  * @return {number|string}
  */
 Cart.prototype.discount = function discount(config) {
-	var result = parseFloat(this.settings('discount_amount_cart')) || 0;
+    var result = parseFloat(this.settings('discount_amount_cart')) || 0;
 
-	if (!result) {
-		result = (parseFloat(this.settings('discount_rate_cart')) || 0) * this.subtotal() / 100;
-	}
+    if (!result) {
+        result = (parseFloat(this.settings('discount_rate_cart')) || 0) * this.subtotal() / 100;
+    }
 
-	config = config || {};
-	config.currency = this.settings('currency_code');
+    config = config || {};
+    config.currency = this.settings('currency_code');
 
-	return currency(result, config);
+    return currency(result, config);
 };
 
 
@@ -1785,18 +1786,18 @@ Cart.prototype.discount = function discount(config) {
  * @return {number|string}
  */
 Cart.prototype.subtotal = function subtotal(config) {
-	var products = this.items(),
-		result = 0,
-		i, len;
+    var products = this.items(),
+        result = 0,
+        i, len;
 
-	for (i = 0, len = products.length; i < len; i++) {
-		result += products[i].total();
-	}
+    for (i = 0, len = products.length; i < len; i++) {
+        result += products[i].total();
+    }
 
-	config = config || {};
-	config.currency = this.settings('currency_code');
+    config = config || {};
+    config.currency = this.settings('currency_code');
 
-	return currency(result, config);
+    return currency(result, config);
 };
 
 
@@ -1809,13 +1810,13 @@ Cart.prototype.subtotal = function subtotal(config) {
 Cart.prototype.total = function total(config) {
     var result = 0;
 
-	result += this.subtotal();
-	result -= this.discount();
+    result += this.subtotal();
+    result -= this.discount();
 
-	config = config || {};
-	config.currency = this.settings('currency_code');
+    config = config || {};
+    config.currency = this.settings('currency_code');
 
-	return currency(result, config);
+    return currency(result, config);
 };
 
 
@@ -1828,12 +1829,12 @@ Cart.prototype.total = function total(config) {
 Cart.prototype.remove = function remove(idx) {
     var item = this._items.splice(idx, 1);
 
-	if (this._items.length === 0) {
-		this.destroy();
-	}
+    if (this._items.length === 0) {
+        this.destroy();
+    }
 
     if (item) {
-		this.save();
+        this.save();
         this.fire('remove', idx, item[0]);
     }
 
@@ -1845,19 +1846,19 @@ Cart.prototype.remove = function remove(idx) {
  * Saves the cart data.
  */
 Cart.prototype.save = function save() {
-	var items = this.items(),
-		settings = this.settings(),
-		data = [],
-		i, len;
+    var items = this.items(),
+        settings = this.settings(),
+        data = [],
+        i, len;
 
-	for (i = 0, len = items.length; i < len; i++) {
-		data.push(items[i].get());
-	}
+    for (i = 0, len = items.length; i < len; i++) {
+        data.push(items[i].get());
+    }
 
-	Storage.prototype.save.call(this, {
-		items: data,
-		settings: settings
-	});
+    Storage.prototype.save.call(this, {
+        items: data,
+        settings: settings
+    });
 };
 
 
@@ -1868,7 +1869,7 @@ Cart.prototype.save = function save() {
  * @param {object} The initiating event
  */
 Cart.prototype.checkout = function checkout(evt) {
-	this.fire('checkout', evt);
+    this.fire('checkout', evt);
 };
 
 
@@ -1876,10 +1877,10 @@ Cart.prototype.checkout = function checkout(evt) {
  * Destroy the cart data. This fires a "destroy" event.
  */
 Cart.prototype.destroy = function destroy() {
-	Storage.prototype.destroy.call(this);
+    Storage.prototype.destroy.call(this);
 
     this._items = [];
-	this._settings = { bn: constants.BN };
+    this._settings = { bn: constants.BN };
 
     this.fire('destroy');
 };
@@ -1943,25 +1944,25 @@ module.exports = {
 
     SETTINGS: /^(?:business|currency_code|lc|paymentaction|no_shipping|cn|no_note|invoice|handling_cart|weight_cart|weight_unit|tax_cart|discount_amount_cart|discount_rate_cart|page_style|image_url|cpp_|cs|cbt|return|cancel_return|notify_url|rm|custom|charset)/,
 
-	BN: 'MiniCart_AddToCart_WPS_US',
+    BN: 'MiniCart_AddToCart_WPS_US',
 
-	KEYUP_TIMEOUT: 500,
+    KEYUP_TIMEOUT: 500,
 
-	SHOWING_CLASS: 'minicart-showing',
+    SHOWING_CLASS: 'minicart-showing',
 
-	REMOVE_CLASS: 'minicart-remove',
+    REMOVE_CLASS: 'minicart-remove',
 
-	CLOSER_CLASS: 'minicart-closer',
+    CLOSER_CLASS: 'minicart-closer',
 
-	QUANTITY_CLASS: 'minicart-quantity',
+    QUANTITY_CLASS: 'minicart-quantity',
 
-	ITEM_CLASS: 'minicart-item',
+    ITEM_CLASS: 'minicart-item',
 
-	ITEM_CHANGED_CLASS: 'minicart-item-changed',
+    ITEM_CHANGED_CLASS: 'minicart-item-changed',
 
-	SUBMIT_CLASS: 'minicart-submit',
+    SUBMIT_CLASS: 'minicart-submit',
 
-	DATA_IDX: 'data-minicart-idx'
+    DATA_IDX: 'data-minicart-idx'
 
 };
 
@@ -1970,12 +1971,12 @@ module.exports = {
 
 
 var Cart = require('./cart'),
-	View = require('./view'),
+    View = require('./view'),
     config = require('./config'),
     minicart = {},
-	cartModel,
-	confModel,
-	viewModel;
+    cartModel,
+    confModel,
+    viewModel;
 
 
 /**
@@ -1984,17 +1985,17 @@ var Cart = require('./cart'),
  * @param {object} userConfig Configuration overrides
  */
 minicart.render = function (userConfig) {
-	confModel = minicart.config = config.load(userConfig);
-	cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
-	viewModel = minicart.view = new View({
-		config: confModel,
-		cart: cartModel
-	});
+    confModel = minicart.config = config.load(userConfig);
+    cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
+    viewModel = minicart.view = new View({
+        config: confModel,
+        cart: cartModel
+    });
 
-	cartModel.on('add', viewModel.addItem, viewModel);
-	cartModel.on('change', viewModel.changeItem, viewModel);
-	cartModel.on('remove', viewModel.removeItem, viewModel);
-	cartModel.on('destroy', viewModel.hide, viewModel);
+    cartModel.on('add', viewModel.addItem, viewModel);
+    cartModel.on('change', viewModel.changeItem, viewModel);
+    cartModel.on('remove', viewModel.removeItem, viewModel);
+    cartModel.on('destroy', viewModel.hide, viewModel);
 };
 
 
@@ -2004,8 +2005,8 @@ minicart.render = function (userConfig) {
 minicart.reset = function () {
     cartModel.destroy();
 
-	viewModel.hide();
-	viewModel.redraw();
+    viewModel.hide();
+    viewModel.redraw();
 };
 
 
@@ -2013,13 +2014,13 @@ minicart.reset = function () {
 
 // Export to either node or the brower window
 if (typeof window === 'undefined') {
-	module.exports = minicart;
+    module.exports = minicart;
 } else {
-	if (!window.paypal) {
-		window.paypal = {};
-	}
+    if (!window.paypal) {
+        window.paypal = {};
+    }
 
-	window.paypal.minicart = minicart;
+    window.paypal.minicart = minicart;
 }
 
 },{"./cart":9,"./config":10,"./view":22}],13:[function(require,module,exports){
@@ -2027,30 +2028,30 @@ if (typeof window === 'undefined') {
 
 
 var currency = require('./util/currency'),
-	Pubsub = require('./util/pubsub'),
-	mixin = require('./util/mixin');
+    Pubsub = require('./util/pubsub'),
+    mixin = require('./util/mixin');
 
 
 var parser = {
-	quantity: function (value) {
-		value = parseInt(value, 10);
+    quantity: function (value) {
+        value = parseInt(value, 10);
 
-		if (isNaN(value) || !value) {
-			value = 1;
-		}
+        if (isNaN(value) || !value) {
+            value = 1;
+        }
 
-		return value;
-	},
-	amount: function (value) {
-		return parseFloat(value) || 0;
-	},
-	href: function (value) {
-		if (value) {
-			return value;
-		} else {
-			return (typeof window !== 'undefined') ? window.location.href : null;
-		}
-	}
+        return value;
+    },
+    amount: function (value) {
+        return parseFloat(value) || 0;
+    },
+    href: function (value) {
+        if (value) {
+            return value;
+        } else {
+            return (typeof window !== 'undefined') ? window.location.href : null;
+        }
+    }
 };
 
 
@@ -2061,17 +2062,17 @@ var parser = {
  * @param {object} data Item data
  */
 function Product(data) {
-	data.quantity = parser.quantity(data.quantity);
-	data.amount = parser.amount(data.amount);
-	data.href = parser.href(data.href);
+    data.quantity = parser.quantity(data.quantity);
+    data.amount = parser.amount(data.amount);
+    data.href = parser.href(data.href);
 
     this._data = data;
-	this._options = null;
-	this._discount = null;
-	this._amount = null;
-	this._total = null;
+    this._options = null;
+    this._discount = null;
+    this._amount = null;
+    this._total = null;
 
-	Pubsub.call(this);
+    Pubsub.call(this);
 }
 
 
@@ -2097,13 +2098,13 @@ Product.prototype.get = function get(key) {
  * @param {string} value
  */
 Product.prototype.set = function set(key, value) {
-	var setter = parser[key];
+    var setter = parser[key];
 
-	this._data[key] = setter ? setter(value) : value;
-	this._options = null;
-	this._discount = null;
-	this._amount = null;
-	this._total = null;
+    this._data[key] = setter ? setter(value) : value;
+    this._options = null;
+    this._discount = null;
+    this._amount = null;
+    this._total = null;
 
     this.fire('change', key);
 };
@@ -2115,39 +2116,39 @@ Product.prototype.set = function set(key, value) {
  * @return {object}
  */
 Product.prototype.options = function options() {
-	var result, key, value, amount, i, j;
+    var result, key, value, amount, i, j;
 
-	if (!this._options) {
-		result = [];
-		i = 0;
+    if (!this._options) {
+        result = [];
+        i = 0;
 
-		while ((key = this.get('on' + i))) {
-			value = this.get('os' + i);
-			amount = 0;
-			j = 0;
+        while ((key = this.get('on' + i))) {
+            value = this.get('os' + i);
+            amount = 0;
+            j = 0;
 
-			while (typeof this.get('option_select' + j) !== 'undefined') {
-				if (this.get('option_select' + j) === value) {
-					amount = parser.amount(this.get('option_amount' + j));
-					break;
-				}
+            while (typeof this.get('option_select' + j) !== 'undefined') {
+                if (this.get('option_select' + j) === value) {
+                    amount = parser.amount(this.get('option_amount' + j));
+                    break;
+                }
 
-				j++;
-			}
+                j++;
+            }
 
-			result.push({
-				key: key,
-				value: value,
-				amount: amount
-			});
+            result.push({
+                key: key,
+                value: value,
+                amount: amount
+            });
 
-			i++;
-		}
+            i++;
+        }
 
-		this._options = result;
-	}
+        this._options = result;
+    }
 
-	return this._options;
+    return this._options;
 };
 
 
@@ -2158,27 +2159,30 @@ Product.prototype.options = function options() {
  * @return {number|string}
  */
 Product.prototype.discount = function discount(config) {
-	var flat, rate, num, limit, result, amount;
+    var flat, rate, num, limit, result, amount;
 
-	if (!this._discount) {
-		result = 0;
-		num = parseInt(this.get('discount_num'), 10) || 0;
-		limit = Math.max(num, this.get('quantity') - 1);
+    if (!this._discount) {
+        result = 0;
+        num = parseInt(this.get('discount_num'), 10) || 0;
+        limit = Math.max(num, this.get('quantity') - 1);
 
-		if ((flat = parser.amount(this.get('discount_amount')))) {
-			result += flat;
-			result += parser.amount(this.get('discount_amount2') || flat) * limit;
-		} else if ((rate = parser.amount(this.get('discount_rate')))) {
-			amount = this.amount();
+        if (this.get('discount_amount') !== undefined) {
+            flat = parser.amount(this.get('discount_amount'));
+            result += flat;
+            result += parser.amount(this.get('discount_amount2') || flat) * limit;
+        } else if (this.get('discount_rate') !== undefined) {
+            rate = parser.amount(this.get('discount_rate'));
+            amount = this.amount();
 
-			result += rate * amount / 100;
-			result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
-		}
+            result += rate * amount / 100;
+            result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+            console.log('result', result, rate, amount, limit);
+        }
 
-		this._discount = result;
-	}
+        this._discount = result;
+    }
 
-	return currency(this._discount, config);
+    return currency(this._discount, config);
 };
 
 
@@ -2189,20 +2193,20 @@ Product.prototype.discount = function discount(config) {
  * @return {number|string}
  */
 Product.prototype.amount = function amount(config) {
-	var result, options, len, i;
+    var result, options, len, i;
 
-	if (!this._amount) {
-		result = this.get('amount');
-		options = this.options();
+    if (!this._amount) {
+        result = this.get('amount');
+        options = this.options();
 
-		for (i = 0, len = options.length; i < len; i++) {
-			result += options[i].amount;
-		}
+        for (i = 0, len = options.length; i < len; i++) {
+            result += options[i].amount;
+        }
 
-		this._amount = result;
-	}
+        this._amount = result;
+    }
 
-	return currency(this._amount, config);
+    return currency(this._amount, config);
 };
 
 
@@ -2213,16 +2217,16 @@ Product.prototype.amount = function amount(config) {
  * @return {number|string}
  */
 Product.prototype.total = function total(config) {
-	var result;
+    var result;
 
-	if (!this._total) {
-		result  = this.get('quantity') * this.amount();
-		result -= this.discount();
+    if (!this._total) {
+        result  = this.get('quantity') * this.amount();
+        result -= this.discount();
 
-		this._total = parser.amount(result);
-	}
+        this._total = parser.amount(result);
+    }
 
-	return currency(this._total, config);
+    return currency(this._total, config);
 };
 
 
@@ -2233,32 +2237,32 @@ Product.prototype.total = function total(config) {
  * @return {boolean}
  */
 Product.prototype.isEqual = function isEqual(data) {
-	var match = false;
+    var match = false;
 
-	if (data instanceof Product) {
-		data = data._data;
-	}
+    if (data instanceof Product) {
+        data = data._data;
+    }
 
-	if (this.get('item_name') === data.item_name) {
-		if (this.get('item_number') === data.item_number) {
-			if (this.get('amount') === parser.amount(data.amount)) {
-				var i = 0;
+    if (this.get('item_name') === data.item_name) {
+        if (this.get('item_number') === data.item_number) {
+            if (this.get('amount') === parser.amount(data.amount)) {
+                var i = 0;
 
-				match = true;
+                match = true;
 
-				while (typeof data['os' + i] !== 'undefined') {
-					if (this.get('os' + i) !== data['os' + i]) {
-						match = false;
-						break;
-					}
+                while (typeof data['os' + i] !== 'undefined') {
+                    if (this.get('os' + i) !== data['os' + i]) {
+                        match = false;
+                        break;
+                    }
 
-					i++;
-				}
-			}
-		}
-	}
+                    i++;
+                }
+            }
+        }
+    }
 
-	return match;
+    return match;
 };
 
 
@@ -2268,7 +2272,7 @@ Product.prototype.isEqual = function isEqual(data) {
  * @return {boolean}
  */
 Product.prototype.isValid = function isValid() {
-	return (this.get('item_name') && this.amount() > 0);
+    return (this.get('item_name') && this.amount() > 0);
 };
 
 
@@ -2294,56 +2298,56 @@ module.exports = Product;
 
 
 module.exports.add = function add(el, str) {
-	var re;
+    var re;
 
-	if (!el) { return false; }
+    if (!el) { return false; }
 
-	if (el && el.classList && el.classList.add) {
-		el.classList.add(str);
-	} else {
-		re = new RegExp("\\b" + str + "\\b");
+    if (el && el.classList && el.classList.add) {
+        el.classList.add(str);
+    } else {
+        re = new RegExp("\\b" + str + "\\b");
 
-		if (!re.test(el.className)) {
-			el.className += " " + str;
-		}
-	}
+        if (!re.test(el.className)) {
+            el.className += " " + str;
+        }
+    }
 };
 
 
 module.exports.remove = function remove(el, str) {
-	var re;
+    var re;
 
-	if (!el) { return false; }
+    if (!el) { return false; }
 
-	if (el.classList && el.classList.add) {
-		el.classList.remove(str);
-	} else {
-		re = new RegExp("\\b" + str + "\\b");
+    if (el.classList && el.classList.add) {
+        el.classList.remove(str);
+    } else {
+        re = new RegExp("\\b" + str + "\\b");
 
-		if (re.test(el.className)) {
-			el.className = el.className.replace(re, "");
-		}
-	}
+        if (re.test(el.className)) {
+            el.className = el.className.replace(re, "");
+        }
+    }
 };
 
 
 module.exports.inject = function inject(el, str) {
-	var style;
+    var style;
 
-	if (!el) { return false; }
+    if (!el) { return false; }
 
-	if (str) {
-		style = document.createElement("style");
-		style.type = "text/css";
+    if (str) {
+        style = document.createElement("style");
+        style.type = "text/css";
 
-		if (style.styleSheet) {
-			style.styleSheet.cssText = str;
-		} else {
-			style.appendChild(document.createTextNode(str));
-		}
+        if (style.styleSheet) {
+            style.styleSheet.cssText = str;
+        } else {
+            style.appendChild(document.createTextNode(str));
+        }
 
-		el.appendChild(style);
-	}
+        el.appendChild(style);
+    }
 };
 
 },{}],15:[function(require,module,exports){
@@ -2417,20 +2421,20 @@ var currencies = {
 
 module.exports = function currency(amount, config) {
     var code = config && config.currency || 'USD',
-		value = currencies[code],
+        value = currencies[code],
         before = value.before || '',
         after = value.after || '',
         length = value.length || 2,
         showCode = value.code && config && config.showCode,
-		result = amount;
+        result = amount;
 
-	if (config && config.format) {
-		result = before + result.toFixed(length) + after;
-	}
+    if (config && config.format) {
+        result = before + result.toFixed(length) + after;
+    }
 
-	if (showCode) {
-		result += ' ' + code;
-	}
+    if (showCode) {
+        result += ' ' + code;
+    }
 
     return result;
 };
@@ -2602,23 +2606,23 @@ var forms = module.exports = {
 
 
 var mixin = module.exports = function mixin(dest, source) {
-	var value;
+    var value;
 
-	for (var key in source) {
-		value = source[key];
+    for (var key in source) {
+        value = source[key];
 
-		if (value && value.constructor === Object) {
-			if (!dest[key]) {
-				dest[key] = value;
-			} else {
-				mixin(dest[key] || {}, value);
-			}
-		} else {
-			dest[key] = value;
-		}
-	}
+        if (value && value.constructor === Object) {
+            if (!dest[key]) {
+                dest[key] = value;
+            } else {
+                mixin(dest[key] || {}, value);
+            }
+        } else {
+            dest[key] = value;
+        }
+    }
 
-	return dest;
+    return dest;
 };
 
 },{}],19:[function(require,module,exports){
@@ -2626,48 +2630,48 @@ var mixin = module.exports = function mixin(dest, source) {
 
 
 function Pubsub() {
-	this._eventCache = {};
+    this._eventCache = {};
 }
 
 
 Pubsub.prototype.on = function on(name, fn, scope) {
-	var cache = this._eventCache[name];
+    var cache = this._eventCache[name];
 
-	if (!cache) {
-		cache = this._eventCache[name] = [];
-	}
+    if (!cache) {
+        cache = this._eventCache[name] = [];
+    }
 
-	cache.push([fn, scope]);
+    cache.push([fn, scope]);
 };
 
 
 Pubsub.prototype.off = function off(name, fn) {
-	var cache = this._eventCache[name],
-		i, len;
+    var cache = this._eventCache[name],
+        i, len;
 
-	if (cache) {
-		for (i = 0, len = cache.length; i < len; i++) {
-			if (cache[i] === fn) {
-				cache = cache.splice(i, 1);
-			}
-		}
-	}
+    if (cache) {
+        for (i = 0, len = cache.length; i < len; i++) {
+            if (cache[i] === fn) {
+                cache = cache.splice(i, 1);
+            }
+        }
+    }
 };
 
 
 Pubsub.prototype.fire = function on(name) {
-	var cache = this._eventCache[name], i, len, fn, scope;
+    var cache = this._eventCache[name], i, len, fn, scope;
 
-	if (cache) {
-		for (i = 0, len = cache.length; i < len; i++) {
-			fn = cache[i][0];
-			scope = cache[i][1] || this;
+    if (cache) {
+        for (i = 0, len = cache.length; i < len; i++) {
+            fn = cache[i][0];
+            scope = cache[i][1] || this;
 
-			if (typeof fn === 'function') {
-				fn.apply(scope, Array.prototype.slice.call(arguments, 1));
-			}
-		}
-	}
+            if (typeof fn === 'function') {
+                fn.apply(scope, Array.prototype.slice.call(arguments, 1));
+            }
+        }
+    }
 };
 
 
@@ -2679,64 +2683,64 @@ module.exports = Pubsub;
 
 (function (window, document) {
 
-	var Storage = module.exports = function Storage(name, duration) {
-		this._name = name;
-		this._duration = duration || 30;
-	};
+    var Storage = module.exports = function Storage(name, duration) {
+        this._name = name;
+        this._duration = duration || 30;
+    };
 
 
-	var proto = Storage.prototype;
+    var proto = Storage.prototype;
 
 
-	// HTML5
-	if (window && window.localStorage) {
-		proto.load = function () {
-			var data = localStorage.getItem(this._name),
-				today,
-				expires;
+    // HTML5
+    if (window && window.localStorage) {
+        proto.load = function () {
+            var data = localStorage.getItem(this._name),
+                today,
+                expires;
 
-			if (data) {
-				data = JSON.parse(decodeURIComponent(data));
-			}
+            if (data) {
+                data = JSON.parse(decodeURIComponent(data));
+            }
 
-			if (data && data.expires) {
-				today = new Date();
-				expires = new Date(data.expires);
+            if (data && data.expires) {
+                today = new Date();
+                expires = new Date(data.expires);
 
-				if (today > expires) {
-					this.remove();
-					return;
-				}
-			}
+                if (today > expires) {
+                    this.remove();
+                    return;
+                }
+            }
 
-			return data && data.value;
-		};
+            return data && data.value;
+        };
 
-		proto.save = function (data) {
-			var expires = new Date(),
-				wrapped;
+        proto.save = function (data) {
+            var expires = new Date(),
+                wrapped;
 
-			expires.setTime(expires.getTime() + this._duration * 24 * 60 * 60 * 1000);
+            expires.setTime(expires.getTime() + this._duration * 24 * 60 * 60 * 1000);
 
-			wrapped = {
-				value: data,
-				expires: expires.toGMTString()
-			};
+            wrapped = {
+                value: data,
+                expires: expires.toGMTString()
+            };
 
-			localStorage.setItem(this._name, encodeURIComponent(JSON.stringify(wrapped)));
-		};
+            localStorage.setItem(this._name, encodeURIComponent(JSON.stringify(wrapped)));
+        };
 
-		proto.destroy = function () {
-			localStorage.removeItem(this._name);
-		};
+        proto.destroy = function () {
+            localStorage.removeItem(this._name);
+        };
 
-	// Non-HTML5 compatible
-	} else {
-		proto.load = function () {};
-		proto.save = function () {};
-		proto.destroy = function () {};
+    // Non-HTML5 compatible
+    } else {
+        proto.load = function () {};
+        proto.save = function () {};
+        proto.destroy = function () {};
 
-	}
+    }
 
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
 
@@ -2755,9 +2759,9 @@ module.exports = function template(str, data) {
 
 // Workaround for IE 8's lack of support
 if (!String.prototype.trim) {
-	String.prototype.trim = function () {
-		return this.replace(/^\s+|\s+$/g, '');
-	};
+    String.prototype.trim = function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    };
 }
 
 },{"ejs":6}],22:[function(require,module,exports){
@@ -2765,12 +2769,12 @@ if (!String.prototype.trim) {
 
 
 var config = require('./config'),
-	events = require('./util/events'),
-	template = require('./util/template'),
-	forms = require('./util/forms'),
-	css = require('./util/css'),
-	viewevents = require('./viewevents'),
-	constants = require('./constants');
+    events = require('./util/events'),
+    template = require('./util/template'),
+    forms = require('./util/forms'),
+    css = require('./util/css'),
+    viewevents = require('./viewevents'),
+    constants = require('./constants');
 
 
 
@@ -2781,24 +2785,24 @@ var config = require('./config'),
  * @param {object} model
  */
 function View(model) {
-	var wrapper;
+    var wrapper;
 
-	this.el = wrapper = document.createElement('div');
-	this.model = model;
-	this.isShowing = false;
+    this.el = wrapper = document.createElement('div');
+    this.model = model;
+    this.isShowing = false;
 
-	// HTML
-	wrapper.id = config.name;
-	config.parent.appendChild(wrapper);
+    // HTML
+    wrapper.id = config.name;
+    config.parent.appendChild(wrapper);
 
-	// CSS
-	css.inject(document.getElementsByTagName('head')[0], config.styles);
+    // CSS
+    css.inject(document.getElementsByTagName('head')[0], config.styles);
 
-	// JavaScript
-	events.add(document, ('ontouchstart' in window) ? 'touchstart' : 'click', viewevents.click, this);
-	events.add(document, 'keyup', viewevents.keyup, this);
-	events.add(document, 'readystatechange', viewevents.readystatechange, this);
-	events.add(window, 'pageshow', viewevents.pageshow, this);
+    // JavaScript
+    events.add(document, ('ontouchstart' in window) ? 'touchstart' : 'click', viewevents.click, this);
+    events.add(document, 'keyup', viewevents.keyup, this);
+    events.add(document, 'readystatechange', viewevents.readystatechange, this);
+    events.add(window, 'pageshow', viewevents.pageshow, this);
 }
 
 
@@ -2806,7 +2810,7 @@ function View(model) {
  * Tells the view to redraw
  */
 View.prototype.redraw = function redraw() {
-	this.el.innerHTML = template(config.template, this.model);
+    this.el.innerHTML = template(config.template, this.model);
 };
 
 
@@ -2814,10 +2818,10 @@ View.prototype.redraw = function redraw() {
  * Tells the view to show
  */
 View.prototype.show = function show() {
-	if (!this.isShowing) {
-		css.add(document.body, constants.SHOWING_CLASS);
-		this.isShowing = true;
-	}
+    if (!this.isShowing) {
+        css.add(document.body, constants.SHOWING_CLASS);
+        this.isShowing = true;
+    }
 };
 
 
@@ -2825,10 +2829,10 @@ View.prototype.show = function show() {
  * Tells the view to hide
  */
 View.prototype.hide = function hide() {
-	if (this.isShowing) {
-		css.remove(document.body, constants.SHOWING_CLASS);
-		this.isShowing = false;
-	}
+    if (this.isShowing) {
+        css.remove(document.body, constants.SHOWING_CLASS);
+        this.isShowing = false;
+    }
 };
 
 
@@ -2836,7 +2840,7 @@ View.prototype.hide = function hide() {
  * Toggles the visibility of the view
  */
 View.prototype.toggle = function toggle() {
-	this[this.isShowing ? 'hide' : 'show']();
+    this[this.isShowing ? 'hide' : 'show']();
 };
 
 
@@ -2847,25 +2851,25 @@ View.prototype.toggle = function toggle() {
  * @return {booealn}
  */
 View.prototype.bind = function bind(form) {
-	var that = this;
+    var that = this;
 
-	if (!constants.COMMANDS[form.cmd.value]) {
-		return false;
-	}
+    if (!constants.COMMANDS[form.cmd.value]) {
+        return false;
+    }
 
-	if (form.display) {
-		events.add(form, 'submit', function (e) {
-			e.preventDefault();
-			that.show();
-		});
-	} else {
-		events.add(form, 'submit', function (e) {
-			e.preventDefault(e);
-			that.model.cart.add(forms.parse(form));
-		});
-	}
+    if (form.display) {
+        events.add(form, 'submit', function (e) {
+            e.preventDefault();
+            that.show();
+        });
+    } else {
+        events.add(form, 'submit', function (e) {
+            e.preventDefault(e);
+            that.model.cart.add(forms.parse(form));
+        });
+    }
 
-	return true;
+    return true;
 };
 
 
@@ -2876,11 +2880,11 @@ View.prototype.bind = function bind(form) {
  * @param {object} data
  */
 View.prototype.addItem = function addItem(idx, data) {
-	this.redraw();
-	this.show();
+    this.redraw();
+    this.show();
 
-	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
-	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
+    var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+    css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
 
@@ -2891,11 +2895,11 @@ View.prototype.addItem = function addItem(idx, data) {
  * @param {object} data
  */
 View.prototype.changeItem = function changeItem(idx, data) {
-	this.redraw();
-	this.show();
+    this.redraw();
+    this.show();
 
-	var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
-	css.add(els[idx], constants.ITEM_CHANGED_CLASS);
+    var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+    css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
 
@@ -2905,7 +2909,7 @@ View.prototype.changeItem = function changeItem(idx, data) {
  * @param {number} idx
  */
 View.prototype.removeItem = function removeItem(idx) {
-	this.redraw();
+    this.redraw();
 };
 
 
@@ -2918,102 +2922,99 @@ module.exports = View;
 
 
 var constants = require('./constants'),
-	events = require('./util/events');
+    events = require('./util/events'),
+    viewevents;
 
 
+module.exports = viewevents = {
+
+    click: function (evt) {
+        var target = evt.target,
+            className = target.className;
+
+        if (this.isShowing) {
+            // Cart checkout button
+            if (className === constants.SUBMIT_CLASS) {
+                this.model.cart.checkout(evt);
+            // Cart close button
+            } else if (className === constants.CLOSER_CLASS) {
+                this.hide();
+            // Product remove button
+            } else if (className === constants.REMOVE_CLASS) {
+                this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
+            // Product quantity input
+            } else if (className === constants.QUANTITY_CLASS) {
+                target[target.setSelectionRange ? 'setSelectionRange' : 'select'](0, 999);
+            // Outside the cart
+            } else if (!(/input|button|select|option/i.test(target.tagName))) {
+                while (target.nodeType === 1) {
+                    if (target === this.el) {
+                        return;
+                    }
+
+                    target = target.parentNode;
+                }
+
+                this.hide();
+            }
+        }
+    },
 
 
+    keyup: function (evt) {
+        var that = this,
+            target = evt.target,
+            timer;
+
+        if (target.className === constants.QUANTITY_CLASS) {
+            timer = setTimeout(function () {
+                var idx = parseInt(target.getAttribute(constants.DATA_IDX), 10),
+                    cart = that.model.cart,
+                    product = cart.items(idx),
+                    quantity = parseInt(target.value, 10);
+
+                if (product) {
+                    if (quantity > 0) {
+                        product.set('quantity', quantity);
+                    } else if (quantity === 0) {
+                        cart.remove(idx);
+                    }
+                }
+            }, constants.KEYUP_TIMEOUT);
+        }
+    },
 
 
-var viewevents = module.exports = {
+    readystatechange: function () {
+        if (/interactive|complete/.test(document.readyState)) {
+            var forms, form, i, len;
 
-	click: function (evt) {
-		var target = evt.target,
-			className = target.className;
+            // Bind to page's forms
+            forms = document.getElementsByTagName('form');
 
-		if (this.isShowing) {
-			// Cart checkout button
-			if (className === constants.SUBMIT_CLASS) {
-				this.model.cart.checkout(evt);
-			// Cart close button
-			} else if (className === constants.CLOSER_CLASS) {
-				this.hide();
-			// Product remove button
-			} else if (className === constants.REMOVE_CLASS) {
-				this.model.cart.remove(target.getAttribute(constants.DATA_IDX));
-			// Product quantity input
-			} else if (className === constants.QUANTITY_CLASS) {
-				target[target.setSelectionRange ? 'setSelectionRange' : 'select'](0, 999);
-			// Outside the cart
-			} else if (!(/input|button|select|option/i.test(target.tagName))) {
-				while (target.nodeType === 1) {
-					if (target === this.el) {
-						return;
-					}
+            for (i = 0, len = forms.length; i < len; i++) {
+                form = forms[i];
 
-					target = target.parentNode;
-				}
+                if (form.cmd && constants.COMMANDS[form.cmd.value]) {
+                    this.bind(form);
+                }
+            }
 
-				this.hide();
-			}
-		}
-	},
+            // Do the initial render when the buttons are ready
+            this.redraw();
+
+            // Only run this once
+            events.remove(document, 'readystatechange', viewevents.readystatechange);
+        }
+    },
 
 
-	keyup: function (evt) {
-		var that = this,
-			target = evt.target,
-			timer;
-
-		if (target.className === constants.QUANTITY_CLASS) {
-			timer = setTimeout(function () {
-				var idx = parseInt(target.getAttribute(constants.DATA_IDX), 10),
-					cart = that.model.cart,
-					product = cart.items(idx),
-					quantity = parseInt(target.value, 10);
-
-				if (product) {
-					if (quantity > 0) {
-						product.set('quantity', quantity);
-					} else if (quantity === 0) {
-						cart.remove(idx);
-					}
-				}
-			}, constants.KEYUP_TIMEOUT);
-		}
-	},
-
-
-	readystatechange: function () {
-		if (/interactive|complete/.test(document.readyState)) {
-			var forms, form, i, len;
-
-			// Bind to page's forms
-			forms = document.getElementsByTagName('form');
-
-			for (i = 0, len = forms.length; i < len; i++) {
-				form = forms[i];
-
-				if (form.cmd && constants.COMMANDS[form.cmd.value]) {
-					this.bind(form);
-				}
-			}
-
-			// Do the initial render when the buttons are ready
-			this.redraw();
-
-			// Only run this once
-			events.remove(document, 'readystatechange', viewevents.readystatechange);
-		}
-	},
-
-
-	pageshow: function (evt) {
-		if (evt.persisted) {
-			this.redraw();
-			this.hide();
-		}
-	}
+    pageshow: function (evt) {
+        if (evt.persisted) {
+            this.redraw();
+            this.hide();
+        }
+    }
 
 };
 

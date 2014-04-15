@@ -134,6 +134,24 @@ describe('Product Model', function () {
     });
 
 
+    it('flat rate discounts apply when the first is zero', function () {
+        item.set('discount_amount', 0);
+        item.set('discount_amount2', 1.00);
+        item.set('quantity', 3);
+
+        assert.strictEqual(item.discount(), 2.00);
+    });
+
+
+    it('percentage discounts apply when the first is zero', function () {
+        item.set('discount_rate', 0);
+        item.set('discount_rate2', 50);
+        item.set('quantity', 4);
+
+        assert.strictEqual(item.discount(), 1.845);
+    });
+
+
     it('amount() returns an individual product amount', function () {
         assert.strictEqual(item.amount(), 1.23);
 
@@ -159,7 +177,6 @@ describe('Product Model', function () {
 
         item.set('quantity', 2);
         assert.strictEqual(item.total(), 2.46);
-
     });
 
 

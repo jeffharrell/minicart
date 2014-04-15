@@ -140,14 +140,17 @@ Product.prototype.discount = function discount(config) {
         num = parseInt(this.get('discount_num'), 10) || 0;
         limit = Math.max(num, this.get('quantity') - 1);
 
-        if ((flat = parser.amount(this.get('discount_amount')))) {
+        if (this.get('discount_amount') !== undefined) {
+            flat = parser.amount(this.get('discount_amount'));
             result += flat;
             result += parser.amount(this.get('discount_amount2') || flat) * limit;
-        } else if ((rate = parser.amount(this.get('discount_rate')))) {
+        } else if (this.get('discount_rate') !== undefined) {
+            rate = parser.amount(this.get('discount_rate'));
             amount = this.amount();
 
             result += rate * amount / 100;
             result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+            console.log('result', result, rate, amount, limit);
         }
 
         this._discount = result;
