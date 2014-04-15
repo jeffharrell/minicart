@@ -37,6 +37,8 @@ var totalFormat = { format: true, showCode: true };
 			<span class="minicart-price"><%= items[i].total(priceFormat) %></span>
 			<input type="hidden" name="item_name_<%= idx %>" value="<%= items[i].get("item_name") %>" />
 			<input type="hidden" name="amount_<%= idx %>" value="<%= items[i].amount() %>" />
+            <input type="hidden" name="shipping_<%= idx %>" value="<%= items[i].get("shipping") %>" />
+            <input type="hidden" name="shipping2_<%= idx %>" value="<%= items[i].get("shipping2") %>" />
 		</li>
 		<% } %>
 	</ul>

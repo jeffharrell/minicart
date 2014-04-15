@@ -11,7 +11,8 @@ var cartData = [
     { item_name: 'Test item 3', amount: 3, item_number: '123ABC' },
     { item_name: 'Test item 4', amount: 100.00, discount_amount: 99.00 },
     { item_name: 'Test item 5', amount: 0.00, on0: 'Size', os0: 'Large', option_select0: 'Large', option_amount0: 50.00 },
-    { item_name: 'Test item 6', amount: 1.00, discount_amount: 0.50, currency_code: 'EUR' }
+    { item_name: 'Test item 6', amount: 1.00, discount_amount: 0.50, currency_code: 'EUR' },
+    { item_name: 'Test item 7', amount: 3.00, quantity: 2, shipping: 1, shipping2: 2 }
 ];
 
 
@@ -439,6 +440,19 @@ describe('View', function () {
         minicart.cart.add(mockData[5]);
 
         assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: €0.50');
+    });
+
+
+    it('should have shipping data', function () {
+        var cart, form;
+
+        minicart.cart.add(mockData[6]);
+
+        cart = document.getElementById(config.name);
+        form = cart.getElementsByTagName('form')[0];
+
+        assert(form.elements.shipping_1.value === '1');
+        assert(form.elements.shipping2_1.value === '2');
     });
 
 
