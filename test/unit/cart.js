@@ -10,20 +10,20 @@ describe('Cart Model', function () {
     var cart;
 
     beforeEach(function () {
-		var data, items, settings, i, len;
+        var data, items, settings, i, len;
 
         cart = new Cart();
 
-		if ((data = JSON.parse(JSON.stringify(cartData)))) {
-			items = data.items;
-			settings = data.settings;
+        if ((data = JSON.parse(JSON.stringify(cartData)))) {
+            items = data.items;
+            settings = data.settings;
 
-			if (items) {
-				for (i = 0, len = items.length; i < len; i++) {
-					cart.add(items[i]);
-				}
-			}
-		}
+            if (items) {
+                for (i = 0, len = items.length; i < len; i++) {
+                    cart.add(items[i]);
+                }
+            }
+        }
 
     });
 
@@ -61,24 +61,24 @@ describe('Cart Model', function () {
     });
 
 
-	it('add() does not add invalid products', function () {
-		var idx = cart.add({});
+    it('add() does not add invalid products', function () {
+        var idx = cart.add({});
 
-		assert.strictEqual(idx, false);
-	});
+        assert.strictEqual(idx, false);
+    });
 
 
-	it('add() for the same product only increments the quantity', function () {
-		var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },
-			idx = cart.add(product);
+    it('add() for the same product only increments the quantity', function () {
+        var product = { item_name: 'Item 3', amount: 3.00, quantity: 1 },
+            idx = cart.add(product);
 
-		assert.strictEqual(cart.items().length, 3);
-		assert.strictEqual(cart.items(idx).get('quantity'), 1);
-		cart.add(product);
-		assert.strictEqual(cart.items().length, 3);
-		assert.strictEqual(cart.items(idx).get('quantity'), 2);
+        assert.strictEqual(cart.items().length, 3);
+        assert.strictEqual(cart.items(idx).get('quantity'), 1);
+        cart.add(product);
+        assert.strictEqual(cart.items().length, 3);
+        assert.strictEqual(cart.items(idx).get('quantity'), 2);
 
-	});
+    });
 
 
     it('add() fires an event', function (done) {
@@ -95,55 +95,55 @@ describe('Cart Model', function () {
     });
 
 
-	it('settings() returns the value for a named setting', function () {
-		assert.strictEqual(cart.settings('currency_code'), 'USD');
-		assert.strictEqual(cart.settings('custom'), 'foo');
-	});
+    it('settings() returns the value for a named setting', function () {
+        assert.strictEqual(cart.settings('currency_code'), 'USD');
+        assert.strictEqual(cart.settings('custom'), 'foo');
+    });
 
 
-	it('settings() returns all when no args are passed', function () {
-		assert.deepEqual(cart.settings(), { bn: 'MiniCart_AddToCart_WPS_US', currency_code: 'USD', custom: 'foo' });
-	});
+    it('settings() returns all when no args are passed', function () {
+        assert.deepEqual(cart.settings(), { bn: 'MiniCart_AddToCart_WPS_US', currency_code: 'USD', custom: 'foo' });
+    });
 
 
-	it('subtotal() returns the cart subtotal', function () {
-		assert.strictEqual(cart.subtotal(), 3.34);
-	});
+    it('subtotal() returns the cart subtotal', function () {
+        assert.strictEqual(cart.subtotal(), 3.34);
+    });
 
 
-	it('subtotal() should not apply discounts', function () {
-		cart._settings.discount_amount_cart = 1.00;
-		assert.strictEqual(cart.subtotal(), 3.34);
-	});
+    it('subtotal() should not apply discounts', function () {
+        cart._settings.discount_amount_cart = 1.00;
+        assert.strictEqual(cart.subtotal(), 3.34);
+    });
 
 
-	it('subtotal() returns the formatted amount', function () {
-		assert.strictEqual(cart.subtotal({ format: true }), '$3.34');
-	});
+    it('subtotal() returns the formatted amount', function () {
+        assert.strictEqual(cart.subtotal({ format: true }), '$3.34');
+    });
 
 
-	it('total() returns the cart product total', function () {
-		assert.strictEqual(cart.total(), 3.34);
-		cart.remove(1);
-		assert.strictEqual(cart.total(), 1);
-	});
+    it('total() returns the cart product total', function () {
+        assert.strictEqual(cart.total(), 3.34);
+        cart.remove(1);
+        assert.strictEqual(cart.total(), 1);
+    });
 
 
-	it('total() uses flat discounts', function () {
-		cart._settings.discount_amount_cart = 1.00;
-		assert.strictEqual(cart.total(), 2.34);
-	});
+    it('total() uses flat discounts', function () {
+        cart._settings.discount_amount_cart = 1.00;
+        assert.strictEqual(cart.total(), 2.34);
+    });
 
 
-	it('total() uses percentage discounts', function () {
-		cart._settings.discount_rate_cart = 50;
-		assert.strictEqual(cart.total(), 1.67);
-	});
+    it('total() uses percentage discounts', function () {
+        cart._settings.discount_rate_cart = 50;
+        assert.strictEqual(cart.total(), 1.67);
+    });
 
 
     it('total() returns the formatted cart product total', function () {
         assert.strictEqual(cart.total({ format: true }), '$3.34');
-		assert.strictEqual(cart.total({ format: true, showCode: true }), '$3.34 USD');
+        assert.strictEqual(cart.total({ format: true, showCode: true }), '$3.34 USD');
     });
 
 
@@ -171,15 +171,15 @@ describe('Cart Model', function () {
     });
 
 
-	it('remove() calls destroy() on the last product', function (done) {
-		cart.on('destroy', function () {
-			assert(true);
-			done();
-		});
+    it('remove() calls destroy() on the last product', function (done) {
+        cart.on('destroy', function () {
+            assert(true);
+            done();
+        });
 
-		cart.remove(1);
-		cart.remove(0);
-	});
+        cart.remove(1);
+        cart.remove(0);
+    });
 
 
     it('remove() fires an event', function (done) {
@@ -197,9 +197,9 @@ describe('Cart Model', function () {
     });
 
 
-	it('has a bn code', function () {
-		assert(!!cart.settings().bn);
-	});
+    it('has a bn code', function () {
+        assert(!!cart.settings().bn);
+    });
 
 
     it('destroy() empties the cart', function () {
@@ -208,10 +208,10 @@ describe('Cart Model', function () {
     });
 
 
-	it('destroy() clears the cart settings', function () {
-		cart.destroy();
-		assert.deepEqual(cart.settings(), { bn: 'MiniCart_AddToCart_WPS_US' });
-	});
+    it('destroy() clears the cart settings', function () {
+        cart.destroy();
+        assert.deepEqual(cart.settings(), { bn: 'MiniCart_AddToCart_WPS_US' });
+    });
 
 
     it('destroy() fires an event', function (done) {

@@ -2,30 +2,30 @@
 
 
 var currency = require('./util/currency'),
-	Pubsub = require('./util/pubsub'),
-	mixin = require('./util/mixin');
+    Pubsub = require('./util/pubsub'),
+    mixin = require('./util/mixin');
 
 
 var parser = {
-	quantity: function (value) {
-		value = parseInt(value, 10);
+    quantity: function (value) {
+        value = parseInt(value, 10);
 
-		if (isNaN(value) || !value) {
-			value = 1;
-		}
+        if (isNaN(value) || !value) {
+            value = 1;
+        }
 
-		return value;
-	},
-	amount: function (value) {
-		return parseFloat(value) || 0;
-	},
-	href: function (value) {
-		if (value) {
-			return value;
-		} else {
-			return (typeof window !== 'undefined') ? window.location.href : null;
-		}
-	}
+        return value;
+    },
+    amount: function (value) {
+        return parseFloat(value) || 0;
+    },
+    href: function (value) {
+        if (value) {
+            return value;
+        } else {
+            return (typeof window !== 'undefined') ? window.location.href : null;
+        }
+    }
 };
 
 
@@ -36,17 +36,17 @@ var parser = {
  * @param {object} data Item data
  */
 function Product(data) {
-	data.quantity = parser.quantity(data.quantity);
-	data.amount = parser.amount(data.amount);
-	data.href = parser.href(data.href);
+    data.quantity = parser.quantity(data.quantity);
+    data.amount = parser.amount(data.amount);
+    data.href = parser.href(data.href);
 
     this._data = data;
-	this._options = null;
-	this._discount = null;
-	this._amount = null;
-	this._total = null;
+    this._options = null;
+    this._discount = null;
+    this._amount = null;
+    this._total = null;
 
-	Pubsub.call(this);
+    Pubsub.call(this);
 }
 
 
@@ -72,13 +72,13 @@ Product.prototype.get = function get(key) {
  * @param {string} value
  */
 Product.prototype.set = function set(key, value) {
-	var setter = parser[key];
+    var setter = parser[key];
 
-	this._data[key] = setter ? setter(value) : value;
-	this._options = null;
-	this._discount = null;
-	this._amount = null;
-	this._total = null;
+    this._data[key] = setter ? setter(value) : value;
+    this._options = null;
+    this._discount = null;
+    this._amount = null;
+    this._total = null;
 
     this.fire('change', key);
 };
@@ -90,39 +90,39 @@ Product.prototype.set = function set(key, value) {
  * @return {object}
  */
 Product.prototype.options = function options() {
-	var result, key, value, amount, i, j;
+    var result, key, value, amount, i, j;
 
-	if (!this._options) {
-		result = [];
-		i = 0;
+    if (!this._options) {
+        result = [];
+        i = 0;
 
-		while ((key = this.get('on' + i))) {
-			value = this.get('os' + i);
-			amount = 0;
-			j = 0;
+        while ((key = this.get('on' + i))) {
+            value = this.get('os' + i);
+            amount = 0;
+            j = 0;
 
-			while (typeof this.get('option_select' + j) !== 'undefined') {
-				if (this.get('option_select' + j) === value) {
-					amount = parser.amount(this.get('option_amount' + j));
-					break;
-				}
+            while (typeof this.get('option_select' + j) !== 'undefined') {
+                if (this.get('option_select' + j) === value) {
+                    amount = parser.amount(this.get('option_amount' + j));
+                    break;
+                }
 
-				j++;
-			}
+                j++;
+            }
 
-			result.push({
-				key: key,
-				value: value,
-				amount: amount
-			});
+            result.push({
+                key: key,
+                value: value,
+                amount: amount
+            });
 
-			i++;
-		}
+            i++;
+        }
 
-		this._options = result;
-	}
+        this._options = result;
+    }
 
-	return this._options;
+    return this._options;
 };
 
 
@@ -133,27 +133,27 @@ Product.prototype.options = function options() {
  * @return {number|string}
  */
 Product.prototype.discount = function discount(config) {
-	var flat, rate, num, limit, result, amount;
+    var flat, rate, num, limit, result, amount;
 
-	if (!this._discount) {
-		result = 0;
-		num = parseInt(this.get('discount_num'), 10) || 0;
-		limit = Math.max(num, this.get('quantity') - 1);
+    if (!this._discount) {
+        result = 0;
+        num = parseInt(this.get('discount_num'), 10) || 0;
+        limit = Math.max(num, this.get('quantity') - 1);
 
-		if ((flat = parser.amount(this.get('discount_amount')))) {
-			result += flat;
-			result += parser.amount(this.get('discount_amount2') || flat) * limit;
-		} else if ((rate = parser.amount(this.get('discount_rate')))) {
-			amount = this.amount();
+        if ((flat = parser.amount(this.get('discount_amount')))) {
+            result += flat;
+            result += parser.amount(this.get('discount_amount2') || flat) * limit;
+        } else if ((rate = parser.amount(this.get('discount_rate')))) {
+            amount = this.amount();
 
-			result += rate * amount / 100;
-			result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
-		}
+            result += rate * amount / 100;
+            result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
+        }
 
-		this._discount = result;
-	}
+        this._discount = result;
+    }
 
-	return currency(this._discount, config);
+    return currency(this._discount, config);
 };
 
 
@@ -164,20 +164,20 @@ Product.prototype.discount = function discount(config) {
  * @return {number|string}
  */
 Product.prototype.amount = function amount(config) {
-	var result, options, len, i;
+    var result, options, len, i;
 
-	if (!this._amount) {
-		result = this.get('amount');
-		options = this.options();
+    if (!this._amount) {
+        result = this.get('amount');
+        options = this.options();
 
-		for (i = 0, len = options.length; i < len; i++) {
-			result += options[i].amount;
-		}
+        for (i = 0, len = options.length; i < len; i++) {
+            result += options[i].amount;
+        }
 
-		this._amount = result;
-	}
+        this._amount = result;
+    }
 
-	return currency(this._amount, config);
+    return currency(this._amount, config);
 };
 
 
@@ -188,16 +188,16 @@ Product.prototype.amount = function amount(config) {
  * @return {number|string}
  */
 Product.prototype.total = function total(config) {
-	var result;
+    var result;
 
-	if (!this._total) {
-		result  = this.get('quantity') * this.amount();
-		result -= this.discount();
+    if (!this._total) {
+        result  = this.get('quantity') * this.amount();
+        result -= this.discount();
 
-		this._total = parser.amount(result);
-	}
+        this._total = parser.amount(result);
+    }
 
-	return currency(this._total, config);
+    return currency(this._total, config);
 };
 
 
@@ -208,32 +208,32 @@ Product.prototype.total = function total(config) {
  * @return {boolean}
  */
 Product.prototype.isEqual = function isEqual(data) {
-	var match = false;
+    var match = false;
 
-	if (data instanceof Product) {
-		data = data._data;
-	}
+    if (data instanceof Product) {
+        data = data._data;
+    }
 
-	if (this.get('item_name') === data.item_name) {
-		if (this.get('item_number') === data.item_number) {
-			if (this.get('amount') === parser.amount(data.amount)) {
-				var i = 0;
+    if (this.get('item_name') === data.item_name) {
+        if (this.get('item_number') === data.item_number) {
+            if (this.get('amount') === parser.amount(data.amount)) {
+                var i = 0;
 
-				match = true;
+                match = true;
 
-				while (typeof data['os' + i] !== 'undefined') {
-					if (this.get('os' + i) !== data['os' + i]) {
-						match = false;
-						break;
-					}
+                while (typeof data['os' + i] !== 'undefined') {
+                    if (this.get('os' + i) !== data['os' + i]) {
+                        match = false;
+                        break;
+                    }
 
-					i++;
-				}
-			}
-		}
-	}
+                    i++;
+                }
+            }
+        }
+    }
 
-	return match;
+    return match;
 };
 
 
@@ -243,7 +243,7 @@ Product.prototype.isEqual = function isEqual(data) {
  * @return {boolean}
  */
 Product.prototype.isValid = function isValid() {
-	return (this.get('item_name') && this.amount() > 0);
+    return (this.get('item_name') && this.amount() > 0);
 };
 
 

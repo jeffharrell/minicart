@@ -2,12 +2,12 @@
 
 
 var Cart = require('./cart'),
-	View = require('./view'),
+    View = require('./view'),
     config = require('./config'),
     minicart = {},
-	cartModel,
-	confModel,
-	viewModel;
+    cartModel,
+    confModel,
+    viewModel;
 
 
 /**
@@ -16,17 +16,17 @@ var Cart = require('./cart'),
  * @param {object} userConfig Configuration overrides
  */
 minicart.render = function (userConfig) {
-	confModel = minicart.config = config.load(userConfig);
-	cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
-	viewModel = minicart.view = new View({
-		config: confModel,
-		cart: cartModel
-	});
+    confModel = minicart.config = config.load(userConfig);
+    cartModel = minicart.cart = new Cart(confModel.name, confModel.duration);
+    viewModel = minicart.view = new View({
+        config: confModel,
+        cart: cartModel
+    });
 
-	cartModel.on('add', viewModel.addItem, viewModel);
-	cartModel.on('change', viewModel.changeItem, viewModel);
-	cartModel.on('remove', viewModel.removeItem, viewModel);
-	cartModel.on('destroy', viewModel.hide, viewModel);
+    cartModel.on('add', viewModel.addItem, viewModel);
+    cartModel.on('change', viewModel.changeItem, viewModel);
+    cartModel.on('remove', viewModel.removeItem, viewModel);
+    cartModel.on('destroy', viewModel.hide, viewModel);
 };
 
 
@@ -36,8 +36,8 @@ minicart.render = function (userConfig) {
 minicart.reset = function () {
     cartModel.destroy();
 
-	viewModel.hide();
-	viewModel.redraw();
+    viewModel.hide();
+    viewModel.redraw();
 };
 
 
@@ -45,11 +45,11 @@ minicart.reset = function () {
 
 // Export to either node or the brower window
 if (typeof window === 'undefined') {
-	module.exports = minicart;
+    module.exports = minicart;
 } else {
-	if (!window.paypal) {
-		window.paypal = {};
-	}
+    if (!window.paypal) {
+        window.paypal = {};
+    }
 
-	window.paypal.minicart = minicart;
+    window.paypal.minicart = minicart;
 }

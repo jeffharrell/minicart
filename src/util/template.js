@@ -11,7 +11,7 @@ module.exports = function template(str, data) {
 
 // Workaround for IE 8's lack of support
 if (!String.prototype.trim) {
-	String.prototype.trim = function () {
-		return this.replace(/^\s+|\s+$/g, '');
-	};
+    String.prototype.trim = function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    };
 }
