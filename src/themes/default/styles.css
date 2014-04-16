@@ -57,8 +57,10 @@
 }
 
 #PPMiniCart ul {
-    clear: right;
-    margin: 15px 0;
+    clear: both;
+    float: left;
+    width: 380px;
+    margin: 5px 0 20px;
     padding: 10px;
     list-style-type: none;
     background: #fff;
@@ -85,8 +87,8 @@
 
 
 #PPMiniCart .minicart-item {
-    position: relative;
-    padding: 6px 0 3px 0;
+    clear: left;
+    padding: 6px 0;
     min-height: 25px;
 }
 
@@ -95,18 +97,35 @@
 }
 
 #PPMiniCart .minicart-item a {
-    position: absolute;
-    top: 11px;
-    left: 0;
-    width: 185px;
     color: #333;
-    line-height: 10px;
     text-decoration: none;
 }
 
+#PPMiniCart .minicart-details-name {
+    float: left;
+    width: 62%;
+}
+
+#PPMiniCart .minicart-details-quantity {
+    float: left;
+    width: 15%;
+}
+
+#PPMiniCart .minicart-details-remove {
+    float: left;
+    width: 7%;
+}
+
+#PPMiniCart .minicart-details-price {
+    float: left;
+    width: 16%;
+    text-align: right;
+}
+
 #PPMiniCart .minicart-attributes {
-    margin: 18px 0 0;
-    padding: 3px 0 0;
+    margin: 0;
+    padding: 0;
+    background: transparent;
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -128,9 +147,6 @@
 }
 
 #PPMiniCart .minicart-quantity {
-    position: absolute;
-    top: 5px;
-    left: 235px;
     width: 30px;
     height: 18px;
     padding: 2px 4px;
@@ -156,12 +172,9 @@
 }
 
 #PPMiniCart .minicart-remove {
-    position: absolute;
-    top: 7px;
-    left: 290px;
     width: 18px;
     height: 19px;
-    margin: 0;
+    margin: 2px 0 0;
     padding: 0;
     background: #b7b7b7;
     border: 1px solid #a3a3a3;
@@ -176,10 +189,8 @@
     opacity: 1;
 }
 
-#PPMiniCart .minicart-price {
-    position: absolute;
-    top: 7px;
-    right: 0;
+#PPMiniCart .minicart-footer {
+    clear: left;
 }
 
 #PPMiniCart .minicart-subtotal {
