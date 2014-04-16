@@ -45,7 +45,7 @@ The minicart has a JavaScript API for advanced users to customize the behavior.
 
 ### General
 
-`paypal.minicart.render(config)`  
+`paypal.minicart.render(config)`
 Renders the minicart to the page. Config is optional and can have the following properties:
 
  * `parent` - HTMLElement the minicart should render to.
@@ -55,96 +55,96 @@ Renders the minicart to the page. Config is optional and can have the following 
  * `styles` - CSS styles for rendering. See [customization](#customization) for details.
  * `strings` - An object of text strings: `button`, `buttonAlt`, `subtotal` and `discount`.
 
-`paypal.minicart.reset()`  
+`paypal.minicart.reset()`
 Resets the minicart back to its default state.
 
 
 ### View
 
-`paypal.minicart.view.show()`  
+`paypal.minicart.view.show()`
 Triggers the minicart to show by adding a "minicart-showing" CSS class to the document.
 
-`paypal.minicart.view.hide()`  
+`paypal.minicart.view.hide()`
 Triggers the minicart to hide by removing the "minicart-showing" CSS class on the document.
 
-`paypal.minicart.view.toggle()`  
+`paypal.minicart.view.toggle()`
 Toggles the visibility of the minicart.
 
-`paypal.minicart.view.bind(form)`  
+`paypal.minicart.view.bind(form)`
 Binds an HTMLFormElement's submit event to the minicart. Useful for forms which may have been added to the page after the initial load.
 
 
 ### Cart
 
-`paypal.minicart.cart.add(data)`  
+`paypal.minicart.cart.add(data)`
 Adds an item to the cart. Fires the *add* event. Example data object:
 
     { "business": "user@example.com", "item_name": "Product", "amount": 5.00, "currency_code": "USD" }
 
-`paypal.minicart.cart.remove(idx)`  
+`paypal.minicart.cart.remove(idx)`
 Removes an item from the cart by index. Fires the *remove* event.
 
-`paypal.minicart.cart.items(idx)`  
+`paypal.minicart.cart.items(idx)`
 Returns an array of items from the cart. If an index is passed then only that item is returned.
 
-`paypal.minicart.cart.settings(key)`  
+`paypal.minicart.cart.settings(key)`
 Returns an object of global cart settings. If a key is passed then only that value is returned.
 
-`paypal.minicart.cart.discount(config)`  
+`paypal.minicart.cart.discount(config)`
 Calculates the cart discount amount. *config* can be used for formatting.
 
-`paypal.minicart.cart.subtotal(config)`  
+`paypal.minicart.cart.subtotal(config)`
 Calculates the cart total minus discounts. *config* can be used for formatting.
 
-`paypal.minicart.cart.total(config)`  
+`paypal.minicart.cart.total(config)`
 Calculates the cart total. *config* can be used for formatting.
 
-`paypal.minicart.cart.destroy()`  
+`paypal.minicart.cart.destroy()`
 Destroys the cart data and resets it back to the default state. Fires the *destroy* event.
 
-`paypal.minicart.cart.on(event, fn, scope)`  
-Subscribe to cart events. Events include:  
- * `add` - Fired when an item is added. *function (idx, product, isExisting)*  
- * `remove` - Fired when an item is removed. *function (idx, product)*  
- * `checkout` - Fired on checkout. *function (evt)*  
- * `destroy` - Fired when the cart is destroyed. *function ()*  
+`paypal.minicart.cart.on(event, fn, scope)`
+Subscribe to cart events. Events include:
+ * `add` - Fired when an item is added. *function (idx, product, isExisting)*
+ * `remove` - Fired when an item is removed. *function (idx, product)*
+ * `checkout` - Fired on checkout. *function (evt)*
+ * `destroy` - Fired when the cart is destroyed. *function ()*
 
-`paypal.minicart.cart.off(event, fn)`  
+`paypal.minicart.cart.off(event, fn)`
 Unsubscribe from cart events.
 
 
 ### Products
 
-`product.get(key)`  
+`product.get(key)`
 Returns a properties object for the product. If a key is passed then only that value is returned.
 
-`product.set(key, value)`  
+`product.set(key, value)`
 Sets a property for the product. Fires a *change* event.
 
-`product.options()`  
+`product.options()`
 Returns the options.
 
-`product.discount(config)`  
+`product.discount(config)`
 Calculates the product discount. *config* can be used for formatting.
 
-`product.amount(config)`  
+`product.amount(config)`
 Calculates the product amount discounts. *config* can be used for formatting.
 
-`product.total(config)`  
+`product.total(config)`
 Calculates the product total. *config* can be used for formatting.
 
-`product.isEqual(product2)`  
+`product.isEqual(product2)`
 Determines if the current product is the same as another.
 
-`product.destroy()`  
+`product.destroy()`
 Destroys the product. Fires the *destroy* event.
 
-`product.on(event, fn, scope)`  
-Subscribe to cart events. Events include:  
- * `change` - Fired when a value is changed. *function (key)*  
- * `destroy` - Fired when the product is destroyed. *function ()*  
+`product.on(event, fn, scope)`
+Subscribe to cart events. Events include:
+ * `change` - Fired when a value is changed. *function (key)*
+ * `destroy` - Fired when the product is destroyed. *function ()*
 
-`product.off(event, fn)`  
+`product.off(event, fn)`
 Unsubscribe from product events.
 
 
@@ -196,7 +196,7 @@ If you're new to the building a theme it's a good idea to copy the one at `src/t
 
 ## Localization
 
-Localization is supported using the *strings* object. 
+Localization is supported using the *strings* object.
 
 ```js
 paypal.minicart.render({
@@ -204,7 +204,6 @@ paypal.minicart.render({
         button: "Caisse",
         buttonAlt: "Total:",
         discount: "Reduction:"
-        processing: "Traitement"
     }
 });
 ```

@@ -38,7 +38,6 @@ describe('Config', function () {
         assert.equal(config.strings.button, 'Go');
         assert.equal(config.strings.subtotal, 'Subtotal:');
         assert.equal(config.strings.discount, 'Discount:');
-        assert.equal(config.strings.processing, 'Processing...');
     });
 
 });
