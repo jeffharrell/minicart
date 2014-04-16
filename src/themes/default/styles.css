@@ -80,12 +80,13 @@
     border: 0;
     font-size: 18px;
     cursor: pointer;
+    font-weight: bold;
 }
 
 
 #PPMiniCart .minicart-item {
     position: relative;
-    padding: 6px 0;
+    padding: 6px 0 3px 0;
     min-height: 25px;
 }
 
@@ -105,7 +106,7 @@
 
 #PPMiniCart .minicart-attributes {
     margin: 18px 0 0;
-    padding: 0;
+    padding: 3px 0 0;
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -184,6 +185,7 @@
 #PPMiniCart .minicart-subtotal {
     position: absolute;
     bottom: 17px;
+    padding-left: 6px;
     left: 10px;
     font-size: 16px;
     font-weight: bold;
@@ -195,6 +197,8 @@
     right: 10px;
     min-width: 153px;
     height: 33px;
+    margin-right: 6px;
+    padding: 0 9px;
     border: 1px solid #ffc727;
     border-radius: 5px;
     color: #000;
