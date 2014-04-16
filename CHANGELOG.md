@@ -5,7 +5,7 @@
 
 * Fixing support for shipping amounts; Resolves #215
 * Fixing support for discounts; Resolves #213
-# Adding storage test coverage
+* Adding storage test coverage
 
 
 ## 3.0.4
