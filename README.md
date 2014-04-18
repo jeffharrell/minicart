@@ -20,7 +20,7 @@ The minicart is a great way to improve your PayPal shopping cart integration. On
 2. Include the following snippet into your HTML before the closing &lt;/body&gt; tag:
 
     ```html
-    <script src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.3/minicart.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/minicart/3.0.5/minicart.min.js"></script>
     <script>
         paypal.minicart.render();
     </script>
