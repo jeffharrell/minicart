@@ -216,7 +216,7 @@ The currency symbol will be automatically updated based on the *currency_code* s
 ## FAQ
 
 ### Is the minicart free? How is it licensed?
-Yes, it's free and licensed under the [MIT License](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE).
+Yes, it's free and licensed under the [MIT License](https://github.com/jeffharrell/MiniCart/raw/master/LICENSE.md).
 
 ### Which browsers are supported?
 The minicart supports Chrome, Safari, Firefox, and Internet Explorer 8+.
