@@ -215,6 +215,32 @@ describe('View', function () {
     });
 
 
+    it('should not re-bind() forms', function () {
+        var form, input;
+
+        form = document.createElement('form');
+        form.action = 'https://www.paypal.com/cgi-bin/webscr';
+        form.method = 'post';
+
+        input = document.createElement('input');
+        input.name = 'business';
+        input.value = 'business@minicartjs.com';
+        form.appendChild(input);
+
+        input = document.createElement('input');
+        input.name = 'cmd';
+        input.value = '_cart';
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+
+        assert(minicart.view.bind(form) === true);
+        assert(minicart.view.bind(form) === false);
+
+        document.body.removeChild(form);
+    });
+
+
     it('should add items via the API', function () {
         minicart.cart.add(mockData[0]);
         assert(getItem(0).name === 'Test item 1');

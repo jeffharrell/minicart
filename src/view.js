@@ -81,13 +81,21 @@ View.prototype.toggle = function toggle() {
  * Binds cart submit events to a form.
  *
  * @param {HTMLElement} form
- * @return {booealn}
+ * @return {boolean}
  */
 View.prototype.bind = function bind(form) {
     var that = this;
 
+    // Don't bind forms without a cmd value
     if (!constants.COMMANDS[form.cmd.value]) {
         return false;
+    }
+
+    // Prevent re-binding forms
+    if (form.hasMinicart) {
+        return false;
+    } else {
+        form.hasMinicart = true;
     }
 
     if (form.display) {

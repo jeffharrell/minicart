@@ -2836,13 +2836,21 @@ View.prototype.toggle = function toggle() {
  * Binds cart submit events to a form.
  *
  * @param {HTMLElement} form
- * @return {booealn}
+ * @return {boolean}
  */
 View.prototype.bind = function bind(form) {
     var that = this;
 
+    // Don't bind forms without a cmd value
     if (!constants.COMMANDS[form.cmd.value]) {
         return false;
+    }
+
+    // Prevent re-binding forms
+    if (form.hasMinicart) {
+        return false;
+    } else {
+        form.hasMinicart = true;
     }
 
     if (form.display) {
@@ -3006,5 +3014,5 @@ module.exports = viewevents = {
 
 };
 
-},{"./constants":11,"./util/events":16}]},{},[9,11,10,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;
