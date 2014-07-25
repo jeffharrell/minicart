@@ -13,16 +13,8 @@
         <input type="hidden" name="quantity" value="1" />
         <input type="hidden" name="amount" value="1.00" />
         <input type="hidden" name="currency_code" value="USD" />
-        <input type="hidden" name="no_shipping" value="2">
-        <input type="hidden" name="no_note" value="1">
-        <input type="hidden" name="shipping2" value="1.50">
-        <input type="hidden" name="shipping" value="2.50">
+        <input type="hidden" name="shipping" value="1.00">
         <strong>Test Product</strong>
-
-        <p>
-            <label><input type="checkbox" id="terms" name="terms" value="" /> I agree to the terms</label>
-        </p>
-
         <input type="submit" name="submit" value="Add to cart" />
     </form>
 
@@ -32,12 +24,16 @@
         paypal.minicart.render();
 
         paypal.minicart.cart.on('checkout', function (evt) {
-            var hasAgreed = !!document.getElementById('terms').checked;
+        	var items, len, i;
 
-            if (!hasAgreed) {
-                alert('You must agree to the terms!');
-				evt.preventDefault();
-            }
+        	if (this.subtotal() > 0) {
+        		items = this.items();
+
+        		for (i = 0, len = items.length; i < len; i++) {
+        			items[i].set('shipping', 0);
+        			items[i].set('shipping2', 0);
+        		}
+        	}
         });
     </script>
 </body>

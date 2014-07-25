@@ -222,4 +222,14 @@ describe('Cart Model', function () {
 
         cart.destroy();
     });
+
+
+    it('checkout() fires an event', function (done) {
+        cart.on('checkout', function () {
+            assert(true);
+            done();
+        });
+
+        cart.checkout();
+    });
 });
