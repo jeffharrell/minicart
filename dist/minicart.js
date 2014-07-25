@@ -2175,7 +2175,6 @@ Product.prototype.discount = function discount(config) {
 
             result += rate * amount / 100;
             result += parser.amount(this.get('discount_rate2') || rate) * amount * limit / 100;
-            console.log('result', result, rate, amount, limit);
         }
 
         this._discount = result;
