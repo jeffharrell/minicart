@@ -59,6 +59,16 @@ module.exports = function (grunt) {
                 },
                 src: ['test/unit/**/*.js']
             }
+        },
+
+        watch: {
+            scripts: {
+                files: ['src/**/*'],
+                tasks: ['build'],
+                options: {
+                    spawn: false
+                }
+            }
         }
     });
 
@@ -66,6 +76,7 @@ module.exports = function (grunt) {
     // Dependencies
     grunt.task.loadNpmTasks('grunt-contrib-jshint');
     grunt.task.loadNpmTasks('grunt-contrib-uglify');
+    grunt.task.loadNpmTasks('grunt-contrib-watch');
     grunt.task.loadNpmTasks('grunt-banner');
     grunt.task.loadNpmTasks('grunt-mocha');
     grunt.task.loadNpmTasks('grunt-mocha-test');
