@@ -2454,7 +2454,7 @@ module.exports = (function (window, document) {
             add: function () {},
             remove: function () {}
         };
-        // Non-IE events
+    // Non-IE events
     } else if (document.addEventListener) {
         return {
             /**
@@ -2493,14 +2493,15 @@ module.exports = (function (window, document) {
 
                         if (wrappedFn) {
                             obj.removeEventListener(type, wrappedFn, false);
-                            delete cache[i];
+                            cache = cache.slice(i);
+                            return true;
                         }
                     }
                 }
             }
         };
 
-        // IE events
+    // IE events
     } else if (document.attachEvent) {
         return {
             /**
@@ -2548,7 +2549,8 @@ module.exports = (function (window, document) {
 
                         if (wrappedFn) {
                             obj.detachEvent('on' + type, wrappedFn);
-                            delete cache[i];
+                            cache = cache.slice(i);
+                            return true;
                         }
                     }
                 }
@@ -2557,6 +2559,7 @@ module.exports = (function (window, document) {
     }
 
 })(typeof window === 'undefined' ? null : window, typeof document === 'undefined' ? null : document);
+
 },{}],17:[function(require,module,exports){
 'use strict';
 
@@ -2798,7 +2801,14 @@ function View(model) {
  * Tells the view to redraw
  */
 View.prototype.redraw = function redraw() {
+    var form;
+
+    if ((form = this.el.querySelector('form'))) {
+        events.remove(form, 'submit', this.model.cart.checkout);
+    }
+
     this.el.innerHTML = template(config.template, this.model);
+    events.add(this.el.querySelector('form'), 'submit', this.model.cart.checkout, this);
 };
 
 
@@ -2929,11 +2939,8 @@ module.exports = viewevents = {
             className = target.className;
 
         if (this.isShowing) {
-            // Cart checkout button
-            if (className === constants.SUBMIT_CLASS) {
-                this.model.cart.checkout(evt);
             // Cart close button
-            } else if (className === constants.CLOSER_CLASS) {
+            if (className === constants.CLOSER_CLASS) {
                 this.hide();
             // Product remove button
             } else if (className === constants.REMOVE_CLASS) {
@@ -3014,5 +3021,5 @@ module.exports = viewevents = {
 
 };
 
-},{"./constants":11,"./util/events":16}]},{},[10,9,11,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[10,11,9,12,13,14,15,16,17,18,19,20,21,22,23])
 ;

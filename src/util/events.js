@@ -14,7 +14,7 @@ module.exports = (function (window, document) {
             add: function () {},
             remove: function () {}
         };
-        // Non-IE events
+    // Non-IE events
     } else if (document.addEventListener) {
         return {
             /**
@@ -53,14 +53,15 @@ module.exports = (function (window, document) {
 
                         if (wrappedFn) {
                             obj.removeEventListener(type, wrappedFn, false);
-                            delete cache[i];
+                            cache = cache.slice(i);
+                            return true;
                         }
                     }
                 }
             }
         };
 
-        // IE events
+    // IE events
     } else if (document.attachEvent) {
         return {
             /**
@@ -108,7 +109,8 @@ module.exports = (function (window, document) {
 
                         if (wrappedFn) {
                             obj.detachEvent('on' + type, wrappedFn);
-                            delete cache[i];
+                            cache = cache.slice(i);
+                            return true;
                         }
                     }
                 }
