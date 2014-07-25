@@ -47,9 +47,9 @@ function isCartShowing() {
 function getItem(idx) {
     var li, attrsList, attrsData = [], i, len;
 
-    if ((li = document.getElementsByClassName('minicart-item')[idx])) {
+    if ((li = document.querySelectorAll('.minicart-item')[idx])) {
 
-        attrsList = li.getElementsByClassName('minicart-attributes')[0];
+        attrsList = li.querySelectorAll('.minicart-attributes')[0];
         attrsList = attrsList && attrsList.getElementsByTagName('li');
 
         if (attrsList) {
@@ -60,8 +60,8 @@ function getItem(idx) {
 
         return {
             name: li.getElementsByTagName('a')[0].textContent.replace(/^\s+|\s+$/g, ''),
-            quantity: li.getElementsByClassName('minicart-quantity')[0].value,
-            amount: li.getElementsByClassName('minicart-price')[0].textContent.replace(/^\s+|\s+$/g, ''),
+            quantity: li.querySelectorAll('.minicart-quantity')[0].value,
+            amount: li.querySelectorAll('.minicart-price')[0].textContent.replace(/^\s+|\s+$/g, ''),
             options: attrsData
         };
     } else {
@@ -246,7 +246,7 @@ describe('View', function () {
 
         minicart.cart.add(mockData[0]);
 
-        input = document.getElementsByClassName('minicart-quantity')[0];
+        input = document.querySelectorAll('.minicart-quantity')[0];
         input.value = 3;
         fakeEvent(input, 'keyup');
 
@@ -262,7 +262,7 @@ describe('View', function () {
 
         minicart.cart.add(mockData[0]);
 
-        input = document.getElementsByClassName('minicart-quantity')[0];
+        input = document.querySelectorAll('.minicart-quantity')[0];
         input.value = '';
         fakeEvent(input, 'keyup');
 
@@ -278,7 +278,7 @@ describe('View', function () {
 
         minicart.cart.add(mockData[0]);
 
-        input = document.getElementsByClassName('minicart-quantity')[0];
+        input = document.querySelectorAll('.minicart-quantity')[0];
         input.value = 'asdf';
         fakeEvent(input, 'keyup');
 
@@ -293,7 +293,7 @@ describe('View', function () {
         minicart.cart.add(mockData[0]);
         assert(typeof getItem(0) === 'object');
 
-        fakeEvent(document.getElementsByClassName('minicart-remove')[0], 'click');
+        fakeEvent(document.querySelectorAll('.minicart-remove')[0], 'click');
         assert(getItem(0) === false);
     });
 
@@ -432,14 +432,14 @@ describe('View', function () {
         minicart.cart.add(mockData[0]);
         minicart.cart.add(mockData[1]);
 
-        assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: $5.00 USD');
+        assert(document.querySelectorAll('.minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: $5.00 USD');
     });
 
 
     it('should display a subtotal with correct currency', function () {
         minicart.cart.add(mockData[5]);
 
-        assert(document.getElementsByClassName('minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: €0.50');
+        assert(document.querySelectorAll('.minicart-subtotal')[0].textContent.replace(/^\s+|\s+$/g, '') === 'Subtotal: €0.50');
     });
 
 
@@ -462,7 +462,7 @@ describe('View', function () {
         minicart.cart.add(mockData[0]);
 
         cart = document.getElementById(config.name);
-        button = cart.getElementsByClassName('minicart-submit')[0];
+        button = cart.querySelectorAll('.minicart-submit')[0];
 
         assert(!!button);
     });
@@ -474,7 +474,7 @@ describe('View', function () {
         minicart.view.show();
 
         cart = document.getElementById(config.name);
-        button = cart.getElementsByClassName('minicart-submit')[0];
+        button = cart.querySelectorAll('.minicart-submit')[0];
 
         assert(!button);
     });

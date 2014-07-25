@@ -116,7 +116,7 @@ View.prototype.addItem = function addItem(idx, data) {
     this.redraw();
     this.show();
 
-    var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+    var els = this.el.querySelectorAll('.' + constants.ITEM_CLASS);
     css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
@@ -131,7 +131,7 @@ View.prototype.changeItem = function changeItem(idx, data) {
     this.redraw();
     this.show();
 
-    var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+    var els = this.el.querySelectorAll('.' + constants.ITEM_CLASS);
     css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 

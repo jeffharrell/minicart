@@ -2871,7 +2871,7 @@ View.prototype.addItem = function addItem(idx, data) {
     this.redraw();
     this.show();
 
-    var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+    var els = this.el.querySelectorAll('.' + constants.ITEM_CLASS);
     css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
@@ -2886,7 +2886,7 @@ View.prototype.changeItem = function changeItem(idx, data) {
     this.redraw();
     this.show();
 
-    var els = this.el.getElementsByClassName(constants.ITEM_CLASS);
+    var els = this.el.querySelectorAll('.' + constants.ITEM_CLASS);
     css.add(els[idx], constants.ITEM_CHANGED_CLASS);
 };
 
@@ -3006,5 +3006,5 @@ module.exports = viewevents = {
 
 };
 
-},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[9,11,10,12,13,14,15,16,17,18,19,20,21,22,23])
 ;
