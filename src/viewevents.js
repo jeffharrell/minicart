@@ -13,8 +13,11 @@ module.exports = viewevents = {
             className = target.className;
 
         if (this.isShowing) {
+            // Cart checkout button
+            if (className === constants.SUBMIT_CLASS) {
+                this.model.cart.checkout(evt);
             // Cart close button
-            if (className === constants.CLOSER_CLASS) {
+            } else if (className === constants.CLOSER_CLASS) {
                 this.hide();
             // Product remove button
             } else if (className === constants.REMOVE_CLASS) {
