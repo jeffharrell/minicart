@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+	<span id="addcart">Add to cart</span> | <span id="viewcart">show cart</span>
+
+	<script src="../dist/minicart.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+	<script>
+		paypal.minicart.render();
+
+		$('#viewcart').click(function (e) {
+			e.stopPropagation();
+
+			paypal.minicart.view.show();
+		});
+
+		$('#addcart').click(function (e) {
+			e.stopPropagation();
+
+			paypal.minicart.cart.add({
+				business: 'user@example.com',
+				item_name: 'Product',
+				amount: 5.00,
+				currency_code: 'USD'
+			});
+		});
+	</script>
+</body>
+</html>

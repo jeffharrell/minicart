@@ -2801,14 +2801,7 @@ function View(model) {
  * Tells the view to redraw
  */
 View.prototype.redraw = function redraw() {
-    var form;
-
-    if ((form = this.el.querySelector('form'))) {
-        events.remove(form, 'submit', this.model.cart.checkout);
-    }
-
     this.el.innerHTML = template(config.template, this.model);
-    events.add(this.el.querySelector('form'), 'submit', this.model.cart.checkout, this);
 };
 
 
@@ -2939,8 +2932,11 @@ module.exports = viewevents = {
             className = target.className;
 
         if (this.isShowing) {
+            // Cart checkout button
+            if (className === constants.SUBMIT_CLASS) {
+                this.model.cart.checkout(evt);
             // Cart close button
-            if (className === constants.CLOSER_CLASS) {
+            } else if (className === constants.CLOSER_CLASS) {
                 this.hide();
             // Product remove button
             } else if (className === constants.REMOVE_CLASS) {
@@ -3021,5 +3017,5 @@ module.exports = viewevents = {
 
 };
 
-},{"./constants":11,"./util/events":16}]},{},[10,11,9,12,13,14,15,16,17,18,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[9,12,11,14,10,13,15,16,17,18,19,20,21,22,23])
 ;
