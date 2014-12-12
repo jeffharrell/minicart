@@ -1,48 +1,48 @@
 @keyframes pop-in {
     0% {
         opacity: 0;
-        transform: scale(0.1) translateX(-50%) translateY(-50%) translateZ(0);
+        transform: scale(0.1, 0.1) translateX(-50%) translateY(-50%) translateZ(0);
     }
 
     60% {
         opacity: 1;
-        transform: scale(1.2) translateX(-50%) translateY(-50%) translateZ(0);
+        transform: scale(1.2, 1.2) translateX(-40%) translateY(-40%) translateZ(0);
     }
 
     100% {
-        transform: scale(1) translateX(-50%) translateY(-50%) translateZ(0);
+        -webkit-transform: scale(1, 1) translateX(-50%) translateY(-50%) translateZ(0);
     };
 }
 
 @-webkit-keyframes pop-in {
     0% {
         opacity: 0;
-        -webkit-transform: scale(0.1) translateX(-50%) translateY(-50%) translateZ(0);
+        transform: scale(0.1, 0.1) translateX(-50%) translateY(-50%) translateZ(0);
     }
 
     60% {
         opacity: 1;
-        -webkit-transform: scale(1.2) translateX(-50%) translateY(-50%) translateZ(0);
+        transform: scale(1.2, 1.2) translateX(-40%) translateY(-40%) translateZ(0);
     }
 
     100% {
-        -webkit-transform: scale(1) translateX(-50%) translateY(-50%) translateZ(0);
+        -webkit-transform: scale(1, 1) translateX(-50%) translateY(-50%) translateZ(0);
     };
 }
 
 @-moz-keyframes pop-in {
     0% {
         opacity: 0;
-        -moz-transform: scale(0.1) translateX(-50%) translateY(-50%) translateZ(0);
+        transform: scale(0.1, 0.1) translateX(-50%) translateY(-50%) translateZ(0);
     }
 
     60% {
         opacity: 1;
-        -moz-transform: scale(1.2) translateX(-50%) translateY(-50%) translateZ(0);
+        transform: scale(1.2, 1.2) translateX(-40%) translateY(-40%) translateZ(0);
     }
 
     100% {
-        -moz-transform: scale(1) translateX(-50%) translateY(-50%) translateZ(0);
+        -webkit-transform: scale(1, 1) translateX(-50%) translateY(-50%) translateZ(0);
     };
 }
 
@@ -219,6 +219,8 @@
     font-size: 13px;
     opacity: 0.70;
     cursor: pointer;
+    font-weight: normal;
+    text-shadow: none;
 }
 
 #PPMiniCart .minicart-remove:hover {
