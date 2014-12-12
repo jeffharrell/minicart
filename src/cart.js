@@ -235,6 +235,7 @@ Cart.prototype.save = function save() {
  * @param {object} The initiating event
  */
 Cart.prototype.checkout = function checkout(evt) {
+    console.log('cart checkout');
     this.fire('checkout', evt);
 };
 
