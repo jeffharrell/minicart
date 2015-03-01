@@ -43,7 +43,9 @@ function View(model) {
  * Tells the view to redraw
  */
 View.prototype.redraw = function redraw() {
+    events.remove(this.el.querySelector('form'), 'submit', this.model.cart.checkout, this.model.cart);
     this.el.innerHTML = template(config.template, this.model);
+    events.add(this.el.querySelector('form'), 'submit', this.model.cart.checkout, this.model.cart);
 };
 
 
