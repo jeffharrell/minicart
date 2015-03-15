@@ -1,0 +1,17 @@
+{
+  "name": "minicart",
+  "homepage": "http://minicartjs.com",
+  "description": "The minicart is a great way to improve your PayPal shopping cart integration.",
+  "main": "dist/minicart.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "Gruntfile.js",
+    "bin",
+    "examples",
+    "tasks"
+  ]
+}
