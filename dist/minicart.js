@@ -2,7 +2,7 @@
  * minicart
  * The Mini Cart is a great way to improve your PayPal shopping cart integration.
  *
- * @version 3.0.5
+ * @version 3.0.6
  * @author Jeff Harrell <https://github.com/jeffharrell/>
  * @url http://www.minicartjs.com/
  * @license MIT <https://github.com/jeffharrell/minicart/raw/master/LICENSE.md>
@@ -3016,5 +3016,5 @@ module.exports = viewevents = {
 
 };
 
-},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,18,17,19,20,21,22,23])
+},{"./constants":11,"./util/events":16}]},{},[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
 ;
