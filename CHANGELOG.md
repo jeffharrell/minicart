@@ -1,6 +1,12 @@
 # CHANGELOG
 
 
+## 3.0.6
+
+* Fixing checkout event issue (thanks to @jakeday)
+* Adding bower.json meta data
+
+
 ## 3.0.5
 
 * Fixing support for shipping amounts; Resolves #215
