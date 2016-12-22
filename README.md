@@ -1,11 +1,10 @@
 # Minicart.js
 
+*As much as I love it, this project is no longer supported with me being short on time. I am open to Pull Requests and if anyone is interested in taking it on please let me know.*
+
 [![Build Status](https://travis-ci.org/jeffharrell/minicart.png?branch=master)](https://travis-ci.org/jeffharrell/minicart)
 
 The minicart is a great way to improve your PayPal shopping cart integration. One simple change and your users will be able to manage their shopping cart directly from your website. Additional APIs provide you the power to customize the behavior to your needs.
-
-*As much as I love it, this project is no longer supported with me being short on time. I am open to Pull Requests and if anyone is interested in taking it on please let me know.*
-
 
 1. [Basic Setup](#basic-setup)
 2. [Advanced API](#advanced-api)
