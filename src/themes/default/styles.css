@@ -1,72 +1,109 @@
 @keyframes pop-in {
-    0% { opacity: 0; transform: scale(0.1); }
-    60% { opacity: 1; transform: scale(1.2); }
-    100% { transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.1, 0.1) translateX(-50%) translateY(-50%) translateZ(0);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.2, 1.2) translateX(-40%) translateY(-40%) translateZ(0);
+    }
+
+    100% {
+        -webkit-transform: scale(1, 1) translateX(-50%) translateY(-50%) translateZ(0);
+    };
 }
 
 @-webkit-keyframes pop-in {
-    0% { opacity: 0; -webkit-transform: scale(0.1); }
-    60% { opacity: 1; -webkit-transform: scale(1.2); }
-    100% { -webkit-transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.1, 0.1) translateX(-50%) translateY(-50%) translateZ(0);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.2, 1.2) translateX(-40%) translateY(-40%) translateZ(0);
+    }
+
+    100% {
+        -webkit-transform: scale(1, 1) translateX(-50%) translateY(-50%) translateZ(0);
+    };
 }
 
 @-moz-keyframes pop-in {
-    0% { opacity: 0; -moz-transform: scale(0.1); }
-    60% { opacity: 1; -moz-transform: scale(1.2); }
-    100% { -moz-transform: scale(1); }
-}
+    0% {
+        opacity: 0;
+        transform: scale(0.1, 0.1) translateX(-50%) translateY(-50%) translateZ(0);
+    }
 
+    60% {
+        opacity: 1;
+        transform: scale(1.2, 1.2) translateX(-40%) translateY(-40%) translateZ(0);
+    }
+
+    100% {
+        -webkit-transform: scale(1, 1) translateX(-50%) translateY(-50%) translateZ(0);
+    };
+}
 
 .minicart-showing #PPMiniCart {
     display: block;
 
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    -moz-transform: translateZ(0);
-
+    transform: translateX(-50%) translateY(-50%) translateZ(0);
+    -webkit-transform: translateX(-50%) translateY(-50%) translateZ(0);
+    -moz-transform: translateX(-50%) translateY(-50%) translateZ(0);
+    
     animation: pop-in 0.25s;
     -webkit-animation: pop-in 0.25s;
     -moz-animation: pop-in 0.25s;
 }
 
 #PPMiniCart {
+    width: 50vw;
+    max-width: 400px;
     display: none;
     position: fixed;
     left: 50%;
-    top: 75px;
+    top: 50%;
 }
 
-#PPMiniCart form {
+#PPMiniCart .minicart-display{
     position: relative;
-    width: 400px;
     max-height: 400px;
-    margin-left: -200px;
-    padding: 10px 10px 40px;
+    padding: 10px;
     background: #fbfbfb;
     border: 1px solid #d7d7d7;
     border-radius: 4px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
     font: 15px/normal arial, helvetica;
-    color: #333;
+    color: #333;    
 }
 
-#PPMiniCart form.minicart-empty {
+#PPMiniCart form {
+}
+
+#PPMiniCart .minicart-empty {
     padding-bottom: 10px;
     font-size: 16px;
     font-weight: bold;
 }
 
-#PPMiniCart ul {
+#PPMiniCart .minicart-list{
+    overflow-y: auto;
+    overflow-x: hidden;
     clear: both;
     float: left;
-    width: 380px;
-    margin: 5px 0 20px;
-    padding: 10px;
-    list-style-type: none;
+    height: 314px;
+    width: 100%;
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+#PPMiniCart ul {
+    list-style-type: none;
+    padding: 10px;
 }
 
 #PPMiniCart .minicart-empty ul {
@@ -84,7 +121,6 @@
     cursor: pointer;
     font-weight: bold;
 }
-
 
 #PPMiniCart .minicart-item {
     clear: left;
@@ -150,12 +186,12 @@
     width: 30px;
     height: 18px;
     padding: 2px 4px;
+    margin: 0;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     font-size: 13px;
     text-align: right;
-
     transition: border linear 0.2s, box-shadow linear 0.2s;
     -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
     -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
@@ -183,6 +219,8 @@
     font-size: 13px;
     opacity: 0.70;
     cursor: pointer;
+    font-weight: normal;
+    text-shadow: none;
 }
 
 #PPMiniCart .minicart-remove:hover {
@@ -190,22 +228,20 @@
 }
 
 #PPMiniCart .minicart-footer {
-    clear: left;
+    clear: both;
+    min-height: 54px;
+    padding: 16px 0;
 }
 
 #PPMiniCart .minicart-subtotal {
-    position: absolute;
-    bottom: 17px;
     padding-left: 6px;
-    left: 10px;
+    float: left;
     font-size: 16px;
     font-weight: bold;
 }
 
 #PPMiniCart .minicart-submit {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+    float:right;
     min-width: 153px;
     height: 33px;
     margin-right: 6px;
@@ -215,7 +251,6 @@
     color: #000;
     text-shadow: 1px 1px 1px #fff6e9;
     cursor: pointer;
-
     background: #ffaa00;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZjZlOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmFhMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, #fff6e9 0%, #ffaa00 100%);
@@ -229,4 +264,43 @@
 #PPMiniCart .minicart-submit img {
     vertical-align: middle;
     padding: 4px 0 0 2px;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow:none
+}
+
+
+
+@media only screen and (max-width : 780px) {
+    #PPMiniCart{
+        width: 80vw;
+        max-width: 700px;
+    }
+}
+
+@media only screen and (max-width : 460px) {
+    #PPMiniCart{
+        width: 95vw;
+        max-width: 440px;
+    }
+}
+
+@media only screen and (max-width : 460px) {
+    #PPMiniCart .minicart-display{
+        height: 428px;
+        max-height: 428px;
+    }
+
+    #PPMiniCart .minicart-footer{
+        text-align: center;
+    }
+
+    #PPMiniCart .minicart-subtotal{
+        float: initial;
+        padding-bottom: 8px;
+    }
+
+    #PPMiniCart .minicart-submit{
+        float: initial;
+    }
 }
