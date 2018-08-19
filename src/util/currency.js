@@ -8,6 +8,7 @@ var currencies = {
     AUD: { before: '$', code: true },
     AWG: { before: '\u0192' },
     BBD: { before: '$', code: true },
+    BDT: { before: '৳', code:true },
     BGN: { before: '\u043b\u0432' },
     BMD: { before: '$', code: true },
     BND: { before: '$', code: true },
